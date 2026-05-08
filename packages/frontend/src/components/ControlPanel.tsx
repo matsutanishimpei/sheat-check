@@ -26,6 +26,8 @@ export const ControlPanel = React.memo(({
   onSaveClassroom,
   isSaving,
 }: ControlPanelProps) => {
+  const studentInviteUrl = roomId ? `${window.location.origin}/student/${roomId}` : '';
+
   return (
     <div className="workspace-header">
       <div className="workspace-title-group">
@@ -40,13 +42,13 @@ export const ControlPanel = React.memo(({
                 UUID チャンネル: <strong style={{ color: 'var(--text-primary)', userSelect: 'all' }}>{roomId}</strong>
               </p>
               <p style={{ fontSize: '0.7rem', color: 'var(--color-student)' }}>
-                🔗 <a href={`${window.location.origin}/?room=${roomId}`} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>学生用ログインリンクを開く</a>
+                🔗 <a href={studentInviteUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>学生用ログインリンクを開く</a>
               </p>
             </div>
             {/* Dynamic QR Code Generator (No external JS bundlers required) */}
             <div style={{ background: '#fff', padding: '0.25rem', borderRadius: 'var(--radius-sm)', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="スマホでスキャンして簡単入室">
               <img 
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(`${window.location.origin}/?room=${roomId}`)}`} 
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=60x60&data=${encodeURIComponent(studentInviteUrl)}`} 
                 alt="QR Code" 
                 style={{ width: '60px', height: '60px', display: 'block' }} 
               />

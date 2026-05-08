@@ -135,3 +135,12 @@
 - [x] Integrate URL dynamic entry: parse `?room=UUID` query parameters on app load, auto-triggering student login setup
 - [x] Add lightweight QR Code Generator overlay to Teacher's View header to ease mobile access for students
 - [x] Execute production build (`npm run build`) and perform end-to-end integration verification
+
+### Phase 11: Route Separation (Teacher vs Student Pages)
+- [x] Install `react-router-dom` in `packages/frontend`
+- [x] Create `TeacherPage.tsx` and `StudentPage.tsx` components to house their respective logic
+- [x] Refactor `App.tsx` to use `<BrowserRouter>`, `<Routes>`, and `<Route>`
+- [x] Move Teacher-specific state (`useRoomLayout`, `useSeatManager`) into `TeacherPage.tsx`
+- [x] Move Student-specific state (`useRealtimeSession` auto-login) into `StudentPage.tsx`
+- [x] Update QR Code generation in `ControlPanel.tsx` to use the new `/student/:roomId` path
+- [x] Verify functionality and execute production build
