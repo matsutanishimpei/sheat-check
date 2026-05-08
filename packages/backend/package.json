@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
+    "build": "tsc --noEmit",
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
-    "hono": "^4.4.7",
-    "@my-app/shared": "*"
+    "@hono/zod-validator": "^0.7.6",
+    "@my-app/shared": "*",
+    "hono": "^4.4.7"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240529.0",

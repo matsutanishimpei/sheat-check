@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "ignoreDeprecations": "5.0",
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -8,6 +9,7 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
+    "types": ["@cloudflare/workers-types"],
     "baseUrl": ".",
     "paths": {
       "@my-app/shared": ["./packages/shared/src/index.ts"],
