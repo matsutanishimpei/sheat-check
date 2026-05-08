@@ -116,3 +116,22 @@
   - [x] Apply `React.memo` to `ControlPanel` to isolate button actions
   - [x] Wrap critical event callbacks (`handleDragEnd`, `handleCellCycle`) in `useCallback` inside `main.tsx`
 - [x] Verify typecheck and production build compilations compile with 100% success
+
+### Phase 9: Local Launch and Verification
+- [x] Set up tasks/todo.md for application launch
+- [x] Run backend migrations locally
+- [x] Launch backend development server (Wrangler)
+- [x] Launch frontend development server (Vite)
+- [x] Open browser to verify application functionality
+
+### Phase 10: Multi-Teacher Decentralized Realtime Sync
+- [x] Define updated Zod schema inside `packages/shared/src/schemas/roomLayout.ts` (add `supabaseUrl` and `supabaseAnonKey` to `SaveRoomLayoutInputSchema`)
+- [x] Create database migration `0002_add_supabase_config_to_rooms.sql` in `packages/backend/migrations/`
+- [x] Apply migration locally via wrangler to local D1 SQLite DB
+- [x] Update Hono API endpoints (`POST /api/rooms`, `PUT /api/rooms/:id`, `GET /api/rooms/:id`) to handle, save, and return Supabase configurations
+- [x] Refactor `useRoomLayout.ts` to include Supabase credentials in save payloads and load states
+- [x] Modify `useRealtimeSession.ts` to support dynamic Supabase initialization based on active loaded room settings (instead of strict localStorage dependencies)
+- [x] Refactor Student Config / Select Wizard to dynamically fetch Supabase configurations from Hono / D1 DB when logging in via Room UUID
+- [x] Integrate URL dynamic entry: parse `?room=UUID` query parameters on app load, auto-triggering student login setup
+- [x] Add lightweight QR Code Generator overlay to Teacher's View header to ease mobile access for students
+- [x] Execute production build (`npm run build`) and perform end-to-end integration verification

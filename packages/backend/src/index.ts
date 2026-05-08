@@ -24,9 +24,9 @@ const routes = app
     const id = c.req.param('id');
     
     try {
-      const room = await c.env.DB.prepare('SELECT id, name, layout_data FROM rooms WHERE id = ?')
+      const room = await c.env.DB.prepare('SELECT id, name, layout_data, supabase_url, supabase_anon_key FROM rooms WHERE id = ?')
         .bind(id)
-        .first<{ id: string; name: string; layout_data: string }>();
+        .first<{ id: string; name: string; layout_data: string; supabase_url: string | null; supabase_anon_key: string | null }>();
 
       if (!room) {
         return c.json({ error: 'Room not found' }, 404);
@@ -38,6 +38,8 @@ const routes = app
         id: room.id,
         name: room.name,
         layouts,
+        supabaseUrl: room.supabase_url || '',
+        supabaseAnonKey: room.supabase_anon_key || '',
       });
     } catch (err: any) {
       return c.json({ error: 'Internal Server Error', message: err.message }, 500);
@@ -52,14 +54,16 @@ const routes = app
     try {
       const layoutDataStr = JSON.stringify(body.layouts);
 
-      await c.env.DB.prepare('INSERT INTO rooms (id, name, layout_data) VALUES (?, ?, ?)')
-        .bind(id, body.name, layoutDataStr)
+      await c.env.DB.prepare('INSERT INTO rooms (id, name, layout_data, supabase_url, supabase_anon_key) VALUES (?, ?, ?, ?, ?)')
+        .bind(id, body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey)
         .run();
 
       return c.json({
         id,
         name: body.name,
         layouts: body.layouts,
+        supabaseUrl: body.supabaseUrl,
+        supabaseAnonKey: body.supabaseAnonKey,
       }, 201);
     } catch (err: any) {
       return c.json({ error: 'Failed to create room', message: err.message }, 500);
@@ -83,14 +87,16 @@ const routes = app
 
       const layoutDataStr = JSON.stringify(body.layouts);
 
-      await c.env.DB.prepare('UPDATE rooms SET name = ?, layout_data = ? WHERE id = ?')
-        .bind(body.name, layoutDataStr, id)
+      await c.env.DB.prepare('UPDATE rooms SET name = ?, layout_data = ?, supabase_url = ?, supabase_anon_key = ? WHERE id = ?')
+        .bind(body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey, id)
         .run();
 
       return c.json({
         id,
         name: body.name,
         layouts: body.layouts,
+        supabaseUrl: body.supabaseUrl,
+        supabaseAnonKey: body.supabaseAnonKey,
       });
     } catch (err: any) {
       return c.json({ error: 'Failed to update room', message: err.message }, 500);

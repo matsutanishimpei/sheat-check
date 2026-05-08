@@ -21,5 +21,7 @@ export const SaveRoomLayoutInputSchema = z.object({
   layouts: z.array(RoomLayoutSchema)
     .min(1, 'At least one layout is required')
     .max(5, 'A maximum of 5 layouts (cases) can be saved'),
+  supabaseUrl: z.string().min(1, 'Supabase URL is required'),
+  supabaseAnonKey: z.string().min(1, 'Supabase Anon Key is required'),
 });
 

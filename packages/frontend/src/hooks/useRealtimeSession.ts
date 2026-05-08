@@ -10,6 +10,10 @@ interface UseRealtimeSessionProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
   onTeacherReset: () => void;
   onTeacherLockState: (locked: boolean) => void;
+  supabaseUrl: string;
+  setSupabaseUrl: (val: string) => void;
+  supabaseAnonKey: string;
+  setSupabaseAnonKey: (val: string) => void;
 }
 
 export function useRealtimeSession({
@@ -20,15 +24,17 @@ export function useRealtimeSession({
   addToast,
   onTeacherReset,
   onTeacherLockState,
+  supabaseUrl,
+  setSupabaseUrl,
+  supabaseAnonKey,
+  setSupabaseAnonKey,
 }: UseRealtimeSessionProps) {
-  const [supabaseUrl, setSupabaseUrl] = useState(() => localStorage.getItem('sb_url') || '');
-  const [supabaseAnonKey, setSupabaseAnonKey] = useState(() => localStorage.getItem('sb_key') || '');
   const [supabase, setSupabase] = useState<SupabaseClient | null>(() => {
     const url = localStorage.getItem('sb_url');
     const key = localStorage.getItem('sb_key');
     if (url && key) {
       try {
-        return createClient(url, key);
+        return createClient(url.trim(), key.trim());
       } catch (err) {
         console.error('Supabase initialization failed:', err);
       }
@@ -38,6 +44,31 @@ export function useRealtimeSession({
 
   const [realtimeLogs, setRealtimeLogs] = useState<RealtimeLog[]>([]);
   const [isOnline, setIsOnline] = useState(true);
+
+  // Dynamically re-initialize Supabase client when credentials update
+  useEffect(() => {
+    const trimmedUrl = supabaseUrl.trim();
+    const trimmedKey = supabaseAnonKey.trim();
+
+    if (trimmedUrl && trimmedKey) {
+      try {
+        const client = createClient(trimmedUrl, trimmedKey);
+        setSupabase(client);
+        
+        try {
+          localStorage.setItem('sb_url', trimmedUrl);
+          localStorage.setItem('sb_key', trimmedKey);
+        } catch (storageErr) {
+          console.warn('Failed to save Supabase config to localStorage (Private Window?):', storageErr);
+        }
+      } catch (err) {
+        console.error('Dynamic Supabase re-initialization failed:', err);
+        setSupabase(null);
+      }
+    } else {
+      setSupabase(null);
+    }
+  }, [supabaseUrl, supabaseAnonKey]);
 
   const teacherChannelRef = useRef<RealtimeChannel | null>(null);
   const studentChannelRef = useRef<RealtimeChannel | null>(null);
@@ -60,16 +91,29 @@ export function useRealtimeSession({
 
   // Initialize/Update Supabase client
   const saveSupabaseConfig = useCallback(() => {
-    if (!supabaseUrl.trim() || !supabaseAnonKey.trim()) {
+    const trimmedUrl = supabaseUrl.trim();
+    const trimmedKey = supabaseAnonKey.trim();
+    
+    if (!trimmedUrl || !trimmedKey) {
       addToastRef.current('error', 'Supabase URL と Anon Key を両方とも入力してください');
       return;
     }
     try {
-      const client = createClient(supabaseUrl, supabaseAnonKey);
+      const client = createClient(trimmedUrl, trimmedKey);
       setSupabase(client);
-      localStorage.setItem('sb_url', supabaseUrl);
-      localStorage.setItem('sb_key', supabaseAnonKey);
-      addToastRef.current('success', 'Supabase 接続設定を保存しました！');
+      
+      try {
+        localStorage.setItem('sb_url', trimmedUrl);
+        localStorage.setItem('sb_key', trimmedKey);
+      } catch (storageErr) {
+        console.warn('Failed to save to localStorage:', storageErr);
+      }
+      
+      if (!roomIdRef.current) {
+        addToastRef.current('success', '接続設定をローカルに保持しました！次に、右上の「D1 に保存」で教室を新規登録してください。');
+      } else {
+        addToastRef.current('success', '接続設定をローカルに保持しました！');
+      }
     } catch (err: any) {
       addToastRef.current('error', `接続設定エラー: ${err.message}`);
     }

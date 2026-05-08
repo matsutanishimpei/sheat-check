@@ -39,6 +39,10 @@ const App = () => {
   const [studentRoomTitle, setStudentRoomTitle] = useState('');
   const [studentLiveSeatLocked, setStudentLiveSeatLocked] = useState(false);
 
+  // Supabase states managed at the root component to prevent circular dependency TDZ errors
+  const [supabaseUrl, setSupabaseUrl] = useState(() => localStorage.getItem('sb_url') || '');
+  const [supabaseAnonKey, setSupabaseAnonKey] = useState(() => localStorage.getItem('sb_key') || '');
+
   // UI state for Toast messages
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
 
@@ -77,6 +81,10 @@ const App = () => {
   } = useRoomLayout({
     addToast,
     onClearLiveStatuses: () => setLiveStatuses({}),
+    supabaseUrl,
+    supabaseAnonKey,
+    setSupabaseUrl,
+    setSupabaseAnonKey,
   });
 
   // 2. Teacher Seat Management & Local Persistence (localStorage)
@@ -95,10 +103,6 @@ const App = () => {
 
   // 3. Realtime Supabase sessions & log feeds (Supabase Broadcast)
   const {
-    supabaseUrl,
-    setSupabaseUrl,
-    supabaseAnonKey,
-    setSupabaseAnonKey,
     supabase,
     saveSupabaseConfig,
     realtimeLogs,
@@ -130,6 +134,10 @@ const App = () => {
         addToast('info', '教員によって座席ロックが解除されました');
       }
     },
+    supabaseUrl,
+    setSupabaseUrl,
+    supabaseAnonKey,
+    setSupabaseAnonKey,
   });
 
   // Wrapper functions for UI triggers
@@ -148,6 +156,75 @@ const App = () => {
   /* ==========================================================================
      Student Stage Handlers (Login & Grid Locks)
      ========================================================================== */
+  // Handle auto-login and metadata fetch via URL query parameter (?room=UUID) on app load
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const roomParam = params.get('room');
+    if (roomParam && roomParam.trim()) {
+      const cleanUuid = roomParam.trim();
+      setStudentClassroomId(cleanUuid);
+      setViewMode('student');
+
+      const storedName = localStorage.getItem(`student_name_${cleanUuid}`);
+      const storedSeatId = localStorage.getItem(`student_seat_id_${cleanUuid}`);
+
+      if (storedName) {
+        setStudentName(storedName);
+        if (storedSeatId) {
+          setStudentSeatId(storedSeatId);
+        }
+      }
+
+      // Fetch room metadata and Supabase config regardless of name presence (crucial for first-time students!)
+      const fetchRoomAndSetup = async () => {
+        try {
+          const res = await client.api.rooms[':id'].$get({
+            param: { id: cleanUuid },
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setStudentRoomTitle(data.name);
+            
+            if (data.supabaseUrl && data.supabaseAnonKey) {
+              setSupabaseUrl(data.supabaseUrl);
+              setSupabaseAnonKey(data.supabaseAnonKey);
+            } else {
+              addToast('error', 'この教室はまだ教員による Supabase 接続設定が保存されていません。教員に確認してください。');
+            }
+
+            const firstLayout = data.layouts[0];
+            const gridObj: Record<string, GridItem['type']> = {};
+            if (firstLayout && firstLayout.grid) {
+              firstLayout.grid.forEach((item: GridItem) => {
+                gridObj[`${item.x},${item.y}`] = item.type;
+              });
+            }
+            setStudentGridLayout(gridObj);
+
+            if (storedName) {
+              if (storedSeatId) {
+                setStudentStage('dashboard');
+                addToast('success', `教室「${data.name}」の固定席 (${storedSeatId}) に自動チェックインしました！`);
+              } else {
+                setStudentStage('select');
+                addToast('info', `教室「${data.name}」の座席選択画面へ進みます`);
+              }
+            } else {
+              addToast('info', `教室「${data.name}」への招待リンクをロードしました。お名前を入力して入室してください！`);
+            }
+          } else {
+            addToast('error', '指定された招待リンクの教室が見つかりませんでした。');
+          }
+        } catch (err: any) {
+          console.error('URL setup failed:', err);
+          addToast('error', `教室データの取得エラー: ${err.message}`);
+        }
+      };
+
+      fetchRoomAndSetup();
+    }
+  }, [addToast, setSupabaseUrl, setSupabaseAnonKey]);
+
   const handleStudentLogin = async () => {
     if (!studentClassroomId.trim()) {
       addToast('error', '教室の UUID を入力してください');
@@ -167,6 +244,14 @@ const App = () => {
       if (res.ok) {
         const data = await res.json();
         setStudentRoomTitle(data.name);
+
+        // Fetch Supabase configuration set by Teacher
+        if (data.supabaseUrl && data.supabaseAnonKey) {
+          setSupabaseUrl(data.supabaseUrl);
+          setSupabaseAnonKey(data.supabaseAnonKey);
+        } else {
+          addToast('warning', 'この教室は Supabase 接続設定がまだ完了していません。教員が設定を保存するまでブロードキャストが使えません。');
+        }
 
         // Fetch Case 1 grid structure
         const firstLayout = data.layouts[0];
@@ -338,7 +423,12 @@ const App = () => {
           setSupabaseUrl={setSupabaseUrl}
           supabaseAnonKey={supabaseAnonKey}
           setSupabaseAnonKey={setSupabaseAnonKey}
-          onSaveSupabaseConfig={saveSupabaseConfig}
+          onSaveSupabaseConfig={async () => {
+            saveSupabaseConfig();
+            if (roomId) {
+              await saveClassroom();
+            }
+          }}
           roomName={roomName}
           setRoomName={setRoomName}
           onCreateNewSession={createNewClassroomSession}

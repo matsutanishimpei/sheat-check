@@ -10,9 +10,20 @@ export interface EditorCase {
 interface UseRoomLayoutProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
   onClearLiveStatuses: () => void;
+  supabaseUrl: string;
+  supabaseAnonKey: string;
+  setSupabaseUrl: (val: string) => void;
+  setSupabaseAnonKey: (val: string) => void;
 }
 
-export function useRoomLayout({ addToast, onClearLiveStatuses }: UseRoomLayoutProps) {
+export function useRoomLayout({
+  addToast,
+  onClearLiveStatuses,
+  supabaseUrl,
+  supabaseAnonKey,
+  setSupabaseUrl,
+  setSupabaseAnonKey,
+}: UseRoomLayoutProps) {
   const [roomName, setRoomName] = useState('一般講義室 301');
   const [roomId, setRoomId] = useState<string | null>(null);
   const [cases, setCases] = useState<EditorCase[]>([
@@ -53,6 +64,10 @@ export function useRoomLayout({ addToast, onClearLiveStatuses }: UseRoomLayoutPr
         const data = await res.json();
         setRoomId(data.id);
         setRoomName(data.name);
+        
+        // Load Supabase configurations into state
+        setSupabaseUrl(data.supabaseUrl);
+        setSupabaseAnonKey(data.supabaseAnonKey);
 
         const loadedCases: EditorCase[] = data.layouts.map((l: any) => {
           const gridObj: Record<string, GridItem['type']> = {};
@@ -82,6 +97,10 @@ export function useRoomLayout({ addToast, onClearLiveStatuses }: UseRoomLayoutPr
       addToast('error', '教室名を入力してください');
       return;
     }
+    if (!supabaseUrl.trim() || !supabaseAnonKey.trim()) {
+      addToast('error', '教室を保存するには、先に教員用設定パネルから Supabase 接続設定を保存してください。');
+      return;
+    }
 
     setIsSaving(true);
     
@@ -109,6 +128,8 @@ export function useRoomLayout({ addToast, onClearLiveStatuses }: UseRoomLayoutPr
           json: {
             name: roomName,
             layouts: formattedLayouts,
+            supabaseUrl,
+            supabaseAnonKey,
           },
         });
 
@@ -124,6 +145,8 @@ export function useRoomLayout({ addToast, onClearLiveStatuses }: UseRoomLayoutPr
           json: {
             name: roomName,
             layouts: formattedLayouts,
+            supabaseUrl,
+            supabaseAnonKey,
           },
         });
 
