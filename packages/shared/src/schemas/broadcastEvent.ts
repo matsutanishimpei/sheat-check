@@ -9,6 +9,8 @@ export const StudentToTeacherEventSchema = z.object({
   seatId: z.string().min(1, 'Seat ID is required'),
   status: SeatStatusTypeSchema,
   studentName: z.string().min(1, 'Student name is required'),
+  studentId: z.string().min(5, 'Student ID must be at least 5 characters').max(15, 'Student ID must be at most 15 characters'),
+  responseTime: z.number().nonnegative().optional(),
   comment: z.string().nullable().optional(),
 });
 
