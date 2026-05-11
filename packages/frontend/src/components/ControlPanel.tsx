@@ -11,6 +11,7 @@ interface ControlPanelProps {
   onBulkReset: () => void;
   onSaveClassroom: () => void;
   isSaving: boolean;
+  mode?: 'layout' | 'monitor';
 }
 
 export const ControlPanel = React.memo(({
@@ -23,14 +24,23 @@ export const ControlPanel = React.memo(({
   onBulkReset,
   onSaveClassroom,
   isSaving,
+  mode = 'layout',
 }: ControlPanelProps) => {
 
   return (
     <div className="workspace-header">
       <div className="workspace-title-group">
-        <h2 className="workspace-title">教室設定</h2>
+        <h2 className="workspace-title">{mode === 'monitor' ? '教員用監視' : '教室設定'}</h2>
         <p className="workspace-subtitle">
-          {roomName} / <strong style={{ color: 'var(--color-student)' }}>{caseName || '通常講義 (標準)'}</strong> を編集中
+          {mode === 'monitor' ? (
+            <>
+              {roomName} / <strong style={{ color: 'var(--color-teacher)' }}>リアルタイム監視中</strong>
+            </>
+          ) : (
+            <>
+              {roomName} / <strong style={{ color: 'var(--color-student)' }}>{caseName || '通常講義 (標準)'}</strong> を編集中
+            </>
+          )}
         </p>
         {roomId ? (
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
@@ -43,34 +53,43 @@ export const ControlPanel = React.memo(({
         )}
       </div>
       <div className="btn-group">
-        {/* Seat Lock Custom Switch Toggle */}
-        <div 
-          className="toggle-container" 
-          onClick={onToggleSeatLock}
-          title="ONにすると、学生は自分の登録座席を変更できなくなります"
-        >
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            {isSeatLocked ? <Lock size={14} style={{ color: 'var(--color-teacher)' }} /> : <Unlock size={14} style={{ color: 'var(--color-door)' }} />}
-            座席ロック
-          </span>
-          <div className={`switch-track ${isSeatLocked ? 'active' : ''}`}>
-            <div className="switch-thumb" />
-          </div>
-        </div>
+        {mode === 'monitor' && (
+          <>
+            {/* Seat Lock Custom Switch Toggle */}
+            <div 
+              className="toggle-container" 
+              onClick={onToggleSeatLock}
+              title="ONにすると、学生は自分の登録座席を変更できなくなります"
+            >
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                {isSeatLocked ? <Lock size={14} style={{ color: 'var(--color-teacher)' }} /> : <Unlock size={14} style={{ color: 'var(--color-door)' }} />}
+                座席ロック
+              </span>
+              <div className={`switch-track ${isSeatLocked ? 'active' : ''}`}>
+                <div className="switch-thumb" />
+              </div>
+            </div>
 
-        <button className="btn btn-secondary" onClick={onClearGrid}>
-          <Trash2 size={16} /> クリア
-        </button>
-        <button className="btn btn-danger" onClick={onBulkReset}>
-          <RotateCcw size={16} /> 一括リセット
-        </button>
-        <button 
-          className="btn btn-primary" 
-          disabled={isSaving} 
-          onClick={onSaveClassroom}
-        >
-          <Save size={16} /> {isSaving ? '保存中...' : 'D1 に保存'}
-        </button>
+            <button className="btn btn-danger" onClick={onBulkReset}>
+              <RotateCcw size={16} /> 一括リセット
+            </button>
+          </>
+        )}
+
+        {mode === 'layout' && (
+          <>
+            <button className="btn btn-secondary" onClick={onClearGrid}>
+              <Trash2 size={16} /> クリア
+            </button>
+            <button 
+              className="btn btn-primary" 
+              disabled={isSaving} 
+              onClick={onSaveClassroom}
+            >
+              <Save size={16} /> {isSaving ? '保存中...' : 'D1 に保存'}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

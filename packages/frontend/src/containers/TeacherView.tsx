@@ -327,6 +327,7 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
             onBulkReset={onBulkReset}
             onSaveClassroom={onSaveClassroom}
             isSaving={isSaving}
+            mode={mode}
           />
 
           {/* Editor Panel Split */}
