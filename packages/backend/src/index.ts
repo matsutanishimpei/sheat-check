@@ -153,6 +153,29 @@ const routes = app
     } catch (err: any) {
       return c.json({ error: 'Failed to fetch rooms', message: err.message }, 500);
     }
+  })
+
+  // 5. DELETE /api/rooms/:id - Physically delete a classroom layout
+  .delete('/api/rooms/:id', async (c) => {
+    const id = c.req.param('id');
+
+    try {
+      const existing = await c.env.DB.prepare('SELECT 1 FROM rooms WHERE id = ?')
+        .bind(id)
+        .first();
+
+      if (!existing) {
+        return c.json({ error: 'Room not found' }, 404);
+      }
+
+      await c.env.DB.prepare('DELETE FROM rooms WHERE id = ?')
+        .bind(id)
+        .run();
+
+      return c.json({ success: true, id });
+    } catch (err: any) {
+      return c.json({ error: 'Failed to delete room', message: err.message }, 500);
+    }
   });
 
 export type AppType = typeof routes;

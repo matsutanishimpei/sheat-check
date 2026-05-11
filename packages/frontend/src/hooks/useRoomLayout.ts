@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import client from '../lib/hc';
 import { GridItem } from '@my-app/shared';
+import { createClient } from '@supabase/supabase-js';
 
 export interface EditorCase {
   caseName: string;
@@ -30,7 +31,7 @@ export function useRoomLayout({
     { caseName: '通常講義 (標準)', grid: {} }
   ]);
   const [activeCaseIdx, setActiveCaseIdx] = useState(0);
-  const [savedRooms, setSavedRooms] = useState<{ id: string; name: string }[]>([]);
+  const [savedRooms, setSavedRooms] = useState<{ id: string; name: string; supabaseUrl?: string; supabaseAnonKey?: string; }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingRooms, setIsLoadingRooms] = useState(false);
   const [isActive, setIsActive] = useState(true);
@@ -222,8 +223,60 @@ export function useRoomLayout({
       };
       return updated;
     });
-    onClearLiveStatuses();
-    addToast('info', 'レイアウトをクリアしました');
+  };
+
+  const deleteClassroom = async (id: string, sbUrl?: string, sbKey?: string) => {
+    if (!window.confirm('この講義室を完全に削除しますか？（この操作は取り消せません）')) {
+      return;
+    }
+
+    // 1. Properly notify students by sending a teacher_reset broadcast before deletion
+    const finalSbUrl = sbUrl || supabaseUrl;
+    const finalSbKey = sbKey || supabaseAnonKey;
+    if (finalSbUrl && finalSbKey) {
+      try {
+        const sb = createClient(finalSbUrl, finalSbKey);
+        const channel = sb.channel(id);
+        channel.subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.send({
+              type: 'broadcast',
+              event: 'teacher_reset',
+              payload: { timestamp: new Date().toISOString() },
+            });
+            sb.removeChannel(channel);
+          }
+        });
+      } catch (err) {
+        console.error('Failed to send closing broadcast to Supabase:', err);
+      }
+    }
+
+    // 2. Call the physical DELETE API
+    try {
+      const res = await client.api.rooms[':id'].$delete({
+        param: { id },
+      });
+
+      if (res.ok) {
+        addToast('success', '講義室を物理削除しました。');
+        // If we are currently editing the deleted classroom, clear the editor state
+        if (roomId === id) {
+          setRoomId(null);
+          setRoomName('新規講義室');
+          setCases([{ caseName: '通常講義 (標準)', grid: {} }]);
+          setActiveCaseIdx(0);
+          setIsActive(true);
+          onClearLiveStatuses();
+        }
+        fetchRooms();
+      } else {
+        const errData = await res.json() as any;
+        addToast('error', `講義室の削除に失敗しました: ${errData.error || '不明なエラー'}`);
+      }
+    } catch (err: any) {
+      addToast('error', `削除中に通信エラーが発生しました: ${err.message}`);
+    }
   };
 
   return {
@@ -249,5 +302,6 @@ export function useRoomLayout({
     updateActiveCaseName,
     updateGridCell,
     clearCurrentGrid,
+    deleteClassroom,
   };
 }

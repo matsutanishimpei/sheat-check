@@ -52,6 +52,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
     fetchRooms,
     clearCurrentGrid,
     updateGridCell,
+    deleteClassroom,
   } = useRoomLayout({
     addToast,
     onClearLiveStatuses: () => setLiveStatuses({}),
@@ -196,6 +197,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
         onClearGrid={clearCurrentGrid}
         onBulkReset={onHandleBulkReset}
         onSaveClassroom={saveClassroom}
+        onDeleteClassroom={deleteClassroom}
         isSaving={isSaving}
         onDragEnd={handleDragEnd}
         onCellCycle={handleCellCycle}

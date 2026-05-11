@@ -27,6 +27,8 @@ import { ControlPanel } from '../components/ControlPanel';
 interface SavedRoom {
   id: string;
   name: string;
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
 }
 
 interface EditorCase {
@@ -61,6 +63,7 @@ interface TeacherViewProps {
   onClearGrid: () => void;
   onBulkReset: () => void;
   onSaveClassroom: () => void;
+  onDeleteClassroom: (id: string, supabaseUrl?: string, supabaseAnonKey?: string) => void;
   isSaving: boolean;
   onDragEnd: (event: DragEndEvent) => void;
   onCellCycle: (x: number, y: number) => void;
@@ -143,6 +146,7 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
   onClearGrid,
   onBulkReset,
   onSaveClassroom,
+  onDeleteClassroom,
   isSaving,
   onDragEnd,
   onCellCycle,
@@ -198,14 +202,65 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
           ) : (
             <div className="room-list-container">
               {savedRooms.map((room) => (
-                <button
+                <div
                   key={room.id}
-                  onClick={() => onLoadClassroom(room.id)}
-                  className={`room-item-btn ${roomId === room.id ? 'selected' : ''}`}
+                  className={`room-item-wrapper ${roomId === room.id ? 'selected' : ''}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                    background: roomId === room.id ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.02)',
+                    border: roomId === room.id ? '1px solid var(--color-student)' : '1px solid var(--border-color)',
+                    borderRadius: '8px',
+                    padding: '0.15rem 0.4rem',
+                    marginBottom: '0.4rem',
+                    gap: '0.4rem',
+                  }}
                 >
-                  <span className="room-item-name">{room.name}</span>
-                  <FolderOpen size={14} style={{ opacity: 0.6 }} />
-                </button>
+                  <button
+                    onClick={() => onLoadClassroom(room.id)}
+                    style={{
+                      flex: 1,
+                      background: 'none',
+                      border: 'none',
+                      textAlign: 'left',
+                      color: 'var(--text-primary)',
+                      cursor: 'pointer',
+                      padding: '0.4rem 0.2rem',
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    {room.name}
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteClassroom(room.id, room.supabaseUrl, room.supabaseAnonKey);
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: 'var(--color-obstacle)',
+                      cursor: 'pointer',
+                      padding: '0.4rem',
+                      borderRadius: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      transition: 'background-color 0.2s',
+                    }}
+                    title="講義室を物理削除"
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               ))}
             </div>
           )}
