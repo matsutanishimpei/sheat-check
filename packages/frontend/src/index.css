@@ -472,6 +472,33 @@ body {
   aspect-ratio: 1;
 }
 
+.grid-9x9.grid-massive {
+  --cell-width: max(calc((100vw - 240px) / 9), var(--min-cell-width, 80px));
+  --cell-height: max(calc((100vh - 420px) / 9), var(--min-cell-height, 40px));
+
+  display: grid;
+  grid-template-columns: repeat(9, var(--cell-width));
+  grid-template-rows: repeat(9, var(--cell-height));
+  gap: 12px;
+  width: auto;
+  max-width: none;
+  aspect-ratio: auto;
+}
+
+.grid-9x9.grid-massive .grid-cell {
+  aspect-ratio: auto;
+  width: var(--cell-width);
+  height: var(--cell-height);
+}
+
+.grid-container-card.grid-massive-container {
+  min-height: auto;
+  padding: 2rem;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto; /* Handle overflow nicely if viewport is too narrow */
+}
+
 /* Grid Droppable/Interactive Cell */
 .grid-cell {
   background: var(--bg-deep);

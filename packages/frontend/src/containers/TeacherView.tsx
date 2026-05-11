@@ -66,6 +66,7 @@ interface TeacherViewProps {
   onDragEnd: (event: DragEndEvent) => void;
   onCellCycle: (x: number, y: number) => void;
   liveStatuses: Record<string, LiveSeatStatus>;
+  mode?: 'layout' | 'monitor';
 }
 
 const PALETTE_ITEMS = [
@@ -148,47 +149,15 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
   onDragEnd,
   onCellCycle,
   liveStatuses,
+  mode = 'layout',
 }) => {
   return (
     <main className="main-content">
       
-      {/* Left Control Sidebar */}
+      {/* Left Control Sidebar - Only in layout mode */}
+      {mode === 'layout' && (
       <div className="sidebar">
         
-        {/* Supabase Connection Configuration */}
-        <div className="card supabase-config-card">
-          <h2 className="card-title" style={{ color: 'var(--color-teacher)' }}>
-            <Database size={18} /> Supabase 接続設定
-          </h2>
-          <div className="input-group">
-            <label className="input-label">Supabase URL</label>
-            <input
-              type="text"
-              className="text-input"
-              placeholder="https://your-project.supabase.co"
-              value={supabaseUrl}
-              onChange={(e) => setSupabaseUrl(e.target.value)}
-            />
-          </div>
-          <div className="input-group">
-            <label className="input-label">Anon Key</label>
-            <input
-              type="password"
-              className="text-input"
-              placeholder="eyJhbGciOi..."
-              value={supabaseAnonKey}
-              onChange={(e) => setSupabaseAnonKey(e.target.value)}
-            />
-          </div>
-          <button 
-            className="btn btn-primary" 
-            style={{ width: '100%', backgroundColor: 'var(--color-teacher)' }}
-            onClick={onSaveSupabaseConfig}
-          >
-            接続設定を保存
-          </button>
-        </div>
-
         {/* General Room Config Card */}
         <div className="card">
           <h2 className="card-title">
@@ -213,55 +182,7 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
           </button>
         </div>
 
-        {/* Room Layout Cases Card */}
-        <div className="card">
-          <h2 className="card-title">
-            <Layers size={18} /> レイアウト・ケース (最大5個)
-          </h2>
-          <div className="input-group">
-            <label className="input-label">ケース名 (Case Name)</label>
-            <input
-              type="text"
-              className="text-input"
-              placeholder="例: グループ学習型"
-              value={cases[activeCaseIdx]?.caseName || ''}
-              onChange={(e) => onUpdateActiveCaseName(e.target.value)}
-            />
-          </div>
 
-          <div className="cases-tabs">
-            {cases.map((c, idx) => (
-              <div
-                key={idx}
-                onClick={() => setActiveCaseIdx(idx)}
-                className={`case-tab-item ${activeCaseIdx === idx ? 'active' : ''}`}
-              >
-                <div className="case-info">
-                  <span className="case-title">{c.caseName || `ケース ${idx + 1}`}</span>
-                  <span className="case-subtitle">パターン {idx + 1}</span>
-                </div>
-                <ArrowRight size={14} style={{ opacity: activeCaseIdx === idx ? 1 : 0 }} />
-              </div>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '1rem' }}>
-            <button 
-              className="btn btn-secondary" 
-              style={{ flex: 1, padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}
-              onClick={onAddNewCase}
-            >
-              <Plus size={14} /> パターン追加
-            </button>
-            <button 
-              className="btn btn-danger" 
-              style={{ flex: 1, padding: '0.5rem 0.75rem', fontSize: '0.8rem' }}
-              onClick={onDeleteCurrentCase}
-            >
-              <Trash2 size={14} /> 削除
-            </button>
-          </div>
-        </div>
 
         {/* D1 History Room List Card */}
         <div className="card">
@@ -336,6 +257,7 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
         </div>
 
       </div>
+      )}
 
       {/* Right Editor Canvas */}
       <DndContext onDragEnd={onDragEnd}>
@@ -359,6 +281,7 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
           <div className="editor-grid-layout">
             
             {/* Left Item Palette */}
+            {mode === 'layout' && (
             <div className="palette">
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontWeight: '500' }}>
                 💡 アイテムをマス目へドラッグ＆ドロップ、または直接クリックして配置してください。
@@ -373,12 +296,14 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
                 />
               ))}
             </div>
+            )}
 
             {/* Right Interactive 9x9 CSS Grid (Now Overlaying realtime status) */}
             <SeatMap
               grid={cases[activeCaseIdx]?.grid}
               liveStatuses={liveStatuses}
-              onCycle={onCellCycle}
+              onCycle={mode === 'monitor' ? () => {} : onCellCycle}
+              massive={mode === 'monitor'}
             />
 
           </div>

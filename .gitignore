@@ -3,5 +3,6 @@ dist
 .wrangler
 tmp
 .env
+.env.local
 .DS_Store
 *.log

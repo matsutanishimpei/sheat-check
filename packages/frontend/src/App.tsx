@@ -1,29 +1,18 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import React, { useState, useCallback } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastList } from './components/ToastList';
-import { TeacherPage } from './pages/TeacherPage';
+import { LoginPage } from './pages/LoginPage';
+import { TeacherLayoutPage } from './pages/TeacherLayoutPage';
+import { TeacherMonitorPage } from './pages/TeacherMonitorPage';
 import { StudentPage } from './pages/StudentPage';
+import { UserStudentPage } from './pages/UserStudentPage';
+import { UserTeacherPage } from './pages/UserTeacherPage';
 import './index.css';
 
 export type Toast = {
   id: string;
   type: 'success' | 'error' | 'info' | 'warning';
   message: string;
-};
-
-// Component to handle backward compatibility for old ?room=UUID QR codes
-const QueryParamRedirect = () => {
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const roomParam = params.get('room');
-    if (roomParam && roomParam.trim()) {
-      navigate(`/student/${roomParam.trim()}`, { replace: true });
-    }
-  }, [navigate]);
-  
-  return null;
 };
 
 const App = () => {
@@ -39,9 +28,13 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <QueryParamRedirect />
       <Routes>
-        <Route path="/" element={<TeacherPage addToast={addToast} />} />
+        <Route path="/" element={<LoginPage addToast={addToast} />} />
+        <Route path="/room_layout" element={<TeacherLayoutPage addToast={addToast} />} />
+        <Route path="/seating" element={<TeacherMonitorPage addToast={addToast} />} />
+        <Route path="/user" element={<Navigate to="/user/student" replace />} />
+        <Route path="/user/student" element={<UserStudentPage addToast={addToast} />} />
+        <Route path="/user/teacher" element={<UserTeacherPage addToast={addToast} />} />
         <Route path="/teacher" element={<Navigate to="/" replace />} />
         <Route path="/student/:roomId" element={<StudentPage addToast={addToast} />} />
         <Route path="/student" element={<StudentPage addToast={addToast} />} />

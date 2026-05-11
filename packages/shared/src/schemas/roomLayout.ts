@@ -10,18 +10,11 @@ export const GridItemSchema = z.object({
   type: GridItemTypeSchema,
 });
 
-export const RoomLayoutSchema = z.object({
-  roomName: z.string().min(1, 'Room name is required'),
-  caseName: z.string().min(1, 'Case name is required'),
-  grid: z.array(GridItemSchema),
-});
-
 export const SaveRoomLayoutInputSchema = z.object({
   name: z.string().min(1, 'Room name is required'),
-  layouts: z.array(RoomLayoutSchema)
-    .min(1, 'At least one layout is required')
-    .max(5, 'A maximum of 5 layouts (cases) can be saved'),
+  grid: z.array(GridItemSchema),
   supabaseUrl: z.string().min(1, 'Supabase URL is required'),
   supabaseAnonKey: z.string().min(1, 'Supabase Anon Key is required'),
+  isActive: z.boolean().optional(),
 });
 

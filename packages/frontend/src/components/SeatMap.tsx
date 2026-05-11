@@ -6,12 +6,13 @@ interface SeatMapProps {
   grid: Record<string, GridItem['type']>;
   liveStatuses: Record<string, LiveSeatStatus>;
   onCycle: (x: number, y: number) => void;
+  massive?: boolean;
 }
 
-export const SeatMap = React.memo(({ grid, liveStatuses, onCycle }: SeatMapProps) => {
+export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, massive = false }: SeatMapProps) => {
   return (
-    <div className="grid-container-card">
-      <div className="grid-9x9">
+    <div className={`grid-container-card ${massive ? 'grid-massive-container' : ''}`}>
+      <div className={`grid-9x9 ${massive ? 'grid-massive' : ''}`}>
         {Array.from({ length: 9 }).map((_, y) => (
           Array.from({ length: 9 }).map((_, x) => {
             const coordKey = `${x},${y}`;

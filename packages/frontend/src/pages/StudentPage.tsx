@@ -19,6 +19,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
   // Supabase Config states
   const [supabaseUrl, setSupabaseUrl] = useState('');
   const [supabaseAnonKey, setSupabaseAnonKey] = useState('');
+  const [isRoomActive, setIsRoomActive] = useState(true);
 
   // Student specific states
   const [studentStage, setStudentStage] = useState<'config' | 'select' | 'dashboard'>('config');
@@ -76,6 +77,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
             const data = await res.json();
             setStudentRoomTitle(data.name);
             
+            const active = data.isActive !== false;
+            setIsRoomActive(active);
+
             if (data.supabaseUrl && data.supabaseAnonKey) {
               setSupabaseUrl(data.supabaseUrl);
               setSupabaseAnonKey(data.supabaseAnonKey);
@@ -83,25 +87,26 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
               addToast('error', 'この教室はまだ教員による Supabase 接続設定が保存されていません。教員に確認してください。');
             }
 
-            const firstLayout = data.layouts[0];
             const gridObj: Record<string, GridItem['type']> = {};
-            if (firstLayout && firstLayout.grid) {
-              firstLayout.grid.forEach((item: GridItem) => {
+            if (data.grid) {
+              data.grid.forEach((item: GridItem) => {
                 gridObj[`${item.x},${item.y}`] = item.type;
               });
             }
             setStudentGridLayout(gridObj);
 
-            if (storedName) {
-              if (storedSeatId) {
-                setStudentStage('dashboard');
-                addToast('success', `教室「${data.name}」の固定席 (${storedSeatId}) に自動チェックインしました！`);
+            if (active) {
+              if (storedName) {
+                if (storedSeatId) {
+                  setStudentStage('dashboard');
+                  addToast('success', `教室「${data.name}」の固定席 (${storedSeatId}) に自動チェックインしました！`);
+                } else {
+                  setStudentStage('select');
+                  addToast('info', `教室「${data.name}」の座席選択画面へ進みます`);
+                }
               } else {
-                setStudentStage('select');
-                addToast('info', `教室「${data.name}」の座席選択画面へ進みます`);
+                addToast('info', `教室「${data.name}」への招待リンクをロードしました。お名前を入力して入室してください！`);
               }
-            } else {
-              addToast('info', `教室「${data.name}」への招待リンクをロードしました。お名前を入力して入室してください！`);
             }
           } else {
             addToast('error', '指定された招待リンクの教室が見つかりませんでした。');
@@ -135,6 +140,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         const data = await res.json();
         setStudentRoomTitle(data.name);
 
+        const active = data.isActive !== false;
+        setIsRoomActive(active);
+
         if (data.supabaseUrl && data.supabaseAnonKey) {
           setSupabaseUrl(data.supabaseUrl);
           setSupabaseAnonKey(data.supabaseAnonKey);
@@ -142,10 +150,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
           addToast('error', 'この教室はまだ教員による Supabase 接続設定が保存されていません。教員に確認してください。');
         }
 
-        const firstLayout = data.layouts[0];
         const gridObj: Record<string, GridItem['type']> = {};
-        if (firstLayout && firstLayout.grid) {
-          firstLayout.grid.forEach((item: GridItem) => {
+        if (data.grid) {
+          data.grid.forEach((item: GridItem) => {
             gridObj[`${item.x},${item.y}`] = item.type;
           });
         }
@@ -158,8 +165,10 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         if (!roomId) {
           navigate(`/student/${studentClassroomId}`);
         } else {
-          setStudentStage('select');
-          addToast('success', `教室「${data.name}」に参加しました！着席する座席を選んでください。`);
+          if (active) {
+            setStudentStage('select');
+            addToast('success', `教室「${data.name}」に参加しました！着席する座席を選んでください。`);
+          }
         }
       } else {
         addToast('error', '指定された UUID の教室が見つかりませんでした。');
@@ -207,27 +216,71 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         </div>
       </header>
 
-      <StudentView
-        supabase={supabase}
-        studentStage={studentStage}
-        setStudentStage={setStudentStage}
-        studentClassroomId={studentClassroomId}
-        setStudentClassroomId={setStudentClassroomId}
-        studentName={studentName}
-        setStudentName={setStudentName}
-        studentSeatId={studentSeatId}
-        setStudentSeatId={setStudentSeatId}
-        studentComment={studentComment}
-        setStudentComment={setStudentComment}
-        studentRoomTitle={studentRoomTitle}
-        studentLiveSeatLocked={studentLiveSeatLocked}
-        studentGridLayout={studentGridLayout}
-        onStudentLogin={handleStudentLogin}
-        onLockSeat={handleLockSeat}
-        onChangeSeat={handleChangeSeat}
-        onSendBroadcast={(status) => sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentComment)}
-        addToast={addToast}
-      />
+      {!isRoomActive ? (
+        <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
+          <div className="card" style={{ maxWidth: '440px', width: '100%', padding: '3rem 2rem', textAlign: 'center', background: 'rgba(20, 27, 45, 0.4)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-color)', borderRadius: '16px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '2rem' }}>🔒</span>
+            </div>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem', color: '#ef4444' }}>現在クローズされています</h3>
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.6' }}>
+              この教室（<strong>{studentRoomTitle || '講義室'}</strong>）は、現在チェックインを受け付けていません。
+              教員が受付を開始するまでしばらくお待ちください。
+            </p>
+            <button 
+              className="btn btn-secondary" 
+              onClick={async () => {
+                try {
+                  const cleanUuid = studentClassroomId || roomId || '';
+                  if (cleanUuid) {
+                    const res = await client.api.rooms[':id'].$get({ param: { id: cleanUuid } });
+                    if (res.ok) {
+                      const data = await res.json();
+                      const active = data.isActive !== false;
+                      setIsRoomActive(active);
+                      if (active) {
+                        addToast('success', '受付が開始されました！画面を進めます。');
+                        if (studentName) {
+                          setStudentStage(studentSeatId ? 'dashboard' : 'select');
+                        }
+                      } else {
+                        addToast('info', '現在も受付クローズ状態です。');
+                      }
+                    }
+                  }
+                } catch (e) {
+                  addToast('error', '再試行に失敗しました。');
+                }
+              }}
+              style={{ width: '100%' }}
+            >
+              状態を再読込
+            </button>
+          </div>
+        </main>
+      ) : (
+        <StudentView
+          supabase={supabase}
+          studentStage={studentStage}
+          setStudentStage={setStudentStage}
+          studentClassroomId={studentClassroomId}
+          setStudentClassroomId={setStudentClassroomId}
+          studentName={studentName}
+          setStudentName={setStudentName}
+          studentSeatId={studentSeatId}
+          setStudentSeatId={setStudentSeatId}
+          studentComment={studentComment}
+          setStudentComment={setStudentComment}
+          studentRoomTitle={studentRoomTitle}
+          studentLiveSeatLocked={studentLiveSeatLocked}
+          studentGridLayout={studentGridLayout}
+          onStudentLogin={handleStudentLogin}
+          onLockSeat={handleLockSeat}
+          onChangeSeat={handleChangeSeat}
+          onSendBroadcast={(status) => sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentComment)}
+          addToast={addToast}
+        />
+      )}
     </div>
   );
 };

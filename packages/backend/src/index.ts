@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { zValidator } from '@hono/zod-validator';
 import { SaveRoomLayoutInputSchema } from '@my-app/shared';
+import { z } from 'zod';
 
 type Bindings = {
   DB: D1Database;
@@ -24,20 +25,22 @@ const routes = app
     const id = c.req.param('id');
     
     try {
-      const room = await c.env.DB.prepare('SELECT id, name, layout_data, supabase_url, supabase_anon_key FROM rooms WHERE id = ?')
+      const room = await c.env.DB.prepare('SELECT id, name, layout_data, supabase_url, supabase_anon_key, is_active FROM rooms WHERE id = ?')
         .bind(id)
-        .first<{ id: string; name: string; layout_data: string; supabase_url: string | null; supabase_anon_key: string | null }>();
+        .first<{ id: string; name: string; layout_data: string; supabase_url: string | null; supabase_anon_key: string | null; is_active: number | null }>();
 
       if (!room) {
         return c.json({ error: 'Room not found' }, 404);
       }
 
-      const layouts = JSON.parse(room.layout_data);
+      const grid = JSON.parse(room.layout_data);
+      const isActive = room.is_active !== 0; // null/1 -> true, 0 -> false
 
       return c.json({
         id: room.id,
         name: room.name,
-        layouts,
+        grid,
+        isActive,
         supabaseUrl: room.supabase_url || '',
         supabaseAnonKey: room.supabase_anon_key || '',
       });
@@ -52,16 +55,18 @@ const routes = app
     const id = crypto.randomUUID();
 
     try {
-      const layoutDataStr = JSON.stringify(body.layouts);
+      const layoutDataStr = JSON.stringify(body.grid);
+      const isActiveVal = body.isActive !== false ? 1 : 0;
 
-      await c.env.DB.prepare('INSERT INTO rooms (id, name, layout_data, supabase_url, supabase_anon_key) VALUES (?, ?, ?, ?, ?)')
-        .bind(id, body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey)
+      await c.env.DB.prepare('INSERT INTO rooms (id, name, layout_data, supabase_url, supabase_anon_key, is_active) VALUES (?, ?, ?, ?, ?, ?)')
+        .bind(id, body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey, isActiveVal)
         .run();
 
       return c.json({
         id,
         name: body.name,
-        layouts: body.layouts,
+        grid: body.grid,
+        isActive: body.isActive !== false,
         supabaseUrl: body.supabaseUrl,
         supabaseAnonKey: body.supabaseAnonKey,
       }, 201);
@@ -70,7 +75,7 @@ const routes = app
     }
   })
 
-  // 3. PUT /api/rooms/:id - Update existing classroom layout (supports up to 5 cases via validation)
+  // 3. PUT /api/rooms/:id - Update existing classroom layout
   .put('/api/rooms/:id', zValidator('json', SaveRoomLayoutInputSchema), async (c) => {
     const id = c.req.param('id');
     const body = c.req.valid('json');
@@ -85,21 +90,52 @@ const routes = app
         return c.json({ error: 'Room not found' }, 404);
       }
 
-      const layoutDataStr = JSON.stringify(body.layouts);
+      const layoutDataStr = JSON.stringify(body.grid);
+      const isActiveVal = body.isActive !== false ? 1 : 0;
 
-      await c.env.DB.prepare('UPDATE rooms SET name = ?, layout_data = ?, supabase_url = ?, supabase_anon_key = ? WHERE id = ?')
-        .bind(body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey, id)
+      await c.env.DB.prepare('UPDATE rooms SET name = ?, layout_data = ?, supabase_url = ?, supabase_anon_key = ?, is_active = ? WHERE id = ?')
+        .bind(body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey, isActiveVal, id)
         .run();
 
       return c.json({
         id,
         name: body.name,
-        layouts: body.layouts,
+        grid: body.grid,
+        isActive: body.isActive !== false,
         supabaseUrl: body.supabaseUrl,
         supabaseAnonKey: body.supabaseAnonKey,
       });
     } catch (err: any) {
       return c.json({ error: 'Failed to update room', message: err.message }, 500);
+    }
+  })
+
+  // 3.5. PATCH /api/rooms/:id/status - Lightweight status toggle (Open/Closed)
+  .patch('/api/rooms/:id/status', zValidator('json', z.object({ isActive: z.boolean() })), async (c) => {
+    const id = c.req.param('id');
+    const body = c.req.valid('json');
+
+    try {
+      const existing = await c.env.DB.prepare('SELECT 1 FROM rooms WHERE id = ?')
+        .bind(id)
+        .first();
+
+      if (!existing) {
+        return c.json({ error: 'Room not found' }, 404);
+      }
+
+      const isActiveVal = body.isActive ? 1 : 0;
+
+      await c.env.DB.prepare('UPDATE rooms SET is_active = ? WHERE id = ?')
+        .bind(isActiveVal, id)
+        .run();
+
+      return c.json({
+        id,
+        isActive: body.isActive,
+      });
+    } catch (err: any) {
+      return c.json({ error: 'Failed to update status', message: err.message }, 500);
     }
   })
 

@@ -144,3 +144,19 @@
 - [x] Move Student-specific state (`useRealtimeSession` auto-login) into `StudentPage.tsx`
 - [x] Update QR Code generation in `ControlPanel.tsx` to use the new `/student/:roomId` path
 - [x] Verify functionality and execute production build
+
+### Phase 12: Teacher UI Separation & Login
+- [x] Implement `.env.local` based simple login authentication for Teachers.
+- [x] Create `LoginPage.tsx` at `/` for teacher authentication.
+- [x] Create `TeacherLayoutPage.tsx` at `/manage` for the layout studio.
+- [x] Create `TeacherMonitorPage.tsx` at `/seating` with a wider monitor view (no sidebar/palette).
+- [x] Add navigation header to allow teachers to switch between Manage and Seating.
+- [x] Verify functionality and execute production build.
+
+### Phase 13: Layout Studio and Seating Monitor Fine-Tuning
+- [x] Remove Supabase connection settings card from layout studio (`/manage`) to focus strictly on creation.
+- [x] Create a custom layout for seating monitor (`/seating`) with Supabase configs quietly positioned in the top-right.
+- [x] Implement room/case dropdown selections inside `/seating`.
+- [x] Configure massive grid cells (2x cell scale: max-width 960px, larger gap) in seating monitor.
+- [x] Add dynamic premium guides/placeholders in seating monitor when no room is selected.
+- [x] Run production build to confirm types are fully integrated.

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import client from '../lib/hc';
-import { GridItem, RoomLayout } from '@my-app/shared';
+import { GridItem } from '@my-app/shared';
 
 export interface EditorCase {
   caseName: string;
@@ -27,13 +27,13 @@ export function useRoomLayout({
   const [roomName, setRoomName] = useState('一般講義室 301');
   const [roomId, setRoomId] = useState<string | null>(null);
   const [cases, setCases] = useState<EditorCase[]>([
-    { caseName: '通常講義 (標準)', grid: {} },
-    { caseName: 'グループワーク', grid: {} }
+    { caseName: '通常講義 (標準)', grid: {} }
   ]);
   const [activeCaseIdx, setActiveCaseIdx] = useState(0);
   const [savedRooms, setSavedRooms] = useState<{ id: string; name: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingRooms, setIsLoadingRooms] = useState(false);
+  const [isActive, setIsActive] = useState(true);
 
   const fetchRooms = async () => {
     setIsLoadingRooms(true);
@@ -64,22 +64,23 @@ export function useRoomLayout({
         const data = await res.json();
         setRoomId(data.id);
         setRoomName(data.name);
+        setIsActive(data.isActive !== false);
         
         // Load Supabase configurations into state
         setSupabaseUrl(data.supabaseUrl);
         setSupabaseAnonKey(data.supabaseAnonKey);
 
-        const loadedCases: EditorCase[] = data.layouts.map((l: any) => {
-          const gridObj: Record<string, GridItem['type']> = {};
-          l.grid.forEach((item: GridItem) => {
+        const gridObj: Record<string, GridItem['type']> = {};
+        if (data.grid) {
+          data.grid.forEach((item: GridItem) => {
             gridObj[`${item.x},${item.y}`] = item.type;
           });
+        }
 
-          return {
-            caseName: l.caseName,
-            grid: gridObj,
-          };
-        });
+        const loadedCases: EditorCase[] = [{
+          caseName: '通常講義 (標準)',
+          grid: gridObj,
+        }];
 
         setCases(loadedCases);
         setActiveCaseIdx(0);
@@ -97,27 +98,18 @@ export function useRoomLayout({
       addToast('error', '教室名を入力してください');
       return;
     }
-    if (!supabaseUrl.trim() || !supabaseAnonKey.trim()) {
-      addToast('error', '教室を保存するには、先に教員用設定パネルから Supabase 接続設定を保存してください。');
-      return;
-    }
+
+    const finalSupabaseUrl = supabaseUrl.trim() || localStorage.getItem('sb_url') || 'https://temp-placeholder.supabase.co';
+    const finalSupabaseAnonKey = supabaseAnonKey.trim() || localStorage.getItem('sb_key') || 'temp-placeholder-key';
 
     setIsSaving(true);
     
-    const formattedLayouts: RoomLayout[] = cases.map((c) => {
-      const gridItems: GridItem[] = Object.entries(c.grid).map(([coord, type]) => {
-        const [xStr, yStr] = coord.split(',');
-        return {
-          x: parseInt(xStr, 10),
-          y: parseInt(yStr, 10),
-          type,
-        };
-      });
-
+    const gridItems: GridItem[] = Object.entries(cases[0].grid).map(([coord, type]) => {
+      const [xStr, yStr] = coord.split(',');
       return {
-        roomName,
-        caseName: c.caseName,
-        grid: gridItems,
+        x: parseInt(xStr, 10),
+        y: parseInt(yStr, 10),
+        type,
       };
     });
 
@@ -127,9 +119,10 @@ export function useRoomLayout({
           param: { id: roomId },
           json: {
             name: roomName,
-            layouts: formattedLayouts,
-            supabaseUrl,
-            supabaseAnonKey,
+            grid: gridItems,
+            supabaseUrl: finalSupabaseUrl,
+            supabaseAnonKey: finalSupabaseAnonKey,
+            isActive: isActive,
           },
         });
 
@@ -144,9 +137,10 @@ export function useRoomLayout({
         const res = await client.api.rooms.$post({
           json: {
             name: roomName,
-            layouts: formattedLayouts,
-            supabaseUrl,
-            supabaseAnonKey,
+            grid: gridItems,
+            supabaseUrl: finalSupabaseUrl,
+            supabaseAnonKey: finalSupabaseAnonKey,
+            isActive: isActive,
           },
         });
 
@@ -172,30 +166,17 @@ export function useRoomLayout({
     setRoomName('新規講義室');
     setCases([{ caseName: '通常講義 (標準)', grid: {} }]);
     setActiveCaseIdx(0);
+    setIsActive(true);
     onClearLiveStatuses();
     addToast('info', '新しい教室の編集スタジオを開始しました');
   };
 
   const addNewCase = () => {
-    if (cases.length >= 5) {
-      addToast('error', '最大5ケースまでしか保存できません');
-      return;
-    }
-    const newCaseNum = cases.length + 1;
-    setCases([...cases, { caseName: `ケース ${newCaseNum}`, grid: {} }]);
-    setActiveCaseIdx(cases.length);
-    addToast('success', `新しいケース ${newCaseNum} を追加しました`);
+    addToast('info', 'レイアウトパターンは現在1教室につき1つに簡素化されています。別教室としてご作成ください。');
   };
 
   const deleteCurrentCase = () => {
-    if (cases.length <= 1) {
-      addToast('error', '少なくとも1つのレイアウトケースが必要です');
-      return;
-    }
-    const filtered = cases.filter((_, idx) => idx !== activeCaseIdx);
-    setCases(filtered);
-    setActiveCaseIdx(Math.max(0, activeCaseIdx - 1));
-    addToast('info', 'レイアウトケースを削除しました');
+    addToast('warning', '教室全体のレイアウト削除はサポートされていません。');
   };
 
   const updateActiveCaseName = (newName: string) => {
@@ -284,6 +265,8 @@ export function useRoomLayout({
     savedRooms,
     isLoadingRooms,
     isSaving,
+    isActive,
+    setIsActive,
     fetchRooms,
     loadClassroom,
     saveClassroom,
