@@ -157,12 +157,6 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
             <LogOut size={16} /> ログアウト
           </button>
         </div>
-
-        <div className="header-status">
-          <span className={`supabase-badge ${supabase ? '' : 'disconnected'}`}>
-             {supabase ? 'Realtime 有効' : 'Supabase 未接続'}
-          </span>
-        </div>
       </header>
 
       <TeacherView

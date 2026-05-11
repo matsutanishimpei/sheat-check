@@ -160,13 +160,48 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
       {mode === 'layout' && (
       <div className="sidebar">
         
-        {/* General Room Config Card */}
-        <div className="card">
-          <h2 className="card-title">
-            <Sliders size={18} /> 講義室の基本設定
+        {/* Unified "Room Selection & Management" Card */}
+        <div className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2 className="card-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <FolderOpen size={18} /> 講義室の選択・管理
+            </span>
+            <button 
+              onClick={onFetchRooms}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '0.25rem',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s',
+              }}
+              title="講義室リストを更新"
+              onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
+            >
+              <RefreshCw size={14} className={isLoadingRooms ? 'animate-spin' : ''} />
+            </button>
           </h2>
-          <div className="input-group">
-            <label className="input-label">教室名 (Room Name)</label>
+
+          {/* 1. Current Classroom Name & Storage Status */}
+          <div className="input-group" style={{ marginBottom: '0.15rem' }}>
+            <label className="input-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>教室名 (Room Name)</span>
+              {roomId ? (
+                <span style={{ fontSize: '0.7rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 'bold' }}>
+                  保存済み
+                </span>
+              ) : (
+                <span style={{ fontSize: '0.7rem', color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)', padding: '0.1rem 0.4rem', borderRadius: '4px', fontWeight: 'bold' }}>
+                  新規(未保存)
+                </span>
+              )}
+            </label>
             <input
               type="text"
               className="text-input"
@@ -175,138 +210,107 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
               onChange={(e) => setRoomName(e.target.value)}
             />
           </div>
+
+          {/* 2. New Classroom Design Action */}
           <button 
             className="btn btn-secondary" 
-            style={{ width: '100%' }}
+            style={{ 
+              width: '100%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              gap: '0.5rem',
+              padding: '0.5rem',
+              fontSize: '0.85rem'
+            }}
             onClick={onCreateNewSession}
           >
-            新規デザイン開始
+            <Plus size={15} /> 新規デザイン開始
           </button>
-        </div>
 
+          {/* Subtle horizontal separator */}
+          <div style={{ height: '1px', background: 'var(--border-color)', margin: '0.15rem 0' }} />
 
+          {/* 3. Saved Classrooms Quick Switch List */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              📂 保存済み講義室リスト
+            </span>
 
-        {/* D1 History Room List Card */}
-        <div className="card">
-          <h2 className="card-title">
-            <FolderOpen size={18} /> 保存済み講義室
-          </h2>
-          {isLoadingRooms ? (
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
-              読み込み中...
-            </p>
-          ) : savedRooms.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
-              保存された教室はありません
-            </p>
-          ) : (
-            <div className="room-list-container">
-              {savedRooms.map((room) => (
-                <div
-                  key={room.id}
-                  className={`room-item-wrapper ${roomId === room.id ? 'selected' : ''}`}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    width: '100%',
-                    background: roomId === room.id ? 'rgba(99, 102, 241, 0.15)' : 'rgba(255, 255, 255, 0.02)',
-                    border: roomId === room.id ? '1px solid var(--color-student)' : '1px solid var(--border-color)',
-                    borderRadius: '8px',
-                    padding: '0.15rem 0.4rem',
-                    marginBottom: '0.4rem',
-                    gap: '0.4rem',
-                  }}
-                >
-                  <button
-                    onClick={() => onLoadClassroom(room.id)}
+            {isLoadingRooms ? (
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
+                読み込み中...
+              </p>
+            ) : savedRooms.length === 0 ? (
+              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
+                保存された教室はありません
+              </p>
+            ) : (
+              <div className="room-list-container" style={{ maxHeight: '180px', overflowY: 'auto' }}>
+                {savedRooms.map((room) => (
+                  <div
+                    key={room.id}
+                    className={`room-item-wrapper ${roomId === room.id ? 'selected' : ''}`}
                     style={{
-                      flex: 1,
-                      background: 'none',
-                      border: 'none',
-                      textAlign: 'left',
-                      color: 'var(--text-primary)',
-                      cursor: 'pointer',
-                      padding: '0.4rem 0.2rem',
-                      fontSize: '0.85rem',
-                      fontWeight: 500,
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    {room.name}
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDeleteClassroom(room.id, room.supabaseUrl, room.supabaseAnonKey);
-                    }}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      color: 'var(--color-obstacle)',
-                      cursor: 'pointer',
-                      padding: '0.4rem',
-                      borderRadius: '4px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      transition: 'background-color 0.2s',
+                      justifyContent: 'space-between',
+                      width: '100%',
+                      background: roomId === room.id ? 'rgba(99, 102, 241, 0.12)' : 'rgba(255, 255, 255, 0.02)',
+                      border: roomId === room.id ? '1px solid var(--color-student)' : '1px solid var(--border-color)',
+                      borderRadius: '8px',
+                      padding: '0.15rem 0.4rem',
+                      marginBottom: '0.4rem',
+                      gap: '0.4rem',
                     }}
-                    title="講義室を物理削除"
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-          <button 
-            className="btn btn-secondary" 
-            style={{ width: '100%', marginTop: '1rem', fontSize: '0.8rem', padding: '0.5rem 0.75rem' }}
-            onClick={onFetchRooms}
-          >
-            <RefreshCw size={14} /> リスト更新
-          </button>
-        </div>
-
-        {/* Realtime Event Monitor Panel */}
-        <div className="card">
-          <h2 className="card-title">
-            <Activity size={18} style={{ color: 'var(--color-student)' }} /> リアルタイム受信ログ
-          </h2>
-          {realtimeLogs.length === 0 ? (
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '1rem' }}>
-              学生からの通信待機中...
-            </p>
-          ) : (
-            <div className="activity-feed-container">
-              {realtimeLogs.map((log) => (
-                <div key={log.id} className={`feed-item ${log.status}`}>
-                  <div className="feed-item-header">
-                    <span>{log.studentName} ({log.seatId})</span>
-                    <span style={{ 
-                      color: log.status === 'ok' 
-                        ? 'var(--color-door)' 
-                        : log.status === 'ng' 
-                          ? 'var(--color-obstacle)' 
-                          : 'var(--text-muted)', 
-                      fontWeight: 'bold' 
-                    }}>
-                      {log.status === 'none' ? '解除' : log.status.toUpperCase()}
-                    </span>
+                    <button
+                      onClick={() => onLoadClassroom(room.id)}
+                      style={{
+                        flex: 1,
+                        background: 'none',
+                        border: 'none',
+                        textAlign: 'left',
+                        color: 'var(--text-primary)',
+                        cursor: 'pointer',
+                        padding: '0.4rem 0.2rem',
+                        fontSize: '0.85rem',
+                        fontWeight: 500,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {room.name}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteClassroom(room.id, room.supabaseUrl, room.supabaseAnonKey);
+                      }}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--color-obstacle)',
+                        cursor: 'pointer',
+                        padding: '0.4rem',
+                        borderRadius: '4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'background-color 0.2s',
+                      }}
+                      title="講義室を物理削除"
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   </div>
-                  {log.comment && <span className="feed-item-comment">「{log.comment}」</span>}
-                  <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'right' }}>
-                    {log.timestamp}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
       </div>
