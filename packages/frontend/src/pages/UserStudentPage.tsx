@@ -91,6 +91,111 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
     loadAllData();
   }, []);
 
+  // Real-time subscription to all classrooms
+  useEffect(() => {
+    if (savedRooms.length === 0) return;
+
+    const activeChannels: { sb: any; channel: any }[] = [];
+
+    savedRooms.forEach((room: any) => {
+      if (!room.supabaseUrl || !room.supabaseAnonKey) return;
+
+      try {
+        const sb = createClient(room.supabaseUrl, room.supabaseAnonKey);
+        const channel = sb.channel(room.id, {
+          config: { broadcast: { self: true } },
+        });
+
+        channel
+          .on('broadcast', { event: 'student_to_teacher' }, (response) => {
+            console.log(`[UserStudentPage] Received broadcast for room ${room.name}:`, response);
+            const payload = response.payload;
+            if (payload && payload.seatId && payload.status) {
+              
+              // 1. Update localStorage so it's persisted and synced
+              const stored = localStorage.getItem(`seat_statuses_room_${room.id}`);
+              let statuses: Record<string, LiveSeatStatus> = {};
+              if (stored) {
+                try { statuses = JSON.parse(stored); } catch (e) {}
+              }
+
+              if (payload.status === 'none') {
+                delete statuses[payload.seatId];
+              } else {
+                statuses[payload.seatId] = {
+                  status: payload.status,
+                  name: payload.studentName || '匿名',
+                  comment: payload.comment || undefined,
+                };
+              }
+              localStorage.setItem(`seat_statuses_room_${room.id}`, JSON.stringify(statuses));
+
+              // 2. Update local state
+              setUsersList((prev) => {
+                // Remove existing record for this room & seat
+                const filtered = prev.filter(u => !(u.roomId === room.id && u.seatId === payload.seatId));
+                
+                if (payload.status === 'none') {
+                  return filtered;
+                } else {
+                  return [
+                    ...filtered,
+                    {
+                      roomId: room.id,
+                      roomName: room.name,
+                      seatId: payload.seatId,
+                      name: payload.studentName || '匿名',
+                      status: payload.status,
+                      comment: payload.comment || undefined,
+                    }
+                  ].sort((a, b) => a.name.localeCompare(b.name, 'ja'));
+                }
+              });
+
+              // Show notification toast
+              if (payload.status === 'none') {
+                addToast('info', `着席解除: ${payload.studentName || '匿名'} さんが ${room.name} (${payload.seatId}) を解放しました`);
+              } else {
+                addToast('success', `リアルタイム受信: ${payload.studentName || '匿名'} さんが ${room.name} (${payload.seatId}) に着席しました`);
+              }
+            }
+          })
+          .on('broadcast', { event: 'student_evicted' }, (response) => {
+            const payload = response.payload;
+            if (payload && payload.seatId) {
+              const stored = localStorage.getItem(`seat_statuses_room_${room.id}`);
+              let statuses: Record<string, LiveSeatStatus> = {};
+              if (stored) {
+                try { statuses = JSON.parse(stored); } catch (e) {}
+              }
+              delete statuses[payload.seatId];
+              localStorage.setItem(`seat_statuses_room_${room.id}`, JSON.stringify(statuses));
+
+              setUsersList((prev) => prev.filter(u => !(u.roomId === room.id && u.seatId === payload.seatId)));
+            }
+          })
+          .on('broadcast', { event: 'teacher_reset' }, () => {
+            localStorage.removeItem(`seat_statuses_room_${room.id}`);
+            setUsersList((prev) => prev.filter(u => u.roomId !== room.id));
+            addToast('warning', `教室「${room.name}」の出席情報が一括クリアされました`);
+          });
+
+        channel.subscribe();
+        activeChannels.push({ sb, channel });
+      } catch (err) {
+        console.error(`Failed to subscribe to real-time for room ${room.name}:`, err);
+      }
+    });
+
+    return () => {
+      activeChannels.forEach(({ sb, channel }) => {
+        try {
+          sb.removeChannel(channel);
+        } catch (e) {}
+      });
+    };
+  }, [savedRooms, addToast]);
+
   // Filter & Search Logic
   const filteredUsers = useMemo(() => {
     return usersList.filter((user) => {
