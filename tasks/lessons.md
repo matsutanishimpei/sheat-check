@@ -28,3 +28,11 @@
   2. Inside the subscription handler, call `callbackRef.current(...)`.
   3. Only include truly identity-stable values in deps (e.g., `supabase` client instance, `roomId` string).
   4. Wrap frequently-used callbacks like `addToast` in `useCallback(…, [])` at the definition site.
+
+## 6. LocalStorage-Based Multi-Session Analytics & CSV Export (Pattern A)
+- **Problem**: Capturing student response times and session histories in educational settings normally requires massive backend tables, indexing, and high write volumes (DB write storm) whenever students submit multiple OK/NG statuses. Furthermore, identifying students via raw manually typed names inevitably breaks data correlation due to spelling/spacing inconsistencies.
+- **Solution**: 
+  1. Enforce strict character-level input validation on Student ID at input time (e.g., regex-guided filtering, auto-uppercase).
+  2. Implement precise client-side latency tracking (milliseconds) starting from dashboard load, resetting upon subsequent submissions.
+  3. Rather than writing every single real-time event to the cloud DB, archive completed session snapshots to the teacher's browser `localStorage` upon bulk-clearing ("状態クリア ＆ 質問保存").
+  4. Perform data pivoting and aggregation entirely in frontend JavaScript to build a highly optimized, Excel-compatible CSV output with BOM (`[0xEF, 0xBB, 0xBF]`) to completely prevent UTF-8 encoding garbles in Japanese spreadsheets.
