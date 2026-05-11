@@ -11,19 +11,22 @@ interface StudentViewProps {
   setStudentStage: (stage: 'config' | 'select' | 'dashboard') => void;
   studentClassroomId: string;
   setStudentClassroomId: (id: string) => void;
+  studentId: string;
+  setStudentId: (id: string) => void;
   studentName: string;
   setStudentName: (name: string) => void;
   studentSeatId: string;
   setStudentSeatId: (seatId: string) => void;
   studentComment: string;
   setStudentComment: (comment: string) => void;
+  studentCurrentStatus: 'ok' | 'ng' | null;
   studentRoomTitle: string;
   studentLiveSeatLocked: boolean;
   studentGridLayout: Record<string, GridItem['type']>;
   onStudentLogin: () => void;
   onLockSeat: () => void;
   onChangeSeat: () => void;
-  onSendBroadcast: (status: 'ok' | 'ng') => void;
+  onSendBroadcast: (status: 'ok' | 'ng', responseTime: number) => void;
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
 }
 
@@ -33,12 +36,15 @@ export const StudentView: React.FC<StudentViewProps> = React.memo(({
   setStudentStage,
   studentClassroomId,
   setStudentClassroomId,
+  studentId,
+  setStudentId,
   studentName,
   setStudentName,
   studentSeatId,
   setStudentSeatId,
   studentComment,
   setStudentComment,
+  studentCurrentStatus,
   studentRoomTitle,
   studentLiveSeatLocked,
   studentGridLayout,
@@ -56,6 +62,8 @@ export const StudentView: React.FC<StudentViewProps> = React.memo(({
             supabase={supabase}
             studentClassroomId={studentClassroomId}
             setStudentClassroomId={setStudentClassroomId}
+            studentId={studentId}
+            setStudentId={setStudentId}
             studentName={studentName}
             setStudentName={setStudentName}
             onLogin={onStudentLogin}
@@ -84,6 +92,7 @@ export const StudentView: React.FC<StudentViewProps> = React.memo(({
             studentLiveSeatLocked={studentLiveSeatLocked}
             onSendBroadcast={onSendBroadcast}
             onChangeSeat={onChangeSeat}
+            currentStatus={studentCurrentStatus}
           />
         )}
       </div>

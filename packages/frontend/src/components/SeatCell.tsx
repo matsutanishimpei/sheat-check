@@ -64,15 +64,23 @@ export const SeatCell = React.memo(({
 
       {/* Floating tooltip displayed on hover */}
       {cellType === 'student' && liveStatus && (
-        <div className="cell-tooltip">
+        <div className="cell-tooltip" style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', minWidth: '160px' }}>
           <div className="tooltip-row">
             <span className="tooltip-name">{liveStatus.name}</span>
             <span className={`tooltip-status ${liveStatus.status}`}>
               {liveStatus.status === 'ok' ? '了解 (OK)' : '不調 (NG)'}
             </span>
           </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+            <span>学籍: {liveStatus.studentId || '-'}</span>
+            {typeof liveStatus.responseTime === 'number' && (
+              <span>応答: {(liveStatus.responseTime / 1000).toFixed(1)}秒</span>
+            )}
+          </div>
+
           {liveStatus.comment && (
-            <div className="tooltip-comment">
+            <div className="tooltip-comment" style={{ marginTop: '0.25rem', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '0.25rem' }}>
               {liveStatus.comment}
             </div>
           )}

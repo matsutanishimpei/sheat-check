@@ -7,8 +7,9 @@ interface StudentDashboardProps {
   studentComment: string;
   setStudentComment: (val: string) => void;
   studentLiveSeatLocked: boolean;
-  onSendBroadcast: (status: 'ok' | 'ng') => void;
+  onSendBroadcast: (status: 'ok' | 'ng', responseTime: number) => void;
   onChangeSeat: () => void;
+  currentStatus: 'ok' | 'ng' | null;
 }
 
 export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
@@ -19,7 +20,25 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
   studentLiveSeatLocked,
   onSendBroadcast,
   onChangeSeat,
+  currentStatus,
 }) => {
+  const startTimeRef = React.useRef<number>(Date.now());
+
+  // Reset timer on mount OR whenever currentStatus is cleared (meaning a new question session has started)
+  React.useEffect(() => {
+    if (currentStatus === null) {
+      startTimeRef.current = Date.now();
+    }
+  }, [currentStatus]);
+
+  const handleSend = (status: 'ok' | 'ng') => {
+    const now = Date.now();
+    const duration = now - startTimeRef.current;
+    onSendBroadcast(status, duration);
+    // Reset start time to measure subsequent status adjustments
+    startTimeRef.current = now;
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div className="student-title-group">
@@ -41,6 +60,42 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
         </div>
       </div>
 
+      {/* Dynamic Status Banner */}
+      <div 
+        style={{ 
+          padding: '1.25rem', 
+          borderRadius: 'var(--radius-md)', 
+          textAlign: 'center',
+          fontWeight: 800,
+          fontSize: '1.2rem',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '0.75rem',
+          transition: 'all var(--transition-normal)',
+          border: '2px solid transparent',
+          marginTop: '0.25rem',
+          background: currentStatus === null 
+            ? 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(239, 68, 68, 0.15))'
+            : 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1))',
+          borderColor: currentStatus === null ? '#f97316' : '#10b981',
+          color: currentStatus === null ? '#f97316' : '#10b981',
+          animation: currentStatus === null ? 'bannerPulse 1.5s infinite alternate' : 'none'
+        }}
+      >
+        {currentStatus === null ? (
+          <>
+            <span style={{ fontSize: '1.5rem' }}>⚡</span>
+            <span>現在、回答待ち（理解度を選択してください）</span>
+          </>
+        ) : (
+          <>
+            <span style={{ fontSize: '1.5rem' }}>✓</span>
+            <span>回答送信完了（次の質問を待機中）</span>
+          </>
+        )}
+      </div>
+
       {studentLiveSeatLocked && (
         <div className="lock-banner" style={{ marginTop: '0' }}>
           <Lock size={14} />
@@ -49,7 +104,14 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
       )}
 
       <div className="input-group">
-        <label className="input-label">コメント (任意)</label>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+          <label className="input-label" style={{ margin: 0 }}>コメント (任意)</label>
+          {currentStatus && (
+            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              ✓ 回答送信完了
+            </span>
+          )}
+        </div>
         <input
           type="text"
           className="text-input"
@@ -62,15 +124,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
       {/* Main giant OK / NG buttons */}
       <div className="action-buttons-grid">
         <button
-          onClick={() => onSendBroadcast('ok')}
-          className="btn-huge btn-ok"
+          onClick={() => handleSend('ok')}
+          className={`btn-huge btn-ok ${
+            currentStatus === 'ok' ? 'active' : currentStatus === 'ng' ? 'inactive' : ''
+          }`}
         >
           <Heart size={36} />
           <span>了解 (OK)</span>
         </button>
         <button
-          onClick={() => onSendBroadcast('ng')}
-          className="btn-huge btn-ng"
+          onClick={() => handleSend('ng')}
+          className={`btn-huge btn-ng ${
+            currentStatus === 'ng' ? 'active' : currentStatus === 'ok' ? 'inactive' : ''
+          }`}
         >
           <AlertTriangle size={36} />
           <span>不調 (NG)</span>

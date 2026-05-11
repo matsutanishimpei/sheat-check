@@ -24,9 +24,11 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
   // Student specific states
   const [studentStage, setStudentStage] = useState<'config' | 'select' | 'dashboard'>('config');
   const [studentClassroomId, setStudentClassroomId] = useState('');
+  const [studentId, setStudentId] = useState('');
   const [studentName, setStudentName] = useState('');
   const [studentSeatId, setStudentSeatId] = useState('');
   const [studentComment, setStudentComment] = useState('');
+  const [studentCurrentStatus, setStudentCurrentStatus] = useState<'ok' | 'ng' | null>(null);
   const [studentRoomTitle, setStudentRoomTitle] = useState('');
   const [studentLiveSeatLocked, setStudentLiveSeatLocked] = useState(false);
   const [studentGridLayout, setStudentGridLayout] = useState<Record<string, GridItem['type']>>({});
@@ -44,15 +46,17 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
     setLiveStatuses,
     addToast,
     onTeacherReset: () => {
-      localStorage.removeItem(`student_seat_id_${studentClassroomId}`);
-      setStudentSeatId('');
-      setStudentStage('select');
-      addToast('warning', '教員によって出席情報が一括リセットされました。新しく座席を選択してください。');
+      setStudentComment('');
+      setStudentCurrentStatus(null);
+      // Keep the seat ID but refresh the portal for the new question session
+      addToast('info', '教員が新しい質問を開始しました。現在の理解度回答がリセットされました。');
     },
     onTeacherEvict: (evictedSeatId) => {
       if (studentSeatId === evictedSeatId) {
         localStorage.removeItem(`student_seat_id_${studentClassroomId}`);
         setStudentSeatId('');
+        setStudentCurrentStatus(null);
+        setStudentComment('');
         setStudentStage('select');
         addToast('warning', '教員によって座席登録が解除されました。新しく座席を選択してください。');
       }
@@ -70,9 +74,13 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       const cleanUuid = roomId.trim();
       setStudentClassroomId(cleanUuid);
 
+      const storedId = localStorage.getItem(`student_id_${cleanUuid}`);
       const storedName = localStorage.getItem(`student_name_${cleanUuid}`);
       const storedSeatId = localStorage.getItem(`student_seat_id_${cleanUuid}`);
 
+      if (storedId) {
+        setStudentId(storedId);
+      }
       if (storedName) {
         setStudentName(storedName);
         if (storedSeatId) {
@@ -139,6 +147,18 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       addToast('error', '教室の UUID を入力してください');
       return;
     }
+    if (!studentId.trim()) {
+      addToast('error', '学籍番号を入力してください');
+      return;
+    }
+
+    // Strict student ID check (5-15 alphanumeric chars)
+    const studentIdPattern = /^[A-Z0-9]{5,15}$/;
+    if (!studentIdPattern.test(studentId.trim())) {
+      addToast('error', '学籍番号は5〜15文字の半角英数字で入力してください。');
+      return;
+    }
+
     if (!studentName.trim()) {
       addToast('error', 'お名前を入力してください');
       return;
@@ -171,7 +191,8 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         }
         setStudentGridLayout(gridObj);
 
-        localStorage.setItem(`student_name_${studentClassroomId}`, studentName);
+        localStorage.setItem(`student_id_${studentClassroomId}`, studentId.trim());
+        localStorage.setItem(`student_name_${studentClassroomId}`, studentName.trim());
         localStorage.setItem('last_room_id', studentClassroomId);
 
         // If not using a URL parameter, explicitly navigate to the clean URL so they can bookmark it
@@ -278,19 +299,25 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
           setStudentStage={setStudentStage}
           studentClassroomId={studentClassroomId}
           setStudentClassroomId={setStudentClassroomId}
+          studentId={studentId}
+          setStudentId={setStudentId}
           studentName={studentName}
           setStudentName={setStudentName}
           studentSeatId={studentSeatId}
           setStudentSeatId={setStudentSeatId}
           studentComment={studentComment}
           setStudentComment={setStudentComment}
+          studentCurrentStatus={studentCurrentStatus}
           studentRoomTitle={studentRoomTitle}
           studentLiveSeatLocked={studentLiveSeatLocked}
           studentGridLayout={studentGridLayout}
           onStudentLogin={handleStudentLogin}
           onLockSeat={handleLockSeat}
           onChangeSeat={handleChangeSeat}
-          onSendBroadcast={(status) => sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentComment)}
+          onSendBroadcast={(status, responseTime) => {
+            setStudentCurrentStatus(status);
+            sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentId, studentComment, responseTime);
+          }}
           addToast={addToast}
         />
       )}

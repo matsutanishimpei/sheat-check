@@ -6,6 +6,8 @@ interface StudentConfigProps {
   supabase: SupabaseClient | null;
   studentClassroomId: string;
   setStudentClassroomId: (val: string) => void;
+  studentId: string;
+  setStudentId: (val: string) => void;
   studentName: string;
   setStudentName: (val: string) => void;
   onLogin: () => void;
@@ -15,6 +17,8 @@ export const StudentConfig: React.FC<StudentConfigProps> = React.memo(({
   supabase,
   studentClassroomId,
   setStudentClassroomId,
+  studentId,
+  setStudentId,
   studentName,
   setStudentName,
   onLogin,
@@ -43,6 +47,17 @@ export const StudentConfig: React.FC<StudentConfigProps> = React.memo(({
           placeholder="教員画面の UUID チャンネルをここにペースト"
           value={studentClassroomId}
           onChange={(e) => setStudentClassroomId(e.target.value)}
+        />
+      </div>
+
+      <div className="input-group">
+        <label className="input-label">学籍番号 (半角英数字 5〜15文字)</label>
+        <input
+          type="text"
+          className="text-input"
+          placeholder="例: 24TE1234"
+          value={studentId}
+          onChange={(e) => setStudentId(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
         />
       </div>
 
