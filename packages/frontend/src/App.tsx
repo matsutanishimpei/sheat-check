@@ -31,9 +31,9 @@ const App = () => {
       <Routes>
         <Route path="/" element={<LoginPage addToast={addToast} />} />
         <Route path="/room_layout" element={<TeacherLayoutPage addToast={addToast} />} />
-        <Route path="/seating" element={<TeacherMonitorPage addToast={addToast} />} />
-        <Route path="/user" element={<Navigate to="/user/student" replace />} />
-        <Route path="/user/student" element={<UserStudentPage addToast={addToast} />} />
+        <Route path="/seats/monitoring" element={<TeacherMonitorPage addToast={addToast} />} />
+        <Route path="/user" element={<Navigate to="/student/monitoring" replace />} />
+        <Route path="/student/monitoring" element={<UserStudentPage addToast={addToast} />} />
         <Route path="/user/teacher" element={<UserTeacherPage addToast={addToast} />} />
         <Route path="/teacher" element={<Navigate to="/" replace />} />
         <Route path="/student/:roomId" element={<StudentPage addToast={addToast} />} />

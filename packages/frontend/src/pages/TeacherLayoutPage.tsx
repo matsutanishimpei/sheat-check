@@ -144,10 +144,10 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
           <Link to="/room_layout" className="mode-toggle-btn active">
             <Sliders size={16} /> 教室設定
           </Link>
-          <Link to="/seating" className="mode-toggle-btn">
+           <Link to="/seats/monitoring" className="mode-toggle-btn">
             <MonitorPlay size={16} /> 教員用監視
           </Link>
-          <Link to="/user/student" className="mode-toggle-btn">
+          <Link to="/student/monitoring" className="mode-toggle-btn">
             <Users size={16} /> 学生名簿
           </Link>
           <Link to="/user/teacher" className="mode-toggle-btn">
