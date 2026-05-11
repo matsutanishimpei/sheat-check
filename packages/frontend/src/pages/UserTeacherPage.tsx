@@ -76,7 +76,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
 
         <div className="header-controls">
           <Link to="/room_layout" className="mode-toggle-btn">
-            <Sliders size={16} /> レイアウトスタジオ
+            <Sliders size={16} /> 教室設定
           </Link>
           <Link to="/seating" className="mode-toggle-btn">
             <MonitorPlay size={16} /> 教員用監視

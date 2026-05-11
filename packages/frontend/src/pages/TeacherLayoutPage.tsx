@@ -137,12 +137,12 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
-          <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| レイアウトスタジオ</span></h1>
+          <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| 教室設定</span></h1>
         </div>
 
         <div className="header-controls">
           <Link to="/room_layout" className="mode-toggle-btn active">
-            <Sliders size={16} /> レイアウトスタジオ
+            <Sliders size={16} /> 教室設定
           </Link>
           <Link to="/seating" className="mode-toggle-btn">
             <MonitorPlay size={16} /> 教員用監視

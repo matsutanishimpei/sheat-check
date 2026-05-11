@@ -30,7 +30,7 @@ export const ControlPanel = React.memo(({
   return (
     <div className="workspace-header">
       <div className="workspace-title-group">
-        <h2 className="workspace-title">教員用監視＆レイアウトスタジオ</h2>
+        <h2 className="workspace-title">教室設定</h2>
         <p className="workspace-subtitle">
           {roomName} / <strong style={{ color: 'var(--color-student)' }}>{caseName || '通常講義 (標準)'}</strong> を編集中
         </p>
