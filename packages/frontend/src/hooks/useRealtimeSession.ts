@@ -45,6 +45,26 @@ export function useRealtimeSession({
   });
 
   const [realtimeLogs, setRealtimeLogs] = useState<RealtimeLog[]>([]);
+
+  // Restore room-specific logs from LocalStorage on mount or when roomId changes
+  useEffect(() => {
+    if (roomId) {
+      const saved = localStorage.getItem(`realtime_logs_room_${roomId}`);
+      if (saved) {
+        try {
+          setRealtimeLogs(JSON.parse(saved));
+        } catch (e) {
+          console.error('Failed to parse saved realtime logs:', e);
+          setRealtimeLogs([]);
+        }
+      } else {
+        setRealtimeLogs([]);
+      }
+    } else {
+      setRealtimeLogs([]);
+    }
+  }, [roomId]);
+
   const [isOnline, setIsOnline] = useState(true);
 
   // Dynamically re-initialize Supabase client when credentials update
@@ -176,6 +196,8 @@ export function useRealtimeSession({
               nextStatuses[payload.seatId] = {
                 status: payload.status,
                 name: payload.studentName || '匿名',
+                studentId: payload.studentId || '不明',
+                responseTime: typeof payload.responseTime === 'number' ? payload.responseTime : undefined,
                 comment: payload.comment || undefined,
               };
             }
@@ -188,12 +210,20 @@ export function useRealtimeSession({
           const logItem: RealtimeLog = {
             id: crypto.randomUUID(),
             studentName: payload.studentName || '匿名',
+            studentId: payload.studentId || '不明',
+            responseTime: typeof payload.responseTime === 'number' ? payload.responseTime : undefined,
             seatId: payload.seatId,
             status: payload.status,
             comment: payload.comment || undefined,
             timestamp: new Date().toLocaleTimeString(),
           };
-          setRealtimeLogs((prev) => [logItem, ...prev].slice(0, 50));
+          setRealtimeLogs((prev) => {
+            const nextLogs = [logItem, ...prev].slice(0, 50);
+            if (currentRoomId) {
+              localStorage.setItem(`realtime_logs_room_${currentRoomId}`, JSON.stringify(nextLogs));
+            }
+            return nextLogs;
+          });
 
           if (payload.status === 'none') {
             addToastRef.current('info', `座席解除: ${logItem.studentName} さんが座席 ${logItem.seatId} を解放しました`);
@@ -281,7 +311,9 @@ export function useRealtimeSession({
     seatId: string,
     status: 'ok' | 'ng' | 'none',
     studentName: string,
-    comment?: string | null
+    studentId: string,
+    comment?: string | null,
+    responseTime?: number
   ): Promise<'ok' | 'error'> => {
     const channel = studentChannelRef.current;
     if (!channel) {
@@ -297,7 +329,9 @@ export function useRealtimeSession({
           seatId,
           status,
           studentName,
+          studentId,
           comment: comment || null,
+          responseTime,
           updatedAt: new Date().toISOString(),
         },
       });
@@ -321,6 +355,12 @@ export function useRealtimeSession({
         event: 'teacher_reset',
         payload: { timestamp: new Date().toISOString() },
       });
+      if (res === 'ok') {
+        setRealtimeLogs([]);
+        if (roomIdRef.current) {
+          localStorage.removeItem(`realtime_logs_room_${roomIdRef.current}`);
+        }
+      }
       return res === 'ok' ? 'ok' : 'error';
     } catch (err) {
       console.error('Failed to send teacher reset:', err);

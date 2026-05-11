@@ -49,9 +49,24 @@ export function useSeatManager({ roomId, addToast }: UseSeatManagerProps) {
       return false;
     }
 
-    setLiveStatuses({});
-    localStorage.removeItem(`seat_statuses_room_${roomId}`);
-    addToast('success', '全座席のステータスを一括リセットし、学生を再登録画面に戻しました！');
+    // Preserve student seating registration but reset status, comments, and times
+    setLiveStatuses((prev) => {
+      const next: Record<string, LiveSeatStatus> = {};
+      Object.keys(prev).forEach((seatId) => {
+        const current = prev[seatId];
+        if (current) {
+          next[seatId] = {
+            ...current,
+            status: 'none',          // Reset to neutral state (gray/blue)
+            comment: '',             // Clear comments
+            responseTime: undefined, // Wipe response times
+          };
+        }
+      });
+      return next;
+    });
+
+    addToast('success', '学生の着席は維持したまま、回答状態とコメントをリセットしました。');
     return true;
   }, [roomId, addToast]);
 
