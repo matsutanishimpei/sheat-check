@@ -226,33 +226,6 @@ export function useRoomLayout({
     addToast('info', 'レイアウトをクリアしました');
   };
 
-  const applyRowPreset = () => {
-    const newGrid: Record<string, GridItem['type']> = {
-      '4,0': 'teacher',
-      '0,8': 'door',
-      '8,8': 'door',
-    };
-
-    for (let y = 2; y <= 7; y++) {
-      for (let x = 1; x <= 7; x++) {
-        if (x !== 3) {
-          newGrid[`${x},${y}`] = 'student';
-        }
-      }
-    }
-
-    setCases((prevCases) => {
-      const updated = [...prevCases];
-      updated[activeCaseIdx] = {
-        ...updated[activeCaseIdx],
-        grid: newGrid,
-      };
-      return updated;
-    });
-    onClearLiveStatuses();
-    addToast('success', '標準的な列配置プリセットを適用しました！');
-  };
-
   return {
     roomName,
     setRoomName,
@@ -276,6 +249,5 @@ export function useRoomLayout({
     updateActiveCaseName,
     updateGridCell,
     clearCurrentGrid,
-    applyRowPreset,
   };
 }

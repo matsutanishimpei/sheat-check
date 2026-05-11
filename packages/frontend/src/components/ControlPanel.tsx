@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Trash2, Sparkles, RotateCcw, Save } from 'lucide-react';
+import { Lock, Unlock, Trash2, RotateCcw, Save } from 'lucide-react';
 
 interface ControlPanelProps {
   roomName: string;
@@ -8,7 +8,6 @@ interface ControlPanelProps {
   isSeatLocked: boolean;
   onToggleSeatLock: () => void;
   onClearGrid: () => void;
-  onApplyRowPreset: () => void;
   onBulkReset: () => void;
   onSaveClassroom: () => void;
   isSaving: boolean;
@@ -21,7 +20,6 @@ export const ControlPanel = React.memo(({
   isSeatLocked,
   onToggleSeatLock,
   onClearGrid,
-  onApplyRowPreset,
   onBulkReset,
   onSaveClassroom,
   isSaving,
@@ -62,9 +60,6 @@ export const ControlPanel = React.memo(({
 
         <button className="btn btn-secondary" onClick={onClearGrid}>
           <Trash2 size={16} /> クリア
-        </button>
-        <button className="btn btn-secondary" onClick={onApplyRowPreset}>
-          <Sparkles size={16} /> 列配置プリセット
         </button>
         <button className="btn btn-danger" onClick={onBulkReset}>
           <RotateCcw size={16} /> 一括リセット

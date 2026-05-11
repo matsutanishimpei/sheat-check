@@ -59,7 +59,6 @@ interface TeacherViewProps {
   isSeatLocked: boolean;
   onToggleSeatLock: () => void;
   onClearGrid: () => void;
-  onApplyRowPreset: () => void;
   onBulkReset: () => void;
   onSaveClassroom: () => void;
   isSaving: boolean;
@@ -142,7 +141,6 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
   isSeatLocked,
   onToggleSeatLock,
   onClearGrid,
-  onApplyRowPreset,
   onBulkReset,
   onSaveClassroom,
   isSaving,
@@ -271,7 +269,6 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
             isSeatLocked={isSeatLocked}
             onToggleSeatLock={onToggleSeatLock}
             onClearGrid={onClearGrid}
-            onApplyRowPreset={onApplyRowPreset}
             onBulkReset={onBulkReset}
             onSaveClassroom={onSaveClassroom}
             isSaving={isSaving}

@@ -60,7 +60,6 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
     setIsActive,
     fetchRooms,
     clearCurrentGrid,
-    applyRowPreset,
     updateGridCell,
   } = useRoomLayout({
     addToast,

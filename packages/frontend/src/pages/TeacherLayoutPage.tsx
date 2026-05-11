@@ -51,7 +51,6 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
     createNewClassroomSession,
     fetchRooms,
     clearCurrentGrid,
-    applyRowPreset,
     updateGridCell,
   } = useRoomLayout({
     addToast,
@@ -195,7 +194,6 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
         isSeatLocked={isSeatLocked}
         onToggleSeatLock={onHandleToggleSeatLock}
         onClearGrid={clearCurrentGrid}
-        onApplyRowPreset={applyRowPreset}
         onBulkReset={onHandleBulkReset}
         onSaveClassroom={saveClassroom}
         isSaving={isSaving}
