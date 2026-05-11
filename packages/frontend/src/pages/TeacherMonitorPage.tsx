@@ -81,39 +81,13 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
     addToast,
   });
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || !active) return;
-
-    const dragType = active.data.current?.type as GridItem['type'];
-    const { x, y } = over.data.current as { x: number; y: number };
-
-    if (dragType && typeof x === 'number' && typeof y === 'number') {
-      updateGridCell(x, y, dragType, removeLiveStatus);
-    }
-  }, [updateGridCell, removeLiveStatus]);
-
-  const handleCellCycle = useCallback((x: number, y: number) => {
-    const currentGrid = cases[activeCaseIdx]?.grid || {};
-    const key = `${x},${y}`;
-    const current = currentGrid[key];
-
-    let next: GridItem['type'] | undefined;
-    if (!current) next = 'student';
-    else if (current === 'student') next = 'teacher';
-    else if (current === 'teacher') next = 'obstacle';
-    else if (current === 'obstacle') next = 'door';
-    else next = undefined; // Cycle to empty
-
-    updateGridCell(x, y, next, removeLiveStatus);
-  }, [cases, activeCaseIdx, updateGridCell, removeLiveStatus]);
-
   const {
     supabase,
     realtimeLogs,
     isOnline,
     saveSupabaseConfig,
     sendTeacherResetBroadcast,
+    sendStudentEvictedBroadcast,
     sendTeacherLockStateBroadcast,
   } = useRealtimeSession({
     roomId,
@@ -128,6 +102,38 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
     supabaseAnonKey,
     setSupabaseAnonKey,
   });
+
+  const handleRemoveLiveStatus = useCallback((key: string) => {
+    removeLiveStatus(key);
+    sendStudentEvictedBroadcast(key);
+  }, [removeLiveStatus, sendStudentEvictedBroadcast]);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || !active) return;
+
+    const dragType = active.data.current?.type as GridItem['type'];
+    const { x, y } = over.data.current as { x: number; y: number };
+
+    if (dragType && typeof x === 'number' && typeof y === 'number') {
+      updateGridCell(x, y, dragType, handleRemoveLiveStatus);
+    }
+  }, [updateGridCell, handleRemoveLiveStatus]);
+
+  const handleCellCycle = useCallback((x: number, y: number) => {
+    const currentGrid = cases[activeCaseIdx]?.grid || {};
+    const key = `${x},${y}`;
+    const current = currentGrid[key];
+
+    let next: GridItem['type'] | undefined;
+    if (!current) next = 'student';
+    else if (current === 'student') next = 'teacher';
+    else if (current === 'teacher') next = 'obstacle';
+    else if (current === 'obstacle') next = 'door';
+    else next = undefined; // Cycle to empty
+
+    updateGridCell(x, y, next, handleRemoveLiveStatus);
+  }, [cases, activeCaseIdx, updateGridCell, handleRemoveLiveStatus]);
 
   const onHandleBulkReset = () => {
     const ok = bulkResetLiveStatuses();

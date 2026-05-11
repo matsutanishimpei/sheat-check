@@ -142,8 +142,14 @@ const routes = app
   // 4. GET /api/rooms - List all saved rooms
   .get('/api/rooms', async (c) => {
     try {
-      const { results } = await c.env.DB.prepare('SELECT id, name FROM rooms').all<{ id: string; name: string }>();
-      return c.json({ rooms: results || [] });
+      const { results } = await c.env.DB.prepare('SELECT id, name, supabase_url, supabase_anon_key FROM rooms').all<{ id: string; name: string; supabase_url: string | null; supabase_anon_key: string | null }>();
+      const mapped = (results || []).map(r => ({
+        id: r.id,
+        name: r.name,
+        supabaseUrl: r.supabase_url || '',
+        supabaseAnonKey: r.supabase_anon_key || '',
+      }));
+      return c.json({ rooms: mapped });
     } catch (err: any) {
       return c.json({ error: 'Failed to fetch rooms', message: err.message }, 500);
     }

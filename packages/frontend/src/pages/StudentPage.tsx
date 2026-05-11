@@ -43,7 +43,20 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
     isSeatLocked: false, // Teacher's lock state is handled by receiving broadcast
     setLiveStatuses,
     addToast,
-    onTeacherReset: () => {},
+    onTeacherReset: () => {
+      localStorage.removeItem(`student_seat_id_${studentClassroomId}`);
+      setStudentSeatId('');
+      setStudentStage('select');
+      addToast('warning', '教員によって出席情報が一括リセットされました。新しく座席を選択してください。');
+    },
+    onTeacherEvict: (evictedSeatId) => {
+      if (studentSeatId === evictedSeatId) {
+        localStorage.removeItem(`student_seat_id_${studentClassroomId}`);
+        setStudentSeatId('');
+        setStudentStage('select');
+        addToast('warning', '教員によって座席登録が解除されました。新しく座席を選択してください。');
+      }
+    },
     onTeacherLockState: (locked) => setStudentLiveSeatLocked(locked),
     supabaseUrl,
     setSupabaseUrl,

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Sliders, MonitorPlay, Users, LogOut, Search, Filter, Download, Trash2, CheckCircle, AlertCircle, RefreshCw, ShieldAlert } from 'lucide-react';
 import client from '../lib/hc';
 import { LiveSeatStatus } from '@my-app/shared';
+import { createClient } from '@supabase/supabase-js';
 
 interface UserStudentPageProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
@@ -106,7 +107,7 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
   }, [usersList, searchQuery, selectedRoomId, selectedStatus]);
 
   // Remove check-in handler
-  const handleRemoveCheckin = (record: UserRecord) => {
+  const handleRemoveCheckin = async (record: UserRecord) => {
     if (!window.confirm(`「${record.name}」さんの着席登録 (${record.seatId}) を解除しますか？`)) {
       return;
     }
@@ -121,6 +122,28 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
         loadAllData(); // Refresh list
       } catch (e) {
         addToast('error', '着席データの更新に失敗しました。');
+        return;
+      }
+    }
+
+    // Dynamic Supabase eviction broadcast
+    const targetRoom = savedRooms.find(r => r.id === record.roomId) as any;
+    if (targetRoom && targetRoom.supabaseUrl && targetRoom.supabaseAnonKey) {
+      try {
+        const sb = createClient(targetRoom.supabaseUrl, targetRoom.supabaseAnonKey);
+        const channel = sb.channel(record.roomId);
+        channel.subscribe(async (status) => {
+          if (status === 'SUBSCRIBED') {
+            await channel.send({
+              type: 'broadcast',
+              event: 'student_evicted',
+              payload: { seatId: record.seatId, timestamp: new Date().toISOString() },
+            });
+            sb.removeChannel(channel);
+          }
+        });
+      } catch (err) {
+        console.error('Failed to send dynamic eviction broadcast:', err);
       }
     }
   };

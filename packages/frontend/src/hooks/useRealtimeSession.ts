@@ -9,6 +9,7 @@ interface UseRealtimeSessionProps {
   setLiveStatuses: React.Dispatch<React.SetStateAction<Record<string, LiveSeatStatus>>>;
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
   onTeacherReset: () => void;
+  onTeacherEvict?: (seatId: string) => void;
   onTeacherLockState: (locked: boolean) => void;
   supabaseUrl: string;
   setSupabaseUrl: (val: string) => void;
@@ -23,6 +24,7 @@ export function useRealtimeSession({
   setLiveStatuses,
   addToast,
   onTeacherReset,
+  onTeacherEvict,
   onTeacherLockState,
   supabaseUrl,
   setSupabaseUrl,
@@ -79,12 +81,14 @@ export function useRealtimeSession({
   // "latest value without re-subscribing".
   const addToastRef = useRef(addToast);
   const onTeacherResetRef = useRef(onTeacherReset);
+  const onTeacherEvictRef = useRef(onTeacherEvict);
   const onTeacherLockStateRef = useRef(onTeacherLockState);
   const isSeatLockedRef = useRef(isSeatLocked);
   const roomIdRef = useRef(roomId);
 
   useEffect(() => { addToastRef.current = addToast; }, [addToast]);
   useEffect(() => { onTeacherResetRef.current = onTeacherReset; }, [onTeacherReset]);
+  useEffect(() => { onTeacherEvictRef.current = onTeacherEvict; }, [onTeacherEvict]);
   useEffect(() => { onTeacherLockStateRef.current = onTeacherLockState; }, [onTeacherLockState]);
   useEffect(() => { isSeatLockedRef.current = isSeatLocked; }, [isSeatLocked]);
   useEffect(() => { roomIdRef.current = roomId; }, [roomId]);
@@ -240,6 +244,14 @@ export function useRealtimeSession({
         console.log('Received reset event from teacher:', response);
         onTeacherResetRef.current();
       })
+      .on('broadcast', { event: 'student_evicted' }, (response) => {
+        console.log('Received eviction event from teacher:', response);
+        if (response.payload && typeof response.payload.seatId === 'string') {
+          if (onTeacherEvictRef.current) {
+            onTeacherEvictRef.current(response.payload.seatId);
+          }
+        }
+      })
       .on('broadcast', { event: 'teacher_lock_state' }, (response) => {
         console.log('Received seat lock state from teacher:', response);
         if (response.payload && typeof response.payload.locked === 'boolean') {
@@ -316,6 +328,26 @@ export function useRealtimeSession({
     }
   }, []);
 
+  const sendStudentEvictedBroadcast = useCallback(async (seatId: string): Promise<'ok' | 'error'> => {
+    const channel = teacherChannelRef.current;
+    if (!channel) {
+      console.error('[sendStudentEvictedBroadcast] No teacher channel available');
+      return 'error';
+    }
+
+    try {
+      const res = await channel.send({
+        type: 'broadcast',
+        event: 'student_evicted',
+        payload: { seatId, timestamp: new Date().toISOString() },
+      });
+      return res === 'ok' ? 'ok' : 'error';
+    } catch (err) {
+      console.error('Failed to send student evicted broadcast:', err);
+      return 'error';
+    }
+  }, []);
+
   const sendTeacherLockStateBroadcast = useCallback(async (locked: boolean): Promise<'ok' | 'error'> => {
     const channel = teacherChannelRef.current;
     if (!channel) {
@@ -348,6 +380,7 @@ export function useRealtimeSession({
     isOnline,
     sendStudentToTeacherBroadcast,
     sendTeacherResetBroadcast,
+    sendStudentEvictedBroadcast,
     sendTeacherLockStateBroadcast,
   };
 }
