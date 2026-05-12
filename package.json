@@ -8,6 +8,12 @@
     "dev:backend": "npm run dev --workspace=@my-app/backend",
     "dev:frontend": "npm run dev --workspace=@my-app/frontend",
     "build": "npm run build --workspaces",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run test --workspaces --if-present",
+    "test:coverage": "npm run test:coverage --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.6",
+    "vitest": "^4.1.6"
   }
 }

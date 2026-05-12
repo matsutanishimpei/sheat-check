@@ -3,15 +3,30 @@ import { cors } from 'hono/cors';
 import { zValidator } from '@hono/zod-validator';
 import { SaveRoomLayoutInputSchema } from '@my-app/shared';
 import { z } from 'zod';
+import { IRoomRepository } from './repositories/RoomRepository';
+import { D1RoomRepository } from './repositories/D1RoomRepository';
 
 type Bindings = {
   DB: D1Database;
 };
 
-const app = new Hono<{ Bindings: Bindings }>();
+type Variables = {
+  roomRepo: IRoomRepository;
+};
+
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
 // Enable CORS for frontend requests
 app.use('*', cors());
+
+// Inject RoomRepository dependency via middleware
+app.use('*', async (c, next) => {
+  // Live environment injection (if not already injected by test setups)
+  if (!c.get('roomRepo')) {
+    c.set('roomRepo', new D1RoomRepository(c.env.DB));
+  }
+  await next();
+});
 
 // Chain routes to export AppType for full Hono RPC client support
 const routes = app
@@ -23,26 +38,22 @@ const routes = app
   // 1. GET /api/rooms/:id - Fetch classroom layout
   .get('/api/rooms/:id', async (c) => {
     const id = c.req.param('id');
+    const repo = c.get('roomRepo');
     
     try {
-      const room = await c.env.DB.prepare('SELECT id, name, layout_data, supabase_url, supabase_anon_key, is_active FROM rooms WHERE id = ?')
-        .bind(id)
-        .first<{ id: string; name: string; layout_data: string; supabase_url: string | null; supabase_anon_key: string | null; is_active: number | null }>();
+      const room = await repo.findById(id);
 
       if (!room) {
         return c.json({ error: 'Room not found' }, 404);
       }
 
-      const grid = JSON.parse(room.layout_data);
-      const isActive = room.is_active !== 0; // null/1 -> true, 0 -> false
-
       return c.json({
         id: room.id,
         name: room.name,
-        grid,
-        isActive,
-        supabaseUrl: room.supabase_url || '',
-        supabaseAnonKey: room.supabase_anon_key || '',
+        grid: room.grid,
+        isActive: room.isActive,
+        supabaseUrl: room.supabaseUrl || '',
+        supabaseAnonKey: room.supabaseAnonKey || '',
       });
     } catch (err: any) {
       return c.json({ error: 'Internal Server Error', message: err.message }, 500);
@@ -53,14 +64,17 @@ const routes = app
   .post('/api/rooms', zValidator('json', SaveRoomLayoutInputSchema), async (c) => {
     const body = c.req.valid('json');
     const id = crypto.randomUUID();
+    const repo = c.get('roomRepo');
 
     try {
-      const layoutDataStr = JSON.stringify(body.grid);
-      const isActiveVal = body.isActive !== false ? 1 : 0;
-
-      await c.env.DB.prepare('INSERT INTO rooms (id, name, layout_data, supabase_url, supabase_anon_key, is_active) VALUES (?, ?, ?, ?, ?, ?)')
-        .bind(id, body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey, isActiveVal)
-        .run();
+      await repo.create({
+        id,
+        name: body.name,
+        grid: body.grid,
+        supabaseUrl: body.supabaseUrl || null,
+        supabaseAnonKey: body.supabaseAnonKey || null,
+        isActive: body.isActive !== false,
+      });
 
       return c.json({
         id,
@@ -79,23 +93,22 @@ const routes = app
   .put('/api/rooms/:id', zValidator('json', SaveRoomLayoutInputSchema), async (c) => {
     const id = c.req.param('id');
     const body = c.req.valid('json');
+    const repo = c.get('roomRepo');
 
     try {
-      // Check if room exists
-      const existing = await c.env.DB.prepare('SELECT 1 FROM rooms WHERE id = ?')
-        .bind(id)
-        .first();
+      const exists = await repo.exists(id);
 
-      if (!existing) {
+      if (!exists) {
         return c.json({ error: 'Room not found' }, 404);
       }
 
-      const layoutDataStr = JSON.stringify(body.grid);
-      const isActiveVal = body.isActive !== false ? 1 : 0;
-
-      await c.env.DB.prepare('UPDATE rooms SET name = ?, layout_data = ?, supabase_url = ?, supabase_anon_key = ?, is_active = ? WHERE id = ?')
-        .bind(body.name, layoutDataStr, body.supabaseUrl, body.supabaseAnonKey, isActiveVal, id)
-        .run();
+      await repo.update(id, {
+        name: body.name,
+        grid: body.grid,
+        supabaseUrl: body.supabaseUrl || null,
+        supabaseAnonKey: body.supabaseAnonKey || null,
+        isActive: body.isActive !== false,
+      });
 
       return c.json({
         id,
@@ -114,21 +127,16 @@ const routes = app
   .patch('/api/rooms/:id/status', zValidator('json', z.object({ isActive: z.boolean() })), async (c) => {
     const id = c.req.param('id');
     const body = c.req.valid('json');
+    const repo = c.get('roomRepo');
 
     try {
-      const existing = await c.env.DB.prepare('SELECT 1 FROM rooms WHERE id = ?')
-        .bind(id)
-        .first();
+      const exists = await repo.exists(id);
 
-      if (!existing) {
+      if (!exists) {
         return c.json({ error: 'Room not found' }, 404);
       }
 
-      const isActiveVal = body.isActive ? 1 : 0;
-
-      await c.env.DB.prepare('UPDATE rooms SET is_active = ? WHERE id = ?')
-        .bind(isActiveVal, id)
-        .run();
+      await repo.updateStatus(id, body.isActive);
 
       return c.json({
         id,
@@ -141,13 +149,14 @@ const routes = app
 
   // 4. GET /api/rooms - List all saved rooms
   .get('/api/rooms', async (c) => {
+    const repo = c.get('roomRepo');
     try {
-      const { results } = await c.env.DB.prepare('SELECT id, name, supabase_url, supabase_anon_key FROM rooms').all<{ id: string; name: string; supabase_url: string | null; supabase_anon_key: string | null }>();
-      const mapped = (results || []).map(r => ({
+      const results = await repo.listAll();
+      const mapped = results.map(r => ({
         id: r.id,
         name: r.name,
-        supabaseUrl: r.supabase_url || '',
-        supabaseAnonKey: r.supabase_anon_key || '',
+        supabaseUrl: r.supabaseUrl || '',
+        supabaseAnonKey: r.supabaseAnonKey || '',
       }));
       return c.json({ rooms: mapped });
     } catch (err: any) {
@@ -158,19 +167,16 @@ const routes = app
   // 5. DELETE /api/rooms/:id - Physically delete a classroom layout
   .delete('/api/rooms/:id', async (c) => {
     const id = c.req.param('id');
+    const repo = c.get('roomRepo');
 
     try {
-      const existing = await c.env.DB.prepare('SELECT 1 FROM rooms WHERE id = ?')
-        .bind(id)
-        .first();
+      const exists = await repo.exists(id);
 
-      if (!existing) {
+      if (!exists) {
         return c.json({ error: 'Room not found' }, 404);
       }
 
-      await c.env.DB.prepare('DELETE FROM rooms WHERE id = ?')
-        .bind(id)
-        .run();
+      await repo.delete(id);
 
       return c.json({ success: true, id });
     } catch (err: any) {

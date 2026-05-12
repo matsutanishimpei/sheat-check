@@ -169,3 +169,11 @@
 - [x] Implement BOM-supported responsive CSV Exporter (Excel compatible) matching Pattern A layout (Students as rows, Questions/Sessions as columns).
 - [x] Inject Student ID and response metrics seamlessly into the Seating Grid Tooltip (hover cards).
 - [x] Run workspace monorepo production build with 100% successful compilation.
+
+### Phase 15: Testing & CI Setup
+- [x] Setup Vitest testing environment across workspaces
+- [x] Implement shared schemas validation tests (Zod parsing, validation limits)
+- [x] Implement backend Hono API integration tests (using Mock D1 binding)
+- [x] Implement frontend critical business logic tests (Student ID validator, Latency tracker, Matrix CSV exporter)
+- [x] Add `.github/workflows/ci.yml` to automatically run Lint, Typecheck, and Tests
+- [x] Verify everything compiles, lint passes, and tests run with 100% success locally

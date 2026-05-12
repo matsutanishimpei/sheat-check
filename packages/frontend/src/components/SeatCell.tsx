@@ -51,10 +51,22 @@ export const SeatCell = React.memo(({
           className={`cell-item ${cellType} ${cellType === 'student' && liveStatus ? `student-live-${liveStatus.status}` : ''}`}
         >
           {cellType === 'student' && liveStatus ? (
-            <span style={{ fontSize: '0.65rem', fontWeight: 800, textAlign: 'center', lineHeight: 1.1 }}>
-              {liveStatus.name.slice(0, 4)}
-              <br />
-              {liveStatus.status.toUpperCase()}
+            <span style={{ 
+              fontSize: '0.85rem', 
+              fontWeight: 850, 
+              textAlign: 'center', 
+              lineHeight: '1.2',
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: 'block',
+              width: '100%',
+              padding: '0 6px',
+              boxSizing: 'border-box'
+            }}
+              title={liveStatus.name}
+            >
+              {liveStatus.name}
             </span>
           ) : (
             getIcon()

@@ -1,6 +1,7 @@
 import React from 'react';
 import { LogIn, AlertTriangle, CornerDownRight } from 'lucide-react';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { filterStudentId } from '../../lib/studentIdHelper';
 
 interface StudentConfigProps {
   supabase: SupabaseClient | null;
@@ -57,7 +58,7 @@ export const StudentConfig: React.FC<StudentConfigProps> = React.memo(({
           className="text-input"
           placeholder="例: 24TE1234"
           value={studentId}
-          onChange={(e) => setStudentId(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+          onChange={(e) => setStudentId(filterStudentId(e.target.value))}
         />
       </div>
 

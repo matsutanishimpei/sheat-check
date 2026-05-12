@@ -499,6 +499,17 @@ body {
   overflow-x: auto; /* Handle overflow nicely if viewport is too narrow */
 }
 
+@media (max-width: 768px) {
+  .grid-9x9.grid-massive {
+    --min-cell-width: 42px !important;
+    --min-cell-height: 28px !important;
+    gap: 4px !important;
+  }
+  .grid-container-card.grid-massive-container {
+    padding: 0.5rem !important;
+  }
+}
+
 /* Grid Droppable/Interactive Cell */
 .grid-cell {
   background: var(--bg-deep);

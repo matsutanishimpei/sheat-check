@@ -9,6 +9,7 @@ import { LiveSeatStatus, GridItem } from '@my-app/shared';
 import { LogOut, Sliders, MonitorPlay, FolderOpen, Lock, Unlock, RotateCcw, Database, ChevronUp, ChevronDown, QrCode, Users, ShieldAlert, Download, Trash2, Activity } from 'lucide-react';
 import { SeatMap } from '../components/SeatMap';
 import client from '../lib/hc';
+import { generateCSVContent } from '../lib/csvHelper';
 
 interface TeacherMonitorPageProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
@@ -285,53 +286,8 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
     }
 
     // CSV作成（エクセル文字化け対策BOM付き）
-    let csvHeader = ['学籍番号', '名前'];
-    sessionKeys.forEach((sKey) => {
-      csvHeader.push(`"${sKey}_判定"`, `"${sKey}_応答時間(秒)"`, `"${sKey}_コメント"`);
-    });
-    csvHeader.push('平均応答時間(秒)', '回答率(%)');
-
-    const csvRows = [csvHeader.join(',')];
-
-    studentIds.forEach((studentId) => {
-      const student = studentMap[studentId];
-      const rowParts: string[] = [studentId, `"${student.name}"`];
-
-      let totalResponseTime = 0;
-      let responseCountForAvg = 0;
-      let totalAnsweredCount = 0;
-
-      sessionKeys.forEach((sKey) => {
-        const resp = student.responses[sKey];
-        if (resp) {
-          rowParts.push(`"${resp.status.toUpperCase()}"`);
-          if (typeof resp.responseTime === 'number') {
-            const sec = (resp.responseTime / 1000).toFixed(1);
-            rowParts.push(sec);
-            totalResponseTime += resp.responseTime;
-            responseCountForAvg++;
-          } else {
-            rowParts.push('-');
-          }
-          rowParts.push(resp.comment ? `"${resp.comment.replace(/"/g, '""')}"` : '""');
-          totalAnsweredCount++;
-        } else {
-          rowParts.push('""', '""', '""');
-        }
-      });
-
-      const avgTimeStr = responseCountForAvg > 0 
-        ? ((totalResponseTime / responseCountForAvg) / 1000).toFixed(1)
-        : '-';
-
-      const rateStr = ((totalAnsweredCount / sessionKeys.length) * 100).toFixed(0);
-
-      rowParts.push(avgTimeStr, `"${rateStr}%"`);
-      csvRows.push(rowParts.join(','));
-    });
-
+    const csvContent = generateCSVContent(sessionKeys, studentMap);
     const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
-    const csvContent = csvRows.join('\r\n');
     const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     
@@ -502,8 +458,8 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
             {/* Split Container: Left SeatMap, Right Realtime Logs */}
             <div style={{ display: 'flex', gap: '2rem', width: '100%', alignItems: 'flex-start', flexWrap: 'wrap' }}>
               
-              {/* Left: SeatMap (Flex 1, centered) */}
-              <div style={{ flex: '1 1 600px', display: 'flex', justifyContent: 'center', minWidth: '320px' }}>
+              {/* Left: SeatMap (Flex 1, centered, safe overflow) */}
+              <div style={{ flex: '1 1 500px', display: 'flex', justifyContent: 'center', minWidth: 0, maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                 <SeatMap
                   grid={cases[activeCaseIdx]?.grid}
                   liveStatuses={liveStatuses}
@@ -515,42 +471,36 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
               {/* Right: Realtime Logs (Fixed width 360px) */}
               <div className="card" style={{ width: '360px', flexShrink: 0, display: 'flex', flexDirection: 'column', maxHeight: '540px', background: 'rgba(20, 27, 45, 0.4)', backdropFilter: 'blur(12px)' }}>
                 <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-                  <Activity size={18} style={{ color: 'var(--color-student)' }} /> リアルタイム受信ログ
+                  <Activity size={18} style={{ color: 'var(--color-student)' }} /> リアルタイム質問・コメント
                 </h2>
-                {realtimeLogs.length === 0 ? (
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '260px', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
-                    <span style={{ fontSize: '2rem' }}>📡</span>
-                    <p style={{ fontSize: '0.85rem', textAlign: 'center', margin: 0, lineHeight: 1.4 }}>
-                      学生からの回答・コメントを<br />リアルタイムに待機しています...
-                    </p>
-                  </div>
-                ) : (
-                  <div className="activity-feed-container" style={{ flex: 1, overflowY: 'auto', maxHeight: '460px', paddingRight: '0.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    {realtimeLogs.map((log) => (
-                      <div key={log.id} className={`feed-item ${log.status}`} style={{ margin: 0 }}>
-                        <div className="feed-item-header">
-                          <span style={{ fontWeight: 600 }}>{log.studentName} ({log.seatId})</span>
-                          <span style={{ 
-                            color: log.status === 'ok' 
-                              ? '#10b981' 
-                              : log.status === 'ng' 
-                                ? '#ef4444' 
-                                : 'var(--text-muted)', 
-                            fontWeight: 'bold',
-                            fontSize: '0.8rem'
-                          }}>
-                            {log.status === 'none' ? '解除' : log.status.toUpperCase()}
+                {(() => {
+                  const commentLogs = realtimeLogs.filter(log => log.comment && log.comment.trim() !== '');
+                  return commentLogs.length === 0 ? (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '260px', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
+                      <span style={{ fontSize: '2rem' }}>📡</span>
+                      <p style={{ fontSize: '0.85rem', textAlign: 'center', margin: 0, lineHeight: 1.4 }}>
+                        学生からのコメントや質問を<br />リアルタイムに待機しています...
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="activity-feed-container" style={{ flex: 1, overflowY: 'auto', maxHeight: '460px', paddingRight: '0.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {commentLogs.map((log) => (
+                        <div key={log.id} className={`feed-item ${log.status}`} style={{ margin: 0 }}>
+                          <div className="feed-item-header">
+                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{log.studentName} ({log.seatId})</span>
+                          </div>
+                          <span className="feed-item-comment" style={{ fontSize: '0.85rem', marginTop: '0.4rem', color: 'var(--text-primary)', display: 'block', padding: '0.35rem 0.5rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '4px', borderLeft: '2.5px solid var(--color-student)', fontStyle: 'normal', lineHeight: '1.4' }}>
+                            {log.comment}
                           </span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                            <span>学籍: {log.studentId || '-'}</span>
+                            <span>{log.timestamp}</span>
+                          </div>
                         </div>
-                        {log.comment && <span className="feed-item-comment" style={{ fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>「{log.comment}」</span>}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                          <span>学籍: {log.studentId || '-'}</span>
-                          <span>{log.timestamp}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
             </div>
