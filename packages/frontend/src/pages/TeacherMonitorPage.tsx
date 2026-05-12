@@ -79,6 +79,8 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
     addToast,
   });
 
+  const [teacherToken] = useState(() => localStorage.getItem('supabase_teacher_token') || '');
+
   const {
     supabase,
     realtimeLogs,
@@ -99,7 +101,18 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
     setSupabaseUrl,
     supabaseAnonKey,
     setSupabaseAnonKey,
+    authToken: teacherToken,
   });
+
+  // Auto-restore active room ID across navigation
+  useEffect(() => {
+    if (!roomId && savedRooms.length > 0) {
+      const activeRoomId = localStorage.getItem('active_teacher_room_id');
+      if (activeRoomId && savedRooms.some(r => r.id === activeRoomId)) {
+        handleLoadClassroom(activeRoomId);
+      }
+    }
+  }, [roomId, savedRooms]);
 
   const handleRemoveLiveStatus = useCallback((key: string) => {
     removeLiveStatus(key);

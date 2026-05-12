@@ -67,6 +67,12 @@ export function useRoomLayout({
         setRoomName(data.name);
         setIsActive(data.isActive !== false);
         
+        try {
+          localStorage.setItem('active_teacher_room_id', data.id);
+        } catch (e) {
+          console.warn('Failed to save room ID to localStorage:', e);
+        }
+
         // Load Supabase configurations into state
         setSupabaseUrl(data.supabaseUrl);
         setSupabaseAnonKey(data.supabaseAnonKey);
@@ -129,6 +135,9 @@ export function useRoomLayout({
 
         if (res.ok) {
           addToast('success', `教室「${roomName}」のレイアウトを更新しました！`);
+          try {
+            localStorage.setItem('active_teacher_room_id', roomId);
+          } catch (e) {}
           fetchRooms();
         } else {
           const errData = await res.json() as any;
@@ -148,6 +157,9 @@ export function useRoomLayout({
         if (res.ok) {
           const data = await res.json() as any;
           setRoomId(data.id);
+          try {
+            localStorage.setItem('active_teacher_room_id', data.id);
+          } catch (e) {}
           addToast('success', `新規教室「${roomName}」を作成・保存しました！`);
           fetchRooms();
         } else {
@@ -169,6 +181,9 @@ export function useRoomLayout({
     setActiveCaseIdx(0);
     setIsActive(true);
     onClearLiveStatuses();
+    try {
+      localStorage.removeItem('active_teacher_room_id');
+    } catch (e) {}
     addToast('info', '新しい教室の編集スタジオを開始しました');
   };
 

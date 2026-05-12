@@ -99,6 +99,8 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
     updateGridCell(x, y, next, removeLiveStatus);
   }, [cases, activeCaseIdx, updateGridCell, removeLiveStatus]);
 
+  const [teacherToken] = useState(() => localStorage.getItem('supabase_teacher_token') || '');
+
   const {
     supabase,
     realtimeLogs,
@@ -106,6 +108,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
     saveSupabaseConfig,
     sendTeacherResetBroadcast,
     sendTeacherLockStateBroadcast,
+    sendRoomLayoutUpdatedBroadcast,
   } = useRealtimeSession({
     roomId,
     studentClassroomId: '', // Teacher doesn't need student classroom id
@@ -118,7 +121,18 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
     setSupabaseUrl,
     supabaseAnonKey,
     setSupabaseAnonKey,
+    authToken: teacherToken,
   });
+
+  // Auto-restore active room ID across navigation
+  useEffect(() => {
+    if (!roomId && savedRooms.length > 0) {
+      const activeRoomId = localStorage.getItem('active_teacher_room_id');
+      if (activeRoomId && savedRooms.some(r => r.id === activeRoomId)) {
+        loadClassroom(activeRoomId);
+      }
+    }
+  }, [roomId, savedRooms]);
 
   const onHandleBulkReset = () => {
     const ok = bulkResetLiveStatuses();
@@ -130,6 +144,14 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
   const onHandleToggleSeatLock = () => {
     const nextLocked = toggleSeatLock();
     sendTeacherLockStateBroadcast(nextLocked);
+  };
+
+  const onHandleSaveClassroom = async () => {
+    await saveClassroom();
+    // Notify all students in real-time that room layout has updated
+    setTimeout(() => {
+      sendRoomLayoutUpdatedBroadcast();
+    }, 800);
   };
 
   return (
@@ -168,7 +190,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
         onSaveSupabaseConfig={async () => {
           saveSupabaseConfig();
           if (roomId) {
-            await saveClassroom();
+            await onHandleSaveClassroom();
           }
         }}
         roomName={roomName}
@@ -190,7 +212,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
         onToggleSeatLock={onHandleToggleSeatLock}
         onClearGrid={clearCurrentGrid}
         onBulkReset={onHandleBulkReset}
-        onSaveClassroom={saveClassroom}
+        onSaveClassroom={onHandleSaveClassroom}
         onDeleteClassroom={deleteClassroom}
         isSaving={isSaving}
         onDragEnd={handleDragEnd}
