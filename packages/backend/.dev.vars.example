@@ -1,0 +1,8 @@
+# JWT Signature Secret Key (Use a strong unique string in production!)
+JWT_SECRET="YOUR_TEACHER_JWT_SECRET_HERE"
+SUPABASE_JWT_SECRET="YOUR_SUPABASE_REALTIME_JWT_SECRET_HERE"
+
+# Optional: Initial Administrator Credentials
+# If omitted or left blank, the app auto-seeds "teacher_admin" / "admin123" securely at boot time.
+# INITIAL_TEACHER_USERNAME="teacher_admin"
+# INITIAL_TEACHER_PASSWORD="admin123"
