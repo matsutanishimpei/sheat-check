@@ -70,6 +70,36 @@ export function useRealtimeSession({
   }, [roomId]);
 
   const [isOnline, setIsOnline] = useState(true);
+  const [isFallbackActive, setIsFallbackActive] = useState(false);
+
+  // ── HTTP Fallback Auto-Polling ──────────────────────────────────
+  // If Supabase limits are reached, poll classroom status from backend every 7 seconds
+  useEffect(() => {
+    if (!isFallbackActive || !studentClassroomId) return;
+
+    let timer: any;
+
+    const pollClassroom = async () => {
+      try {
+        const res = await fetch(`/api/rooms/${studentClassroomId}`);
+        if (res.ok) {
+          const data = await res.json();
+          // Trigger layout layout re-renders automatically
+          if (data && onRoomLayoutUpdatedRef.current) {
+            onRoomLayoutUpdatedRef.current();
+          }
+        }
+      } catch (err) {
+        console.warn('HTTP Fallback polling failed:', err);
+      }
+    };
+
+    timer = setInterval(pollClassroom, 7000); // Poll every 7 seconds
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, [isFallbackActive, studentClassroomId]);
 
   // Dynamically re-initialize Supabase client when credentials update
   useEffect(() => {
@@ -303,6 +333,11 @@ export function useRealtimeSession({
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           console.log(`[Student] Successfully subscribed to channel: ${studentClassroomId}`);
+          setIsFallbackActive(false);
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn(`[Student] Realtime subscription status failed: ${status}. Fallback activated.`);
+          setIsFallbackActive(true);
+          addToastRef.current('warning', '大教室での接続上限、または通信不通により、リアルタイム同期が制限されています。バックアップのHTTP自動同期（自動ポーリング）に自動切り替えしました。');
         }
       });
 
@@ -450,6 +485,7 @@ export function useRealtimeSession({
     realtimeLogs,
     setRealtimeLogs,
     isOnline,
+    isFallbackActive,
     sendStudentToTeacherBroadcast,
     sendTeacherResetBroadcast,
     sendStudentEvictedBroadcast,

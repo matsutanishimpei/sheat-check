@@ -13,6 +13,15 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('expired') === 'true') {
+      addToast('warning', 'セッションの有効期限が切れました。安全のため再ログインしてください。');
+      // Clean up the URL query parameter instantly
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [addToast]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     

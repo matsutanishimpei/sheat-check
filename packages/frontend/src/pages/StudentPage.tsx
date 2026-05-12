@@ -114,6 +114,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
 
   const {
     supabase,
+    isFallbackActive,
     sendStudentToTeacherBroadcast,
   } = useRealtimeSession({
     roomId: '', // Student doesn't need to subscribe to the teacher's management channel the same way
@@ -351,6 +352,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       ) : (
         <StudentView
           supabase={supabase}
+          isFallbackActive={isFallbackActive}
           studentStage={studentStage}
           setStudentStage={setStudentStage}
           studentClassroomId={studentClassroomId}

@@ -7,6 +7,7 @@ import { StudentDashboard } from '../components/student/StudentDashboard';
 
 interface StudentViewProps {
   supabase: SupabaseClient | null;
+  isFallbackActive?: boolean;
   studentStage: 'config' | 'select' | 'dashboard';
   setStudentStage: (stage: 'config' | 'select' | 'dashboard') => void;
   studentClassroomId: string;
@@ -32,6 +33,7 @@ interface StudentViewProps {
 
 export const StudentView: React.FC<StudentViewProps> = React.memo(({
   supabase,
+  isFallbackActive = false,
   studentStage,
   setStudentStage,
   studentClassroomId,
@@ -56,6 +58,27 @@ export const StudentView: React.FC<StudentViewProps> = React.memo(({
 }) => {
   return (
     <main className="student-view-container">
+      {isFallbackActive && (
+        <div style={{
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          border: '1px solid rgba(245, 158, 11, 0.25)',
+          borderRadius: 'var(--border-radius)',
+          padding: '0.75rem 1rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.5rem',
+          color: '#f59e0b',
+          fontSize: '0.8rem',
+          fontWeight: 500,
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        }}>
+          <span style={{ fontSize: '1rem', animation: 'spin 4s infinite linear' }}>⚙️</span>
+          <span>大教室制限により、HTTPバックアップ同期モードが稼働中（リアルタイム自動復旧中）</span>
+        </div>
+      )}
+      
       <div className="student-card">
         {studentStage === 'config' && (
           <StudentConfig
