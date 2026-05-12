@@ -1,28 +1,55 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock } from 'lucide-react';
+import { Lock, User, Loader2 } from 'lucide-react';
+import client from '../lib/hc';
 
 interface LoginPageProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
 }
 
 export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Read from Vite env var, fallback to 'admin' if not configured
-    const correctPassword = import.meta.env.VITE_TEACHER_PASSWORD || 'admin';
+    if (!username.trim() || !password) {
+      addToast('error', 'ユーザー名とパスワードを入力してください。');
+      return;
+    }
 
-    if (password === correctPassword) {
-      localStorage.setItem('teacher_auth', 'true');
+    setLoading(true);
+    try {
+      const res = await client.api.auth.teacher.login.$post({
+        json: {
+          username: username.trim(),
+          password,
+        },
+      });
+
+      if (!res.ok) {
+        const errData = await res.json() as { error?: string };
+        throw new Error(errData.error || 'ユーザー名またはパスワードが正しくありません');
+      }
+
+      const data = await res.json();
+
+      // Store authentication tokens & teacher profile details securely in browser storage
+      localStorage.setItem('teacher_jwt', data.token);
+      localStorage.setItem('supabase_teacher_token', data.supabaseToken);
+      localStorage.setItem('logged_in_teacher', JSON.stringify(data.teacher));
+      localStorage.setItem('teacher_auth', 'true'); // For legacy guard compatibility
+
       addToast('success', 'ログインしました。教員用管理画面へ移動します。');
       navigate('/room_layout');
-    } else {
-      addToast('error', 'パスワードが間違っています。');
+    } catch (err: any) {
+      addToast('error', err.message || 'サーバーとの通信に失敗しました。');
       setPassword('');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -36,31 +63,76 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
       </header>
       
       <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div className="card" style={{ maxWidth: '400px', width: '100%', padding: '2rem', textAlign: 'center' }}>
+        <div className="card" style={{ maxWidth: '420px', width: '100%', padding: '2.5rem 2rem', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-teacher)', marginBottom: '1.5rem' }}>
             <Lock size={32} />
           </div>
           <h2 className="card-title" style={{ fontSize: '1.5rem', marginBottom: '0.5rem', justifyContent: 'center' }}>教員ログイン</h2>
-          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.9rem' }}>
-            システムを利用するにはパスワードを入力してください。
+          <p style={{ color: 'var(--text-muted)', marginBottom: '2rem', fontSize: '0.85rem', lineHeight: '1.4' }}>
+            システム管理、および座席モニタリングを開始するためにアカウント情報を入力してください。
           </p>
           
-          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             <div className="input-group" style={{ textAlign: 'left' }}>
-              <label className="input-label">パスワード</label>
+              <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <User size={14} /> ユーザー名
+              </label>
+              <input
+                type="text"
+                className="text-input"
+                placeholder="ユーザー名を入力... (例: teacher_admin)"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                disabled={loading}
+                autoFocus
+              />
+            </div>
+
+            <div className="input-group" style={{ textAlign: 'left' }}>
+              <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <Lock size={14} /> パスワード
+              </label>
               <input
                 type="password"
                 className="text-input"
                 placeholder="パスワードを入力..."
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoFocus
+                disabled={loading}
               />
             </div>
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', backgroundColor: 'var(--color-teacher)', padding: '0.75rem', marginTop: '0.5rem' }}>
-              ログイン
+
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              disabled={loading}
+              style={{ 
+                width: '100%', 
+                backgroundColor: 'var(--color-teacher)', 
+                padding: '0.85rem', 
+                marginTop: '0.5rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={18} />
+                  認証中...
+                </>
+              ) : (
+                'ログイン'
+              )}
             </button>
           </form>
+
+          <div style={{ marginTop: '1.5rem', padding: '0.75rem', borderRadius: 'var(--border-radius)', backgroundColor: 'rgba(255, 255, 255, 0.03)', border: '1px dashed rgba(255, 255, 255, 0.1)', fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'left' }}>
+            <span style={{ fontWeight: 'bold', color: 'var(--text-color)' }}>💡 初期デモアカウント：</span><br />
+            ユーザー名: <code style={{ color: 'var(--color-teacher)', fontFamily: 'monospace' }}>teacher_admin</code><br />
+            パスワード: <code style={{ color: 'var(--color-teacher)', fontFamily: 'monospace' }}>admin123</code>
+          </div>
         </div>
       </main>
     </div>
