@@ -177,3 +177,47 @@
 - [x] Implement frontend critical business logic tests (Student ID validator, Latency tracker, Matrix CSV exporter)
 - [x] Add `.github/workflows/ci.yml` to automatically run Lint, Typecheck, and Tests
 - [x] Verify everything compiles, lint passes, and tests run with 100% success locally
+
+### Phase 16: Teacher ID/PW Auth & Supabase JWT (Approach B)
+- [x] **Step 1: Schema & Type Definitions (Shared)**
+  - [x] Define `TeacherLoginInputSchema` inside `packages/shared/src/schemas/auth.ts` (validates username and password)
+  - [x] Extract TypeScript type `TeacherLoginInput` inside `packages/shared/src/types/auth.ts`
+  - [x] Re-export the schema and type in `packages/shared/src/index.ts`
+- [x] **Step 2: Database Migration (Backend)**
+  - [x] Create `0003_create_teachers_table.sql` inside `packages/backend/migrations/` with `teachers` table structure (id, username, password_hash, created_at)
+  - [x] Seed a default admin teacher account with a secure bcrypt hashed password in the migration SQL
+  - [x] Run wrangler local migrations to update the local SQLite database
+- [x] **Step 3: Backend Authentication & JWT Issuance (Hono)**
+  - [x] Install `bcryptjs` and `@types/bcryptjs` in the workspace root or specified workspaces
+  - [x] Create JWT utility functions to sign Supabase-compatible tokens (using Supabase JWT secret from wrangler.toml)
+  - [x] Implement `POST /api/auth/teacher/login` using `@hono/zod-validator` and `bcryptjs.compare`
+  - [x] Implement Hono endpoints to issue temporary student Supabase JWT tokens when checking into a room
+- [x] **Step 4: Frontend Login Integration (Vite/React)**
+  - [x] Refactor `LoginPage.tsx` to handle authentic ID/PW authentication via Hono API
+  - [x] Persist the signed Teacher JWT and the Supabase access token in LocalStorage
+  - [x] Protect `/manage` and `/seating` routes with real JWT presence checks
+- [x] **Step 5: Dynamic Supabase Client Authorization (Approach B)**
+  - [x] Integrate JWT access token retriever in Teacher's Supabase client initialization
+  - [x] Integrate JWT access token retriever in Student's Supabase client initialization upon check-in
+  - [x] Set up proper Supabase Realtime Authorization settings (verify connections with custom JWT claims)
+- [x] **Step 6: Verification, Testing & QA**
+  - [x] Add unit/integration tests in `packages/backend` verifying password verification and JWT token generation
+  - [x] Verify types, run lint checks, and execute vitest suite to ensure 100% stability
+
+### Phase 17: Teacher Account Management (CRUD with Token Auth)
+- [ ] **Step 1: Backend Middleware & Repository Extension**
+  - [ ] Implement `teacherAuth` middleware/guard in `packages/backend/src/index.ts` to verify incoming Authorization Bearer JWT tokens
+  - [ ] Extend `TeacherRepository` and its implementations (`D1TeacherRepository` / `InMemoryTeacherRepository`) with `create`, `delete`, and `listAll` methods
+- [ ] **Step 2: Backend CRUD Endpoints**
+  - [ ] Implement `GET /api/auth/teachers` (List all teachers - returns id, username, createdAt) protected by `teacherAuth`
+  - [ ] Implement `POST /api/auth/teachers` (Create new teacher - validates input, hashes password via bcrypt) protected by `teacherAuth`
+  - [ ] Implement `DELETE /api/auth/teachers/:id` (Delete teacher account - protects against self-deletion locking out the system) protected by `teacherAuth`
+- [ ] **Step 3: Frontend API & State Client Integration**
+  - [ ] Create a dedicated header tab/interface or settings panel inside Teacher Workspace (Manage page) to manage accounts
+  - [ ] Update frontend Hono RPC call interceptor or headers to dynamically attach `Authorization: Bearer <teacher_jwt>` for protected routes
+  - [ ] Implement interactive Account Manager UI: fetch teachers list, show "Add Teacher" modal, and display "Delete Account" confirmations with secure self-deletion guards
+- [ ] **Step 4: Quality Assurance & Integration Testing**
+  - [ ] Add integration tests in `packages/backend/src/index.test.ts` verifying protected list, create, and delete teacher routes
+  - [ ] Ensure perfect monorepo typecheck, run vitest suites, and execute a final production build
+
+

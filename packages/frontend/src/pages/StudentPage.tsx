@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { hc } from 'hono/client';
 import type { AppType } from '@my-app/backend';
@@ -20,6 +20,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
   const [supabaseUrl, setSupabaseUrl] = useState('');
   const [supabaseAnonKey, setSupabaseAnonKey] = useState('');
   const [isRoomActive, setIsRoomActive] = useState(true);
+  const [studentToken, setStudentToken] = useState(() => localStorage.getItem('supabase_student_token') || '');
 
   // Student specific states
   const [studentStage, setStudentStage] = useState<'config' | 'select' | 'dashboard'>('config');
@@ -35,6 +36,81 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
   
   // Empty live statuses for Student Page (since they only send, not receive grid updates visually)
   const [liveStatuses, setLiveStatuses] = useState<Record<string, LiveSeatStatus>>({});
+
+  const fetchRoomAndSetup = useCallback(async (
+    cleanUuid: string,
+    storedId?: string | null,
+    storedName?: string | null,
+    storedSeatId?: string | null,
+    forceStageUpdate = false
+  ) => {
+    try {
+      const res = await client.api.rooms[':id'].$get({
+        param: { id: cleanUuid },
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        setStudentRoomTitle(data.name);
+        
+        const active = data.isActive !== false;
+        setIsRoomActive(active);
+
+        if (data.supabaseUrl && data.supabaseAnonKey) {
+          setSupabaseUrl(data.supabaseUrl);
+          setSupabaseAnonKey(data.supabaseAnonKey);
+
+          // Dynamically pre-fetch student JWT token if already logged in previously
+          if (storedId && storedName) {
+            try {
+              const tokenRes = await client.api.rooms[':id']['student-token'].$post({
+                param: { id: cleanUuid },
+                json: { studentId: storedId, name: storedName }
+              });
+              if (tokenRes.ok) {
+                const tokenData = await tokenRes.json();
+                localStorage.setItem('supabase_student_token', tokenData.supabaseToken);
+                setStudentToken(tokenData.supabaseToken);
+              }
+            } catch (jwtErr) {
+              console.error('Failed to pre-fetch student realtime token:', jwtErr);
+            }
+          }
+        } else {
+          addToast('error', 'この教室はまだ教員による Supabase 接続設定が保存されていません。教員に確認してください。');
+        }
+
+        const gridObj: Record<string, GridItem['type']> = {};
+        if (data.grid) {
+          data.grid.forEach((item: GridItem) => {
+            gridObj[`${item.x},${item.y}`] = item.type;
+          });
+        }
+        setStudentGridLayout(gridObj);
+
+        if (active) {
+          if (forceStageUpdate) {
+            if (storedName) {
+              if (storedSeatId) {
+                setStudentStage('dashboard');
+                addToast('success', `教室「${data.name}」の固定席 (${storedSeatId}) に自動チェックインしました！`);
+              } else {
+                setStudentStage('select');
+                addToast('info', `教室「${data.name}」の座席選択画面へ進みます`);
+              }
+            } else {
+              addToast('info', `教室「${data.name}」への招待リンクをロードしました。お名前を入力して入室してください！`);
+            }
+          }
+        }
+      } else {
+        addToast('error', '指定された招待リンクの教室が見つかりませんでした。');
+      }
+    } catch (err: any) {
+      console.error('URL setup failed:', err);
+      addToast('error', `教室データの取得エラー: ${err.message}`);
+    }
+  }, [addToast]);
 
   const {
     supabase,
@@ -62,10 +138,18 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       }
     },
     onTeacherLockState: (locked) => setStudentLiveSeatLocked(locked),
+    onRoomLayoutUpdated: () => {
+      if (studentClassroomId) {
+        // Silent hot reload of the classroom layout
+        fetchRoomAndSetup(studentClassroomId, null, null, null, false);
+        addToast('info', '教員が教室の座席レイアウトを更新しました。配置が自動同期されました！');
+      }
+    },
     supabaseUrl,
     setSupabaseUrl,
     supabaseAnonKey,
     setSupabaseAnonKey,
+    authToken: studentToken,
   });
 
   // Handle URL parameter login flow on mount
@@ -88,59 +172,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         }
       }
 
-      const fetchRoomAndSetup = async () => {
-        try {
-          const res = await client.api.rooms[':id'].$get({
-            param: { id: cleanUuid },
-          });
-          
-          if (res.ok) {
-            const data = await res.json();
-            setStudentRoomTitle(data.name);
-            
-            const active = data.isActive !== false;
-            setIsRoomActive(active);
-
-            if (data.supabaseUrl && data.supabaseAnonKey) {
-              setSupabaseUrl(data.supabaseUrl);
-              setSupabaseAnonKey(data.supabaseAnonKey);
-            } else {
-              addToast('error', 'この教室はまだ教員による Supabase 接続設定が保存されていません。教員に確認してください。');
-            }
-
-            const gridObj: Record<string, GridItem['type']> = {};
-            if (data.grid) {
-              data.grid.forEach((item: GridItem) => {
-                gridObj[`${item.x},${item.y}`] = item.type;
-              });
-            }
-            setStudentGridLayout(gridObj);
-
-            if (active) {
-              if (storedName) {
-                if (storedSeatId) {
-                  setStudentStage('dashboard');
-                  addToast('success', `教室「${data.name}」の固定席 (${storedSeatId}) に自動チェックインしました！`);
-                } else {
-                  setStudentStage('select');
-                  addToast('info', `教室「${data.name}」の座席選択画面へ進みます`);
-                }
-              } else {
-                addToast('info', `教室「${data.name}」への招待リンクをロードしました。お名前を入力して入室してください！`);
-              }
-            }
-          } else {
-            addToast('error', '指定された招待リンクの教室が見つかりませんでした。');
-          }
-        } catch (err: any) {
-          console.error('URL setup failed:', err);
-          addToast('error', `教室データの取得エラー: ${err.message}`);
-        }
-      };
-
-      fetchRoomAndSetup();
+      fetchRoomAndSetup(cleanUuid, storedId, storedName, storedSeatId, true);
     }
-  }, [roomId, addToast]);
+  }, [roomId, fetchRoomAndSetup]);
 
   const handleStudentLogin = async () => {
     if (!studentClassroomId.trim()) {
@@ -179,6 +213,28 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         if (data.supabaseUrl && data.supabaseAnonKey) {
           setSupabaseUrl(data.supabaseUrl);
           setSupabaseAnonKey(data.supabaseAnonKey);
+
+          // Retrieve student Supabase Access Token (JWT) from backend to lock down Realtime channels
+          try {
+            const tokenRes = await client.api.rooms[':id']['student-token'].$post({
+              param: { id: studentClassroomId.trim() },
+              json: {
+                studentId: studentId.trim(),
+                name: studentName.trim()
+              }
+            });
+
+            if (tokenRes.ok) {
+              const tokenData = await tokenRes.json();
+              localStorage.setItem('supabase_student_token', tokenData.supabaseToken);
+              setStudentToken(tokenData.supabaseToken);
+            } else {
+              throw new Error('Supabase 認証トークンの取得に失敗しました');
+            }
+          } catch (tokenErr: any) {
+            addToast('error', `リアルタイム通信の認証に失敗しました: ${tokenErr.message}`);
+            return;
+          }
         } else {
           addToast('error', 'この教室はまだ教員による Supabase 接続設定が保存されていません。教員に確認してください。');
         }

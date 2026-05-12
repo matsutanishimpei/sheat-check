@@ -11,10 +11,12 @@ interface UseRealtimeSessionProps {
   onTeacherReset: () => void;
   onTeacherEvict?: (seatId: string) => void;
   onTeacherLockState: (locked: boolean) => void;
+  onRoomLayoutUpdated?: () => void;
   supabaseUrl: string;
   setSupabaseUrl: (val: string) => void;
   supabaseAnonKey: string;
   setSupabaseAnonKey: (val: string) => void;
+  authToken?: string;
 }
 
 export function useRealtimeSession({
@@ -26,10 +28,12 @@ export function useRealtimeSession({
   onTeacherReset,
   onTeacherEvict,
   onTeacherLockState,
+  onRoomLayoutUpdated,
   supabaseUrl,
   setSupabaseUrl,
   supabaseAnonKey,
   setSupabaseAnonKey,
+  authToken,
 }: UseRealtimeSessionProps) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(() => {
     const url = localStorage.getItem('sb_url');
@@ -103,6 +107,7 @@ export function useRealtimeSession({
   const onTeacherResetRef = useRef(onTeacherReset);
   const onTeacherEvictRef = useRef(onTeacherEvict);
   const onTeacherLockStateRef = useRef(onTeacherLockState);
+  const onRoomLayoutUpdatedRef = useRef(onRoomLayoutUpdated);
   const isSeatLockedRef = useRef(isSeatLocked);
   const roomIdRef = useRef(roomId);
 
@@ -110,6 +115,7 @@ export function useRealtimeSession({
   useEffect(() => { onTeacherResetRef.current = onTeacherReset; }, [onTeacherReset]);
   useEffect(() => { onTeacherEvictRef.current = onTeacherEvict; }, [onTeacherEvict]);
   useEffect(() => { onTeacherLockStateRef.current = onTeacherLockState; }, [onTeacherLockState]);
+  useEffect(() => { onRoomLayoutUpdatedRef.current = onRoomLayoutUpdated; }, [onRoomLayoutUpdated]);
   useEffect(() => { isSeatLockedRef.current = isSeatLocked; }, [isSeatLocked]);
   useEffect(() => { roomIdRef.current = roomId; }, [roomId]);
 
@@ -176,7 +182,7 @@ export function useRealtimeSession({
 
     addToastRef.current('info', `Supabase チャンネル「${roomId}」を購読中...`);
 
-    const channel = supabase.channel(roomId, {
+    const channel = supabase.channel(`room:${roomId}`, {
       config: { broadcast: { self: true } },
     });
 
@@ -265,7 +271,7 @@ export function useRealtimeSession({
 
     if (!supabase || !studentClassroomId.trim()) return;
 
-    const channel = supabase.channel(studentClassroomId, {
+    const channel = supabase.channel(`room:${studentClassroomId}`, {
       config: { broadcast: { self: true } },
     });
 
@@ -286,6 +292,12 @@ export function useRealtimeSession({
         console.log('Received seat lock state from teacher:', response);
         if (response.payload && typeof response.payload.locked === 'boolean') {
           onTeacherLockStateRef.current(response.payload.locked);
+        }
+      })
+      .on('broadcast', { event: 'room_layout_updated' }, (response) => {
+        console.log('Received room layout update event from teacher:', response);
+        if (onRoomLayoutUpdatedRef.current) {
+          onRoomLayoutUpdatedRef.current();
         }
       })
       .subscribe((status) => {
@@ -408,6 +420,26 @@ export function useRealtimeSession({
     }
   }, []);
 
+  const sendRoomLayoutUpdatedBroadcast = useCallback(async (): Promise<'ok' | 'error'> => {
+    const channel = teacherChannelRef.current;
+    if (!channel) {
+      console.error('[sendRoomLayoutUpdatedBroadcast] No teacher channel available');
+      return 'error';
+    }
+
+    try {
+      const res = await channel.send({
+        type: 'broadcast',
+        event: 'room_layout_updated',
+        payload: { timestamp: new Date().toISOString() },
+      });
+      return res === 'ok' ? 'ok' : 'error';
+    } catch (err) {
+      console.error('Failed to send room layout updated broadcast:', err);
+      return 'error';
+    }
+  }, []);
+
   return {
     supabaseUrl,
     setSupabaseUrl,
@@ -422,5 +454,6 @@ export function useRealtimeSession({
     sendTeacherResetBroadcast,
     sendStudentEvictedBroadcast,
     sendTeacherLockStateBroadcast,
+    sendRoomLayoutUpdatedBroadcast,
   };
 }
