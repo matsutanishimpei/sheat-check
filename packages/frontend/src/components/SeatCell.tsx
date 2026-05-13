@@ -51,34 +51,45 @@ export const SeatCell = React.memo(({
           className={`cell-item ${cellType} ${cellType === 'student' && liveStatus ? `student-live-${liveStatus.status}` : ''}`}
         >
           {cellType === 'student' && liveStatus ? (
-            <span style={{ 
-              fontSize: '0.85rem', 
-              fontWeight: 850, 
-              textAlign: 'center', 
-              lineHeight: '1.2',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              display: 'block',
-              width: '100%',
-              padding: '0 6px',
-              boxSizing: 'border-box'
-            }}
-              title={liveStatus.name}
-            >
-              {liveStatus.name}
-            </span>
+            <>
+              {/* Default Name Display */}
+              <span className="student-name-display" style={{ 
+                fontSize: '0.85rem', 
+                fontWeight: 850, 
+                textAlign: 'center', 
+                lineHeight: '1.2',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: 'block',
+                width: '100%',
+                padding: '0 6px',
+                boxSizing: 'border-box'
+              }}>
+                {liveStatus.name}
+              </span>
+              {/* Hover Student ID Display */}
+              <span className="student-id-display" style={{ 
+                fontSize: '0.8rem', 
+                fontWeight: 'bold', 
+                fontFamily: 'monospace',
+                textAlign: 'center', 
+                lineHeight: '1.2',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: 'none', /* Toggled via CSS on hover */
+                width: '100%',
+                padding: '0 4px',
+                boxSizing: 'border-box',
+                letterSpacing: '0.02em'
+              }}>
+                {liveStatus.studentId}
+              </span>
+            </>
           ) : (
             getIcon()
           )}
-        </div>
-      )}
-
-      {cellType === 'student' && liveStatus && (
-        <div className={`cell-tooltip ${y === 0 ? 'tooltip-down' : ''}`} style={{ pointerEvents: 'none', padding: '0.4rem 0.6rem', minWidth: 'auto', display: 'inline-block', textAlign: 'center' }}>
-          <span style={{ fontSize: '0.85rem', fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
-            {liveStatus.studentId}
-          </span>
         </div>
       )}
     </div>

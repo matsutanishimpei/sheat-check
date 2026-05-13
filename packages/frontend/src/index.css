@@ -1099,5 +1099,20 @@ body {
   margin-left: auto !important;
 }
 
+/* ==========================================================================
+   Inline Student Seat Hover: Swaps Name with Student ID & hides original status colors
+   ========================================================================== */
+.grid-cell:hover .cell-item.student {
+  background-color: #0f172a !important;
+  border-color: #38bdf8 !important; /* Beautiful glowing cyan outline */
+  color: #f8fafc !important;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.45) !important;
+}
 
+.grid-cell:hover .student-name-display {
+  display: none !important;
+}
 
+.grid-cell:hover .student-id-display {
+  display: block !important;
+}
