@@ -37,9 +37,9 @@ const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
   return response;
 };
 
-// Use the current origin for the client, assuming Vite proxy in dev
-// and same-domain in production. Attach headers dynamically.
-const client = hc<AppType>('/', {
+// Use VITE_API_URL if configured (cross-origin in production), otherwise fallback to root "/" for local proxy dev.
+const apiUrl = import.meta.env.VITE_API_URL || '/';
+const client = hc<AppType>(apiUrl, {
   fetch: customFetch,
   headers: () => {
     const headers: Record<string, string> = {};
