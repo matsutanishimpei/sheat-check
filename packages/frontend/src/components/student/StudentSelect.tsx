@@ -71,8 +71,11 @@ export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
                   style={{ aspectRatio: 1, position: 'relative' }}
                 >
                   {isStudentSeat && (
-                    <div className="cell-item student" style={isSelected ? { backgroundColor: 'var(--color-student-hover)' } : undefined}>
-                      <Users size={14} />
+                    <div 
+                      className="cell-item student" 
+                      style={isSelected ? { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' } : undefined}
+                    >
+                      <Users size={14} style={isSelected ? { color: '#0b132b', filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.25))' } : undefined} />
                     </div>
                   )}
                   {cellType === 'teacher' && (

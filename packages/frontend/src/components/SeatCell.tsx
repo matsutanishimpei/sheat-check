@@ -73,6 +73,14 @@ export const SeatCell = React.memo(({
           )}
         </div>
       )}
+
+      {cellType === 'student' && liveStatus && (
+        <div className={`cell-tooltip ${y === 0 ? 'tooltip-down' : ''}`} style={{ pointerEvents: 'none', padding: '0.4rem 0.6rem', minWidth: 'auto', display: 'inline-block', textAlign: 'center' }}>
+          <span style={{ fontSize: '0.85rem', fontWeight: 'bold', fontFamily: 'monospace', color: 'var(--text-primary)', letterSpacing: '0.05em' }}>
+            {liveStatus.studentId}
+          </span>
+        </div>
+      )}
     </div>
   );
 });

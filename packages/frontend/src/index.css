@@ -987,13 +987,28 @@ body {
 }
 
 .grid-cell.student-selected {
-  background: var(--color-student) !important;
-  border-color: var(--color-student-hover) !important;
-  box-shadow: var(--shadow-sm) !important;
+  background: #f59e0b !important;
+  border-color: #d97706 !important;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.65) !important;
+  transform: scale(1.05);
+  animation: selection-pulse 1.5s infinite ease-in-out;
+  z-index: 10;
+}
+
+@keyframes selection-pulse {
+  0% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.95), 0 0 0 4px rgba(245, 158, 11, 0.25);
+  }
+  100% {
+    box-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
+  }
 }
 
 .grid-cell.student-selected .cell-item {
-  color: white !important;
+  color: #0b132b !important;
 }
 
 .grid-cell.student-unselectable {
