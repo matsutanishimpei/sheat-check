@@ -456,30 +456,30 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.grid-9x9 {
+.grid-12x12 {
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(9, 1fr);
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, 1fr);
   gap: 6px;
   width: 100%;
   max-width: 480px;
   aspect-ratio: 1;
 }
 
-.grid-9x9.grid-massive {
-  --cell-width: max(calc((100vw - 620px) / 9), var(--min-cell-width, 48px));
-  --cell-height: max(calc((100vh - 440px) / 9), var(--min-cell-height, 32px));
+.grid-12x12.grid-massive {
+  --cell-width: max(calc((100vw - 620px) / 12), var(--min-cell-width, 40px));
+  --cell-height: max(calc((100vh - 440px) / 12), var(--min-cell-height, 26px));
 
   display: grid;
-  grid-template-columns: repeat(9, var(--cell-width));
-  grid-template-rows: repeat(9, var(--cell-height));
+  grid-template-columns: repeat(12, var(--cell-width));
+  grid-template-rows: repeat(12, var(--cell-height));
   gap: 12px;
   width: auto;
   max-width: none;
   aspect-ratio: auto;
 }
 
-.grid-9x9.grid-massive .grid-cell {
+.grid-12x12.grid-massive .grid-cell {
   aspect-ratio: auto;
   width: var(--cell-width);
   height: var(--cell-height);
@@ -494,9 +494,9 @@ body {
 }
 
 @media (max-width: 768px) {
-  .grid-9x9.grid-massive {
-    --min-cell-width: 42px !important;
-    --min-cell-height: 28px !important;
+  .grid-12x12.grid-massive {
+    --min-cell-width: 36px !important;
+    --min-cell-height: 24px !important;
     gap: 4px !important;
   }
   .grid-container-card.grid-massive-container {

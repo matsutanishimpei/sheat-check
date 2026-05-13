@@ -40,9 +40,9 @@ export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
       )}
 
       <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
-        <div className="grid-9x9" style={{ maxWidth: '320px' }}>
-          {Array.from({ length: 9 }).map((_, y) => (
-            Array.from({ length: 9 }).map((_, x) => {
+        <div className="grid-12x12" style={{ maxWidth: '420px' }}>
+          {Array.from({ length: 12 }).map((_, y) => (
+            Array.from({ length: 12 }).map((_, x) => {
               const coordKey = `${x},${y}`;
               const cellType = studentGridLayout[coordKey];
               const isStudentSeat = cellType === 'student';
