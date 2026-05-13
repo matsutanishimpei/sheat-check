@@ -32,21 +32,19 @@ jobs:
       - name: Apply Production D1 Migrations
         uses: cloudflare/wrangler-action@v3
         with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: d1 migrations apply DB --remote
           workingDirectory: 'packages/backend'
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       # バックエンドのデプロイ
       - name: Deploy API
         uses: cloudflare/wrangler-action@v3
         with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
           workingDirectory: 'packages/backend'
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   # 3. テスト合格およびバックエンドデプロイ完了後にのみ実行されるフロントエンドデプロイ
   deploy-frontend:
@@ -64,7 +62,6 @@ jobs:
       - name: Deploy Pages
         uses: cloudflare/wrangler-action@v3
         with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy packages/frontend/dist --project-name=seets-check
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
