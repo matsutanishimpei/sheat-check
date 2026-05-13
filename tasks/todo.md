@@ -220,4 +220,10 @@
   - [ ] Add integration tests in `packages/backend/src/index.test.ts` verifying protected list, create, and delete teacher routes
   - [ ] Ensure perfect monorepo typecheck, run vitest suites, and execute a final production build
 
-
+### Phase 18: UI De-AI Redesign (Corporate & Educational SaaS Style) (Completed)
+- [x] Create the UI redesign plan at [de_ai_redesign_plan.md](file:///C:/Users/matsu/.gemini/antigravity/brain/c64c1176-a632-4060-a2cb-7d466a80a1f2/de_ai_redesign_plan.md)
+- [x] Refactor core CSS variables in `packages/frontend/src/index.css` to build a clean Slate-Indigo light theme
+- [x] Strip out glassmorphism, background radial glows, and tech text gradients
+- [x] Style student action dashboard big buttons (OK/NG) with solid Emerald and Rose colors and clean touch elevations
+- [x] Relax classroom alert animations from high-frequency glowing neon to clean border shadow pulses
+- [x] Validate and compile the entire monorepo with 100% success using `npm run build`
