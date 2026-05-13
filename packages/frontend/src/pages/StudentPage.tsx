@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { hc } from 'hono/client';
-import type { AppType } from '@my-app/backend';
 import { GridItem, LiveSeatStatus } from '@my-app/shared';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { StudentView } from '../containers/StudentView';
-
-const client = hc<AppType>('/');
+import client from '../lib/hc';
 
 interface StudentPageProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
