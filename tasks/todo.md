@@ -227,3 +227,10 @@
 - [x] Style student action dashboard big buttons (OK/NG) with solid Emerald and Rose colors and clean touch elevations
 - [x] Relax classroom alert animations from high-frequency glowing neon to clean border shadow pulses
 - [x] Validate and compile the entire monorepo with 100% success using `npm run build`
+
+### Phase 19: Remove Responsive Design from Teacher Pages & Table-structured SeatMap (Completed)
+- [x] Identify elements causing responsive layout in `/seats/monitoring` (`TeacherMonitorPage.tsx` and `index.css`)
+- [x] Refactor SeatMap layout to a robust HTML `<table>` structure, locking cell sizes to 86px x 40px (massive mode) to completely eliminate CSS grid collapse
+- [x] Move the Realtime comment feed container directly underneath the SeatMap as a full-width bottom panel to prevent horizontal collisions
+- [x] Lock page width and prevent wrapping on all other teacher dashboards (`TeacherLayoutPage`, `UserStudentPage`, `UserTeacherPage`) to enforce desktop-first visualization
+- [x] Verify that building and typechecking pass 100% successfully and without issues

@@ -13,34 +13,37 @@
   --bg-card: #ffffff;
   --bg-card-hover: #f1f5f9;
   --border-color: #e2e8f0;
-  --text-primary: #0b132b;     /* 深みのある真夜中の紺黒 (Midnight Blue-Black) */
-  --text-secondary: #223354;   /* インクのような深いネイビー (Deep Ink Navy) */
-  --text-muted: #5c6b8c;       /* 視認性の高いスチールネイビー (Steel Navy) */
-  
+  --text-primary: #0b132b;
+  /* 深みのある真夜中の紺黒 (Midnight Blue-Black) */
+  --text-secondary: #223354;
+  /* インクのような深いネイビー (Deep Ink Navy) */
+  --text-muted: #5c6b8c;
+  /* 視認性の高いスチールネイビー (Steel Navy) */
+
   --color-student: #4f46e5;
   --color-student-hover: #4338ca;
   --color-student-glow: rgba(79, 70, 229, 0.08);
-  
+
   --color-teacher: #ea580c;
   --color-teacher-hover: #c2410c;
   --color-teacher-glow: rgba(234, 88, 12, 0.08);
-  
+
   --color-obstacle: #e11d48;
   --color-obstacle-hover: #be123c;
   --color-obstacle-glow: rgba(225, 29, 72, 0.08);
-  
+
   --color-door: #059669;
   --color-door-hover: #047857;
   --color-door-glow: rgba(5, 150, 105, 0.08);
-  
+
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 18px;
-  
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
-  
+
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -49,21 +52,25 @@ body {
   background-color: var(--bg-deep);
   color: var(--text-primary);
   min-height: 100vh;
-  overflow-x: hidden;
-  font-size: 1.05rem; /* Globally scale up base font size for handwriting */
+  overflow-x: auto;
+  font-size: 1.05rem;
+  /* Globally scale up base font size for handwriting */
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-deep);
 }
+
 ::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: var(--radius-sm);
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
@@ -145,11 +152,7 @@ body {
   width: 100%;
 }
 
-@media (max-width: 1024px) {
-  .main-content {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 /* Sidebar Components */
 .sidebar {
@@ -323,13 +326,15 @@ body {
 }
 
 .workspace-title {
-  font-size: 1.75rem; /* Enlarge panel title */
+  font-size: 1.75rem;
+  /* Enlarge panel title */
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .workspace-subtitle {
-  font-size: 1.05rem; /* Enlarge subtitle */
+  font-size: 1.05rem;
+  /* Enlarge subtitle */
   color: var(--text-secondary);
 }
 
@@ -344,7 +349,8 @@ body {
   gap: 0.5rem;
   padding: 0.75rem 1.25rem;
   border-radius: var(--radius-md);
-  font-size: 1rem; /* Enlarge button text */
+  font-size: 1rem;
+  /* Enlarge button text */
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -390,11 +396,7 @@ body {
   gap: 1.5rem;
 }
 
-@media (max-width: 768px) {
-  .editor-grid-layout {
-    grid-template-columns: 1fr;
-  }
-}
+
 
 /* Drag and Drop Palette */
 .palette {
@@ -432,10 +434,21 @@ body {
   border-radius: 50%;
 }
 
-.palette-color-indicator.student { background-color: var(--color-student); }
-.palette-color-indicator.teacher { background-color: var(--color-teacher); }
-.palette-color-indicator.obstacle { background-color: var(--color-obstacle); }
-.palette-color-indicator.door { background-color: var(--color-door); }
+.palette-color-indicator.student {
+  background-color: var(--color-student);
+}
+
+.palette-color-indicator.teacher {
+  background-color: var(--color-teacher);
+}
+
+.palette-color-indicator.obstacle {
+  background-color: var(--color-obstacle);
+}
+
+.palette-color-indicator.door {
+  background-color: var(--color-door);
+}
 
 .palette-name {
   font-size: 0.9rem;
@@ -456,52 +469,61 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.grid-12x12 {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(12, 1fr);
-  gap: 6px;
-  width: 100%;
-  max-width: 480px;
-  aspect-ratio: 1;
-}
-
-.grid-12x12.grid-massive {
-  --cell-width: max(calc((100vw - 620px) / 12), var(--min-cell-width, 40px));
-  --cell-height: max(calc((100vh - 440px) / 12), var(--min-cell-height, 26px));
-
-  display: grid;
-  grid-template-columns: repeat(12, var(--cell-width));
-  grid-template-rows: repeat(12, var(--cell-height));
-  gap: 12px;
+.seat-map-table {
+  border-collapse: separate;
+  border-spacing: 6px;
   width: auto;
-  max-width: none;
-  aspect-ratio: auto;
+  margin: 0 auto;
 }
 
-.grid-12x12.grid-massive .grid-cell {
-  aspect-ratio: auto;
-  width: var(--cell-width);
-  height: var(--cell-height);
+.seat-map-table .grid-cell {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.seat-map-table .cell-item {
+  width: 100%;
+  height: 100%;
+  min-width: 40px;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.seat-map-table.massive {
+  border-collapse: separate;
+  border-spacing: 12px;
+  width: 100%; /* 親コンテナの横幅いっぱいに広げる */
+  max-width: 100%; /* 制限なしで画面幅を最大限に活用 */
+  table-layout: fixed; /* 12列を完全に均等（12等分）にして、画面幅から各席の幅を最大値で動的割り出し */
+  margin: 0 auto;
+}
+
+.seat-map-table.massive .grid-cell {
+  width: 100%; /* 12等分されたカラム幅いっぱいに各席を広げる */
+  height: 44px; /* 高さは美しく44pxに固定 */
+  min-height: 44px;
+}
+
+.seat-map-table.massive .cell-item {
+  width: 100%; /* セル内の色付き背景も幅いっぱいに */
+  height: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .grid-container-card.grid-massive-container {
   min-height: auto;
   padding: 1.25rem;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
-  overflow-x: auto; /* Handle overflow nicely if viewport is too narrow */
-}
-
-@media (max-width: 768px) {
-  .grid-12x12.grid-massive {
-    --min-cell-width: 36px !important;
-    --min-cell-height: 24px !important;
-    gap: 4px !important;
-  }
-  .grid-container-card.grid-massive-container {
-    padding: 0.5rem !important;
-  }
+  overflow-x: auto; /* スマホや極端に狭い画面での最小崩れ防止 */
 }
 
 /* Grid Droppable/Interactive Cell */
@@ -569,9 +591,17 @@ body {
 
 /* Pulse Animations and Extras */
 @keyframes pulseGlow {
-  0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
 }
 
 .logo-icon.pulse {
@@ -602,10 +632,21 @@ body {
   min-width: 280px;
 }
 
-.toast.success { border-left-color: var(--color-door); }
-.toast.error { border-left-color: var(--color-obstacle); }
-.toast.info { border-left-color: var(--color-student); }
-.toast.warning { border-left-color: var(--color-teacher); }
+.toast.success {
+  border-left-color: var(--color-door);
+}
+
+.toast.error {
+  border-left-color: var(--color-obstacle);
+}
+
+.toast.info {
+  border-left-color: var(--color-student);
+}
+
+.toast.warning {
+  border-left-color: var(--color-teacher);
+}
 
 .toast-message {
   font-size: 0.9rem;
@@ -630,11 +671,13 @@ body {
   background: transparent;
   border: none;
   color: var(--text-secondary);
-  padding: 0.65rem 1.25rem; /* Comfortable padding */
+  padding: 0.65rem 1.25rem;
+  /* Comfortable padding */
   border-radius: calc(var(--radius-md) - 2px);
   cursor: pointer;
   font-weight: 600;
-  font-size: 1rem; /* Enlarge navigation tab text */
+  font-size: 1rem;
+  /* Enlarge navigation tab text */
   transition: all var(--transition-fast);
   display: flex;
   align-items: center;
@@ -684,9 +727,17 @@ body {
   gap: 0.25rem;
 }
 
-.feed-item.ok { border-left: 3px solid var(--color-door); }
-.feed-item.ng { border-left: 3px solid var(--color-obstacle); }
-.feed-item.none { border-left: 3px solid var(--text-muted); }
+.feed-item.ok {
+  border-left: 3px solid var(--color-door);
+}
+
+.feed-item.ng {
+  border-left: 3px solid var(--color-obstacle);
+}
+
+.feed-item.none {
+  border-left: 3px solid var(--text-muted);
+}
 
 .feed-item-header {
   display: flex;
@@ -818,9 +869,17 @@ body {
    -------------------------------------------------------------------------- */
 
 @keyframes pulseRedBorder {
-  0% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(225, 29, 72, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
+  0% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 6px rgba(225, 29, 72, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 29, 72, 0);
+  }
 }
 
 .cell-item.student-live-ng {
@@ -999,9 +1058,11 @@ body {
   0% {
     box-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
   }
+
   50% {
     box-shadow: 0 0 18px rgba(245, 158, 11, 0.95), 0 0 0 4px rgba(245, 158, 11, 0.25);
   }
+
   100% {
     box-shadow: 0 0 12px rgba(245, 158, 11, 0.65);
   }
@@ -1043,7 +1104,8 @@ body {
   opacity: 0.40 !important;
   transform: scale(0.96) !important;
   box-shadow: none !important;
-  pointer-events: auto; /* Allow changing vote directly by clicking the inactive button */
+  pointer-events: auto;
+  /* Allow changing vote directly by clicking the inactive button */
 }
 
 .btn-huge.active {
@@ -1059,11 +1121,11 @@ body {
 .app-header {
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
-  padding: 1.5rem 2rem 1.25rem 2rem;
+  padding: 0.75rem 2rem; /* スリムな縦パディング */
   display: flex;
-  flex-direction: column; /* Brand/title on top, controls/links on bottom */
-  align-items: flex-start;
-  gap: 1.25rem;
+  flex-direction: row; /* 完全に横並び（1行）へ */
+  align-items: center; /* 縦中央寄せ */
+  justify-content: space-between; /* 左右に綺麗に分散 */
   position: sticky;
   top: 0;
   z-index: 100;
@@ -1075,10 +1137,11 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0; /* ロゴが潰れないよう固定 */
 }
 
 .header-title {
-  font-size: 1.75rem; /* Large welcoming title */
+  font-size: 1.5rem; /* 1行にスッキリ収まるフォントサイズに調整 */
   font-weight: 700;
   color: var(--text-primary);
   display: flex;
@@ -1088,15 +1151,17 @@ body {
 
 .header-controls {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.75rem;
-  width: 100%;
+  width: auto;
+  flex-grow: 1;
+  justify-content: flex-end; /* 右寄せ */
 }
 
-/* Push the 'Logout' (last child) to the far right side of the row */
+/* Push the 'Logout' (last child) to the far right side of the row with standard margin */
 .header-controls .mode-toggle-btn:last-child {
-  margin-left: auto !important;
+  margin-left: 0.5rem !important;
 }
 
 /* ==========================================================================
@@ -1104,7 +1169,8 @@ body {
    ========================================================================== */
 .grid-cell:hover .cell-item.student {
   background-color: #0f172a !important;
-  border-color: #38bdf8 !important; /* Beautiful glowing cyan outline */
+  border-color: #38bdf8 !important;
+  /* Beautiful glowing cyan outline */
   color: #f8fafc !important;
   box-shadow: 0 0 10px rgba(56, 189, 248, 0.45) !important;
 }

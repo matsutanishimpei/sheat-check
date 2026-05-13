@@ -155,7 +155,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>

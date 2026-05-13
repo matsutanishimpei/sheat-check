@@ -287,7 +287,7 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px' }}>
       {/* App Header */}
       <header className="app-header">
         <div className="header-brand">
@@ -334,8 +334,8 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
         </div>
 
         {/* Action Controls & Filters */}
-        <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', flex: 1, alignItems: 'center' }}>
+        <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', flexWrap: 'nowrap', gap: '1rem', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', flexWrap: 'nowrap', gap: '1rem', flex: 1, alignItems: 'center' }}>
             
             {/* Search Box */}
             <div style={{ position: 'relative', minWidth: '240px', flex: 1 }}>

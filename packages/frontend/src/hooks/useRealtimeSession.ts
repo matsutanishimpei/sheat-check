@@ -277,6 +277,14 @@ export function useRealtimeSession({
             event: 'teacher_lock_state',
             payload: { locked: isSeatLockedRef.current },
           });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          console.warn(`[Teacher] Realtime subscription failed: ${status}. Scheduling auto-reconnect in 10s...`);
+          setTimeout(() => {
+            if (teacherChannelRef.current) {
+              console.log('[Teacher] Retrying subscription to channel:', roomId);
+              teacherChannelRef.current.subscribe();
+            }
+          }, 10000);
         }
       });
 
@@ -335,9 +343,15 @@ export function useRealtimeSession({
           console.log(`[Student] Successfully subscribed to channel: ${studentClassroomId}`);
           setIsFallbackActive(false);
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          console.warn(`[Student] Realtime subscription status failed: ${status}. Fallback activated.`);
+          console.warn(`[Student] Realtime subscription status failed: ${status}. Fallback activated. Scheduling auto-reconnect in 10s...`);
           setIsFallbackActive(true);
           addToastRef.current('warning', '大教室での接続上限、または通信不通により、リアルタイム同期が制限されています。バックアップのHTTP自動同期（自動ポーリング）に自動切り替えしました。');
+          setTimeout(() => {
+            if (studentChannelRef.current) {
+              console.log('[Student] Retrying subscription to channel:', studentClassroomId);
+              studentChannelRef.current.subscribe();
+            }
+          }, 10000);
         }
       });
 

@@ -346,7 +346,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1600px' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
@@ -465,11 +465,11 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
         {roomId ? (
           <div style={{ display: 'flex', flexDirection: 'column', width: '100%', marginTop: '1rem', flex: 1, gap: '2rem' }}>
             
-            {/* Split Container: Left SeatMap, Right Realtime Logs */}
-            <div style={{ display: 'flex', gap: '2rem', width: '100%', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            {/* Vertical Layout: SeatMap on Top, Realtime Logs on Bottom */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', width: '100%', alignItems: 'flex-start' }}>
               
-              {/* Left: SeatMap (Flex 1, centered, safe overflow) */}
-              <div style={{ flex: '1 1 500px', display: 'flex', justifyContent: 'safe center', minWidth: 0, maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+              {/* Top: SeatMap (Clean container fit with auto-scroll if too wide) */}
+              <div style={{ width: '100%', display: 'flex', justifyContent: 'flex-start', overflowX: 'auto', paddingBottom: '0.5rem' }}>
                 <SeatMap
                   grid={cases[activeCaseIdx]?.grid}
                   liveStatuses={liveStatuses}
@@ -478,13 +478,13 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                 />
               </div>
 
-              {/* Right: Realtime Logs (Fixed width 360px) */}
-              <div className="card" style={{ width: '360px', flexShrink: 0, display: 'flex', flexDirection: 'column', maxHeight: '540px' }}>
+              {/* Bottom: Realtime Logs (Expanded to full screen width to align with SeatMap) */}
+              <div className="card" style={{ width: '100%', maxWidth: '100%', flexShrink: 0, display: 'flex', flexDirection: 'column', minHeight: '320px', maxHeight: '480px' }}>
                 <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <Activity size={18} style={{ color: 'var(--color-student)' }} /> リアルタイム質問・コメント
                 </h2>
                 {(() => {
-                  const commentLogs = realtimeLogs.filter(log => log.comment && log.comment.trim() !== '');
+                  const commentLogs = [...realtimeLogs.filter(log => log.comment && log.comment.trim() !== '')].reverse();
                   return commentLogs.length === 0 ? (
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '260px', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
                       <span style={{ fontSize: '2rem' }}>📡</span>
@@ -493,7 +493,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                       </p>
                     </div>
                   ) : (
-                    <div className="activity-feed-container" style={{ flex: 1, overflowY: 'auto', maxHeight: '460px', paddingRight: '0.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div className="activity-feed-container" style={{ flex: 1, overflowY: 'scroll', maxHeight: '380px', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {commentLogs.map((log) => (
                         <div key={log.id} className={`feed-item ${log.status}`} style={{ margin: 0 }}>
                           <div className="feed-item-header">
