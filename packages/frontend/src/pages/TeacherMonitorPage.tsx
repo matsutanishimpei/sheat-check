@@ -346,7 +346,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1600px' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
