@@ -72,10 +72,10 @@ interface TeacherViewProps {
 }
 
 const PALETTE_ITEMS = [
-  { type: 'student' as const, name: '学生席 (Student)', icon: Users, colorClass: 'student' },
-  { type: 'teacher' as const, name: '教卓 (Teacher)', icon: GraduationCap, colorClass: 'teacher' },
-  { type: 'obstacle' as const, name: '使用不可 (Obstacle)', icon: XCircle, colorClass: 'obstacle' },
-  { type: 'door' as const, name: '出入口 (Door)', icon: DoorOpen, colorClass: 'door' },
+  { type: 'student' as const, name: 'みんなの席', icon: Users, colorClass: 'student' },
+  { type: 'teacher' as const, name: '教卓', icon: GraduationCap, colorClass: 'teacher' },
+  { type: 'obstacle' as const, name: '空き', icon: XCircle, colorClass: 'obstacle' },
+  { type: 'door' as const, name: '出入り口', icon: DoorOpen, colorClass: 'door' },
 ];
 
 /* ==========================================================================

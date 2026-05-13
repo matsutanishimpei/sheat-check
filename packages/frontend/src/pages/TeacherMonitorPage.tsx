@@ -341,7 +341,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
       });
       addToast('success', nextActive ? 'チェックインの受付を開始しました（オープン）' : 'チェックインの受付を停止しました（クローズ）');
     } catch (err: any) {
-      addToast('error', `ステータス更新に失敗しました: ${err.message}`);
+      console.error(`ステータス更新に失敗しました: ${err.message}`);
     }
   };
 
@@ -350,7 +350,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
-          <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| 教員用監視</span></h1>
+          <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| みんなの様子</span></h1>
         </div>
 
         <div className="header-controls">
@@ -358,7 +358,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
             <Sliders size={16} /> 教室設定
           </Link>
           <Link to="/seats/monitoring" className="mode-toggle-btn active">
-            <MonitorPlay size={16} /> 教員用監視
+            <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn">
             <Users size={16} /> 学生名簿
@@ -406,11 +406,8 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
             {/* Monitor Controls (Lock/Reset) */}
             {roomId && (
                <div className="card" style={{ padding: '0.75rem 1rem', display: 'flex', gap: '0.75rem', alignItems: 'center', flexWrap: 'wrap' }}>
-                 <button className={`btn ${isSeatLocked ? 'btn-danger' : 'btn-primary'}`} style={{ padding: '0.5rem 1rem' }} onClick={onHandleToggleSeatLock}>
-                    {isSeatLocked ? <><Lock size={16}/> 座席ロック解除</> : <><Unlock size={16}/> 全員着席（ロック）</>}
-                 </button>
-                 <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={onHandleBulkReset} title="現在の学生の回答状態を履歴に保存し、全員の回答状況をクリアして新しい質問を開始します。">
-                    <RotateCcw size={16}/> 新規質問開始
+                 <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={onHandleBulkReset} title="現在の学生の回答状態を履歴に保存し、全員의回答状況をクリアして新しい質問を開始します。">
+                    <RotateCcw size={16}/> みんなの回答をクリア
                  </button>
                  <button className="btn btn-success" style={{ padding: '0.5rem 1rem', backgroundColor: '#10b981', borderColor: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={handleExportCSV}>
                     <Download size={16}/> 回答ログ (CSV)
@@ -482,7 +479,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
               </div>
 
               {/* Right: Realtime Logs (Fixed width 360px) */}
-              <div className="card" style={{ width: '360px', flexShrink: 0, display: 'flex', flexDirection: 'column', maxHeight: '540px', background: 'rgba(20, 27, 45, 0.4)', backdropFilter: 'blur(12px)' }}>
+              <div className="card" style={{ width: '360px', flexShrink: 0, display: 'flex', flexDirection: 'column', maxHeight: '540px' }}>
                 <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <Activity size={18} style={{ color: 'var(--color-student)' }} /> リアルタイム質問・コメント
                 </h2>
@@ -526,8 +523,6 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                 padding: '1.5rem', 
                 display: 'flex', 
                 gap: '2rem', 
-                background: 'rgba(20, 27, 45, 0.6)', 
-                backdropFilter: 'blur(16px)',
                 border: '1px solid var(--border-color)',
               }}
             >
@@ -539,7 +534,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                 </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>API URL</label>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>API URL</label>
                     <input
                       type="text"
                       className="text-input"
@@ -550,7 +545,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                     />
                   </div>
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ANON KEY</label>
+                    <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>ANON KEY</label>
                     <input
                       type="password"
                       className="text-input"
@@ -578,7 +573,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                 <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', flex: 1 }}>
                   <div style={{ background: '#fff', padding: '0.75rem', borderRadius: '12px', display: 'inline-block', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' }}>
                     <img 
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + '/student/' + roomId)}`} 
+                       src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(window.location.origin + '/student/' + roomId)}`} 
                       alt="Student QR Code" 
                       style={{ width: '180px', height: '180px', display: 'block' }} 
                     />
@@ -588,7 +583,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                       <QrCode size={18} color="var(--color-student)" />
                       <span style={{ fontSize: '1rem', fontWeight: 600 }}>学生用チェックイン QR</span>
                     </div>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', margin: 0, lineHeight: 1.4 }}>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.4 }}>
                       学生はスマートフォンでこのQRコードを読み取ることで、アプリにログインして自分の座席を選択できます。
                     </p>
                     <a 
@@ -605,7 +600,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '1rem', border: '2px dashed rgba(245, 158, 11, 0.3)', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.05)', textAlign: 'center' }}>
                   <span style={{ fontSize: '2rem' }}>⚠️</span>
                   <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#f59e0b' }}>Supabase 接続未設定</span>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0, maxWidth: '320px', lineHeight: 1.4 }}>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, maxWidth: '320px', lineHeight: 1.4 }}>
                     左側のフォームに有効な Supabase 設定を入力し「設定を保存して接続」ボタンをクリックすると、ここに学生用のチェックインQRコードが自動生成されます。
                   </p>
                 </div>
@@ -614,12 +609,12 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
           </div>
         ) : (
           <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '4rem 2rem' }}>
-            <div className="card" style={{ maxWidth: '480px', width: '100%', padding: '3rem 2rem', textAlign: 'center', background: 'rgba(20, 27, 45, 0.4)', backdropFilter: 'blur(12px)' }}>
+            <div className="card" style={{ maxWidth: '480px', width: '100%', padding: '3rem 2rem', textAlign: 'center' }}>
               <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(59, 130, 246, 0.1)', color: 'var(--color-student)', marginBottom: '1.5rem' }}>
                 <MonitorPlay size={32} />
               </div>
               <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem' }}>ライブ監視を開始</h3>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.5' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.5' }}>
                 上部のメニューから教室を選択して、リアルタイムの授業理解度（OK/NG状況やコメント）の監視を開始してください。
               </p>
             </div>

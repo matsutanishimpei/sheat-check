@@ -107,8 +107,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         addToast('error', '指定された招待リンクの教室が見つかりませんでした。');
       }
     } catch (err: any) {
-      console.error('URL setup failed:', err);
-      addToast('error', `教室データの取得エラー: ${err.message}`);
+      console.error('教室データの取得エラー:', err);
     }
   }, [addToast]);
 
@@ -233,7 +232,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
               throw new Error('Supabase 認証トークンの取得に失敗しました');
             }
           } catch (tokenErr: any) {
-            addToast('error', `リアルタイム通信の認証に失敗しました: ${tokenErr.message}`);
+            console.error('リアルタイム通信の認証に失敗しました:', tokenErr);
             return;
           }
         } else {
@@ -265,7 +264,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         addToast('error', '指定された UUID の教室が見つかりませんでした。');
       }
     } catch (err: any) {
-      addToast('error', `教室データの取得エラー: ${err.message}`);
+      console.error('教室データの取得エラー:', err);
     }
   };
 

@@ -78,10 +78,10 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
         });
         setUsersList(aggregatedUsers);
       } else {
-        addToast('error', '教室一覧の取得に失敗しました。');
+        console.error('教室一覧の取得に失敗しました。');
       }
     } catch (err: any) {
-      addToast('error', `データロードエラー: ${err.message}`);
+      console.error(`データロードエラー: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -152,12 +152,12 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
                 }
               });
 
-              // Show notification toast
-              if (payload.status === 'none') {
-                addToast('info', `着席解除: ${payload.studentName || '匿名'} さんが ${room.name} (${payload.seatId}) を解放しました`);
-              } else {
-                addToast('success', `リアルタイム受信: ${payload.studentName || '匿名'} さんが ${room.name} (${payload.seatId}) に着席しました`);
-              }
+              // Log real-time event to console instead of showing toast
+              console.log(
+                payload.status === 'none'
+                  ? `[Realtime] 着席解除: ${payload.studentName || '匿名'} さんが ${room.name} (${payload.seatId}) を解放しました`
+                  : `[Realtime] 着席受信: ${payload.studentName || '匿名'} さんが ${room.name} (${payload.seatId}) に着席しました`
+              );
             }
           })
           .on('broadcast', { event: 'student_evicted' }, (response) => {
@@ -300,7 +300,7 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
             <Sliders size={16} /> 教室設定
           </Link>
           <Link to="/seats/monitoring" className="mode-toggle-btn">
-            <MonitorPlay size={16} /> 教員用監視
+            <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn active">
             <Users size={16} /> 学生名簿

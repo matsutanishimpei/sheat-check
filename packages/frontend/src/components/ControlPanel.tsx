@@ -30,48 +30,33 @@ export const ControlPanel = React.memo(({
   return (
     <div className="workspace-header">
       <div className="workspace-title-group">
-        <h2 className="workspace-title">{mode === 'monitor' ? '教員用監視' : '教室設定'}</h2>
+        <h2 className="workspace-title">{mode === 'monitor' ? 'みんなの様子' : '教室設定'}</h2>
         <p className="workspace-subtitle">
           {mode === 'monitor' ? (
             <>
-              {roomName} / <strong style={{ color: 'var(--color-teacher)' }}>リアルタイム監視中</strong>
+              教室：<strong>{roomName}</strong>（リアルタイム監視中）
             </>
           ) : (
             <>
-              {roomName} / <strong style={{ color: 'var(--color-student)' }}>{caseName || '通常講義 (標準)'}</strong> を編集中
+              教室：<strong>{roomName}</strong>（レイアウトを編集中）
             </>
           )}
         </p>
         {roomId ? (
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-            教室ID (D1): <strong style={{ color: 'var(--text-primary)', userSelect: 'all' }}>{roomId}</strong>
+            教室のID: <strong style={{ color: 'var(--text-primary)', userSelect: 'all' }}>{roomId}</strong>
           </p>
         ) : (
           <p style={{ fontSize: '0.8rem', color: 'rgba(245, 158, 11, 0.85)', marginTop: '0.25rem' }}>
-            ⚠️ <strong>未登録の新規教室です。</strong> 画面右上の「<strong>D1に保存</strong>」ボタンから登録してください。
+            ⚠️ <strong>未登録の新規教室です。</strong> 「<strong>教室を保存</strong>」ボタンから登録してください。
           </p>
         )}
       </div>
       <div className="btn-group">
         {mode === 'monitor' && (
           <>
-            {/* Seat Lock Custom Switch Toggle */}
-            <div 
-              className="toggle-container" 
-              onClick={onToggleSeatLock}
-              title="ONにすると、学生は自分の登録座席を変更できなくなります"
-            >
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                {isSeatLocked ? <Lock size={14} style={{ color: 'var(--color-teacher)' }} /> : <Unlock size={14} style={{ color: 'var(--color-door)' }} />}
-                座席ロック
-              </span>
-              <div className={`switch-track ${isSeatLocked ? 'active' : ''}`}>
-                <div className="switch-thumb" />
-              </div>
-            </div>
-
             <button className="btn btn-danger" onClick={onBulkReset}>
-              <RotateCcw size={16} /> 一括リセット
+              <RotateCcw size={16} /> みんなの回答をクリア
             </button>
           </>
         )}
@@ -86,7 +71,7 @@ export const ControlPanel = React.memo(({
               disabled={isSaving} 
               onClick={onSaveClassroom}
             >
-              <Save size={16} /> {isSaving ? '保存中...' : 'D1 に保存'}
+              <Save size={16} /> {isSaving ? '保存中...' : '教室を保存'}
             </button>
           </>
         )}

@@ -59,10 +59,10 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
         const data = await res.json();
         setTeachersList(data.teachers);
       } else {
-        addToast('error', '教員一覧の取得に失敗しました。');
+        console.error('教員一覧の取得に失敗しました。');
       }
     } catch (err) {
-      addToast('error', 'サーバーとの通信に失敗しました。');
+      console.error('サーバーとの通信に失敗しました。', err);
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +117,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
         addToast('error', errData.error || '教員の登録に失敗しました。');
       }
     } catch (err) {
-      addToast('error', '教員登録中にエラーが発生しました。');
+      console.error('教員登録中にエラーが発生しました。', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -146,7 +146,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
         addToast('error', errData.error || '教員の削除に失敗しました。');
       }
     } catch (err) {
-      addToast('error', '削除中にエラーが発生しました。');
+      console.error('削除中にエラーが発生しました。', err);
     }
   };
 
@@ -175,7 +175,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
             <Sliders size={16} /> 教室設定
           </Link>
           <Link to="/seats/monitoring" className="mode-toggle-btn">
-            <MonitorPlay size={16} /> 教員用監視
+            <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn">
             <Users size={16} /> 学生名簿
