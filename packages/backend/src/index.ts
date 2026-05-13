@@ -26,8 +26,28 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-// Enable CORS for frontend requests
-app.use('*', cors());
+// Enable secure dynamic CORS for local dev and Cloudflare Pages deployments
+app.use(
+  '*',
+  cors({
+    origin: (origin) => {
+      if (!origin) return 'https://seets-check.pages.dev';
+      // Dynamically allow local development and any Cloudflare Pages deployments (including preview URLs)
+      if (
+        origin.endsWith('.pages.dev') ||
+        origin.startsWith('http://localhost:') ||
+        origin.startsWith('http://127.0.0.1:')
+      ) {
+        return origin;
+      }
+      return 'https://seets-check.pages.dev';
+    },
+    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    maxAge: 600,
+    credentials: true,
+  })
+);
 
 // Teacher Authentication Helper (Avoids breaking Hono RPC chain inference)
 const verifyTeacher = async (c: any) => {
