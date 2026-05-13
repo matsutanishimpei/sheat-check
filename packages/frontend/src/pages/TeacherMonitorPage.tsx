@@ -469,7 +469,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
             <div style={{ display: 'flex', gap: '2rem', width: '100%', alignItems: 'flex-start', flexWrap: 'wrap' }}>
               
               {/* Left: SeatMap (Flex 1, centered, safe overflow) */}
-              <div style={{ flex: '1 1 500px', display: 'flex', justifyContent: 'center', minWidth: 0, maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
+              <div style={{ flex: '1 1 500px', display: 'flex', justifyContent: 'safe center', minWidth: 0, maxWidth: '100%', overflowX: 'auto', overflowY: 'hidden' }}>
                 <SeatMap
                   grid={cases[activeCaseIdx]?.grid}
                   liveStatuses={liveStatuses}

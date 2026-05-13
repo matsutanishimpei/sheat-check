@@ -355,7 +355,7 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
             </div>
             )}
 
-            {/* Right Interactive 9x9 CSS Grid (Now Overlaying realtime status) */}
+            {/* Right Interactive 12x12 CSS Grid (Now Overlaying realtime status) */}
             <SeatMap
               grid={cases[activeCaseIdx]?.grid}
               liveStatuses={liveStatuses}
