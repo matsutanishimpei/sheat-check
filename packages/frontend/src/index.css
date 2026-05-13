@@ -1182,3 +1182,19 @@ body {
 .grid-cell:hover .student-id-display {
   display: block !important;
 }
+
+/* ==========================================================================
+   Student Seat Selection Table Style (Independent from Teacher massive styles)
+   ========================================================================== */
+.student-select-table {
+  width: 100%;
+  max-width: 420px;
+  table-layout: fixed;
+  border-collapse: separate;
+}
+
+.student-select-table .grid-cell {
+  width: 100%;
+  aspect-ratio: 1;
+  font-size: 1rem;
+}

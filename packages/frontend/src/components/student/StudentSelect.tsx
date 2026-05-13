@@ -39,55 +39,73 @@ export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0' }}>
-        <div className="grid-12x12" style={{ maxWidth: '420px' }}>
-          {Array.from({ length: 12 }).map((_, y) => (
-            Array.from({ length: 12 }).map((_, x) => {
-              const coordKey = `${x},${y}`;
-              const cellType = studentGridLayout[coordKey];
-              const isStudentSeat = cellType === 'student';
-              const isSelected = studentSeatId === coordKey;
-              
-              let cellClass = 'grid-cell student-unselectable';
-              if (isStudentSeat) {
-                cellClass = isSelected 
-                  ? 'grid-cell student-selected' 
-                  : 'grid-cell student-selectable';
-              }
+      <div style={{ display: 'flex', justifyContent: 'center', margin: '1rem 0', width: '100%' }}>
+        <table 
+          className="student-select-table" 
+          style={{ 
+            borderCollapse: 'separate', 
+            borderSpacing: '6px', 
+            width: '100%', 
+            maxWidth: '420px', 
+            tableLayout: 'fixed',
+            margin: '0 auto'
+          }}
+        >
+          <tbody>
+            {Array.from({ length: 12 }).map((_, y) => (
+              <tr key={`row-${y}`}>
+                {Array.from({ length: 12 }).map((_, x) => {
+                  const coordKey = `${x},${y}`;
+                  const cellType = studentGridLayout[coordKey];
+                  const isStudentSeat = cellType === 'student';
+                  const isSelected = studentSeatId === coordKey;
+                  
+                  let cellClass = 'grid-cell student-unselectable';
+                  if (isStudentSeat) {
+                    cellClass = isSelected 
+                      ? 'grid-cell student-selected' 
+                      : 'grid-cell student-selectable';
+                  }
 
-              const handleClick = () => {
-                if (isStudentSeat && !studentLiveSeatLocked) {
-                  setStudentSeatId(coordKey);
-                } else if (studentLiveSeatLocked) {
-                  addToast('error', '座席ロック中のため席の変更はできません');
-                }
-              };
+                  const handleClick = () => {
+                    if (isStudentSeat && !studentLiveSeatLocked) {
+                      setStudentSeatId(coordKey);
+                    } else if (studentLiveSeatLocked) {
+                      addToast('error', '座席ロック中のため席の変更はできません');
+                    }
+                  };
 
-              return (
-                <div
-                  key={coordKey}
-                  onClick={handleClick}
-                  className={cellClass}
-                  style={{ aspectRatio: 1, position: 'relative' }}
-                >
-                  {isStudentSeat && (
-                    <div 
-                      className="cell-item student" 
-                      style={isSelected ? { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' } : undefined}
+                  return (
+                    <td 
+                      key={coordKey} 
+                      style={{ padding: 0, border: 'none', position: 'relative' }}
                     >
-                      <Users size={14} style={isSelected ? { color: '#0b132b', filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.25))' } : undefined} />
-                    </div>
-                  )}
-                  {cellType === 'teacher' && (
-                    <div className="cell-item teacher">
-                      <GraduationCap size={14} />
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ))}
-        </div>
+                      <div
+                        onClick={handleClick}
+                        className={cellClass}
+                        style={{ aspectRatio: 1, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: isStudentSeat ? 'pointer' : 'default' }}
+                      >
+                        {isStudentSeat && (
+                          <div 
+                            className="cell-item student" 
+                            style={isSelected ? { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' } : undefined}
+                          >
+                            <Users size={14} style={isSelected ? { color: '#0b132b', filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.25))' } : undefined} />
+                          </div>
+                        )}
+                        {cellType === 'teacher' && (
+                          <div className="cell-item teacher">
+                            <GraduationCap size={14} />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div style={{ display: 'flex', gap: '0.75rem' }}>
