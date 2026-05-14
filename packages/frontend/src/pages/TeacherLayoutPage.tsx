@@ -6,7 +6,7 @@ import { useSeatManager } from '../hooks/useSeatManager';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { TeacherView } from '../containers/TeacherView';
 import { LiveSeatStatus, GridItem } from '@my-app/shared';
-import { LogOut, Sliders, MonitorPlay, Users, ShieldAlert } from 'lucide-react';
+import { LogOut, Sliders, MonitorPlay, Users, ShieldAlert, LayoutGrid } from 'lucide-react';
 
 interface TeacherLayoutPageProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
@@ -158,7 +158,9 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
     <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
-          <div className="logo-icon">🪑</div>
+          <div className="logo-icon">
+            <LayoutGrid size={24} style={{ color: 'var(--color-primary)' }} />
+          </div>
           <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| 教室設定</span></h1>
         </div>
 

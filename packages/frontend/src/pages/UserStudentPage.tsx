@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sliders, MonitorPlay, Users, LogOut, Search, Filter, Download, Trash2, CheckCircle, AlertCircle, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Sliders, MonitorPlay, Users, LogOut, Search, Filter, Download, Trash2, CheckCircle, AlertCircle, RefreshCw, ShieldAlert, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 import { LiveSeatStatus } from '@my-app/shared';
 import { createClient } from '@supabase/supabase-js';
@@ -291,7 +291,9 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
       {/* App Header */}
       <header className="app-header">
         <div className="header-brand">
-          <div className="logo-icon">🪑</div>
+          <div className="logo-icon">
+            <LayoutGrid size={24} style={{ color: 'var(--color-primary)' }} />
+          </div>
           <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| 学生名簿</span></h1>
         </div>
 

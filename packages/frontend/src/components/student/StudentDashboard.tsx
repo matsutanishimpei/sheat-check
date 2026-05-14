@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, User, Lock, AlertTriangle, Unlock } from 'lucide-react';
+import { Heart, User, Lock, AlertTriangle, Unlock, Sparkles, Lightbulb, PenTool, HelpCircle, Volume2, Thermometer } from 'lucide-react';
 
 interface StudentDashboardProps {
   studentName: string;
@@ -97,7 +97,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.65rem',
             fontWeight: 800,
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
@@ -108,7 +108,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <span style={{ fontSize: '1.75rem' }}>✨</span>
+          <Sparkles size={28} />
           <span>バッチリ！</span>
         </button>
 
@@ -128,7 +128,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.65rem',
             fontWeight: 800,
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
@@ -139,7 +139,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <span style={{ fontSize: '1.75rem' }}>💡</span>
+          <Lightbulb size={28} />
           <span>なるほど！</span>
         </button>
 
@@ -159,7 +159,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.65rem',
             fontWeight: 800,
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
@@ -170,7 +170,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <span style={{ fontSize: '1.75rem' }}>✍️</span>
+          <PenTool size={28} />
           <span>メモ待って</span>
         </button>
 
@@ -190,7 +190,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.65rem',
             fontWeight: 800,
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
@@ -201,7 +201,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <span style={{ fontSize: '1.75rem' }}>❓</span>
+          <HelpCircle size={28} />
           <span>むずかしい</span>
         </button>
 
@@ -221,7 +221,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.65rem',
             fontWeight: 800,
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
@@ -232,7 +232,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <span style={{ fontSize: '1.75rem' }}>📢</span>
+          <Volume2 size={28} />
           <span>声が遠い</span>
         </button>
 
@@ -252,7 +252,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.5rem',
+            gap: '0.65rem',
             fontWeight: 800,
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
@@ -263,7 +263,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <span style={{ fontSize: '1.75rem' }}>❄️</span>
+          <Thermometer size={28} />
           <span>暑い・寒い</span>
         </button>
       </div>

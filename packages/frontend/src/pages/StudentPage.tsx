@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { LayoutGrid, Lock } from 'lucide-react';
 import { GridItem, LiveSeatStatus } from '@my-app/shared';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { StudentView } from '../containers/StudentView';
@@ -293,7 +294,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
     <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
-          <div className="logo-icon">🪑</div>
+          <div className="logo-icon">
+            <LayoutGrid size={24} style={{ color: 'var(--color-student)' }} />
+          </div>
           <h1 className="header-title">Seats & Check</h1>
         </div>
         <div className="header-status">
@@ -307,7 +310,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
           <div className="card" style={{ maxWidth: '440px', width: '100%', padding: '3rem 2rem', textAlign: 'center', background: 'rgba(20, 27, 45, 0.4)', backdropFilter: 'blur(12px)', border: '1px solid var(--border-color)', borderRadius: '16px' }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '2rem' }}>🔒</span>
+              <Lock size={32} />
             </div>
             <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '0.75rem', color: '#ef4444' }}>現在クローズされています</h3>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem', lineHeight: '1.6' }}>

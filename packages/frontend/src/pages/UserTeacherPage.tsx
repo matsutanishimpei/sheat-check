@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sliders, MonitorPlay, Users, LogOut, Search, Shield, ShieldAlert, CheckCircle, RefreshCw, Plus, Trash2, X, Loader2, Key } from 'lucide-react';
+import { Sliders, MonitorPlay, Users, LogOut, Search, Shield, ShieldAlert, CheckCircle, RefreshCw, Plus, Trash2, X, Loader2, Key, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 
 interface UserTeacherPageProps {
@@ -166,7 +166,9 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
       {/* App Header */}
       <header className="app-header">
         <div className="header-brand">
-          <div className="logo-icon">🪑</div>
+          <div className="logo-icon">
+            <LayoutGrid size={24} style={{ color: 'var(--color-primary)' }} />
+          </div>
           <h1 className="header-title">Seats & Check <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginLeft: '0.5rem', fontWeight: 'normal' }}>| 教員一覧</span></h1>
         </div>
 

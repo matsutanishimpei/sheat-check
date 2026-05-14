@@ -47,3 +47,7 @@
 - **Solution**:
   1. Compress mobile button labels to strict 4-5 character micro-copy combined with high-impact emojis (`✨ バッチリ！`, `✍️ メモ待って`), enforced with `whiteSpace: nowrap` and responsive font sizing.
   2. Implement a "subtractive design esthetic" on classroom monitoring grids: empty student seats render exclusively as vibrant colored borders with zero fill (`transparent`), while unassigned floor cells render completely transparent without borders or fills. This instantly draws the human eye directly to active student check-ins.
+
+## 9. High-Fidelity Design Systems: Cross-Platform Vector SVG Icon Replacement
+- **Failure mode**: Relying on OS-dependent text emojis (`✨`, `💡`, `⚙️`, `🔒`, `🪑`) for core application navigation, status indicators, or interactive buttons creates severe visual fragmentation. On Windows, macOS, iOS, and Android, these emojis render with wildly different textures, color schemes, and aspect ratios, destroying the premium visual consistency of a professional SaaS dashboard.
+- **Action**: Completely eliminate text emojis across the entire UI codebase. Standardize exclusively on high-fidelity vector SVG icon libraries (such as `lucide-react`). Vector icons guarantee absolute pixel perfection, scalable dimensions, CSS-controllable color harmony (`currentColor`), and pristine cross-platform rendering under all operating systems and viewport resolutions.

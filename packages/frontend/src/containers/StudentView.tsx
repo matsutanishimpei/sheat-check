@@ -1,5 +1,6 @@
 import React from 'react';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { Settings } from 'lucide-react';
 import { GridItem } from '@my-app/shared';
 import { StudentConfig } from '../components/student/StudentConfig';
 import { StudentSelect } from '../components/student/StudentSelect';
@@ -74,7 +75,7 @@ export const StudentView: React.FC<StudentViewProps> = React.memo(({
           fontWeight: 500,
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
         }}>
-          <span style={{ fontSize: '1rem', animation: 'spin 4s infinite linear' }}>⚙️</span>
+          <Settings size={16} style={{ animation: 'spin 4s infinite linear' }} />
           <span>大教室制限により、HTTPバックアップ同期モードが稼働中（リアルタイム自動復旧中）</span>
         </div>
       )}

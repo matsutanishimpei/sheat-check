@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, User, Loader2 } from 'lucide-react';
+import { Lock, User, Loader2, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 
 interface LoginPageProps {
@@ -66,7 +66,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
     <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
-          <div className="logo-icon">🪑</div>
+          <div className="logo-icon">
+            <LayoutGrid size={24} style={{ color: 'var(--color-teacher)' }} />
+          </div>
           <h1 className="header-title">Seats & Check</h1>
         </div>
       </header>
