@@ -36,3 +36,14 @@
   2. Implement precise client-side latency tracking (milliseconds) starting from dashboard load, resetting upon subsequent submissions.
   3. Rather than writing every single real-time event to the cloud DB, archive completed session snapshots to the teacher's browser `localStorage` upon bulk-clearing ("状態クリア ＆ 質問保存").
   4. Perform data pivoting and aggregation entirely in frontend JavaScript to build a highly optimized, Excel-compatible CSV output with BOM (`[0xEF, 0xBB, 0xBF]`) to completely prevent UTF-8 encoding garbles in Japanese spreadsheets.
+
+## 7. Realtime Broadcast Stale State Trap (React Asynchronous Batching)
+- **Failure mode**: When a user clicks a button to update local state (e.g., `setStudentComment('[順調]...')`) and immediately triggers a broadcast transmission function (`handleSend('ok')`) on the next line, the broadcast payload sends the **old, un-updated state value** (such as an empty string). The updated message only transmits upon a second button tap.
+- **Root cause**: React state updater functions operate asynchronously (state batching). At the exact moment `handleSend` executes, the parent component's `studentComment` variable has not yet re-rendered with the new value.
+- **Prevention rule**: For realtime broadcast methods triggered by UI interactions, always design the broadcast handler to accept an **immediate, optional override parameter** (e.g., `onSendBroadcast(status, overrideComment?)`). Pass the exact literal string directly into both the state updater and the broadcast handler simultaneously to guarantee zero-latency synchronous delivery.
+
+## 8. Mobile UI Layout: Absolute Single-Line Label Design & Transparent Grid Esthetics
+- **Failure mode**: In responsive multi-column layouts (such as 2x3 grid buttons on mobile screens), long button labels wrap unpredictably across multiple lines, destroying vertical alignment and the premium feel of glassmorphism cards. Similarly, rendering dense dotted borders and solid background fills for empty or inactive grid cells creates overwhelming visual noise for teachers monitoring a crowded classroom.
+- **Solution**:
+  1. Compress mobile button labels to strict 4-5 character micro-copy combined with high-impact emojis (`✨ バッチリ！`, `✍️ メモ待って`), enforced with `whiteSpace: nowrap` and responsive font sizing.
+  2. Implement a "subtractive design esthetic" on classroom monitoring grids: empty student seats render exclusively as vibrant colored borders with zero fill (`transparent`), while unassigned floor cells render completely transparent without borders or fills. This instantly draws the human eye directly to active student check-ins.
