@@ -17,7 +17,8 @@ import {
   Trash2, 
   FolderOpen, 
   RefreshCw, 
-  Activity 
+  Activity,
+  Lightbulb
 } from 'lucide-react';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { GridItem, LiveSeatStatus, RealtimeLog } from '@my-app/shared';
@@ -233,8 +234,8 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
 
           {/* 3. Saved Classrooms Quick Switch List */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              📂 保存済み講義室リスト
+            <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              <FolderOpen size={14} /> 保存済み講義室リスト
             </span>
 
             {isLoadingRooms ? (
@@ -340,8 +341,8 @@ export const TeacherView: React.FC<TeacherViewProps> = React.memo(({
             {/* Left Item Palette */}
             {mode === 'layout' && (
             <div className="palette">
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontWeight: '500' }}>
-                💡 アイテムをマス目へドラッグ＆ドロップ、または直接クリックして配置してください。
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.25rem', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                <Lightbulb size={14} /> <span>アイテムをマス目へドラッグ＆ドロップ、または直接クリックして配置してください。</span>
               </p>
               {PALETTE_ITEMS.map((item) => (
                 <DraggablePaletteItem

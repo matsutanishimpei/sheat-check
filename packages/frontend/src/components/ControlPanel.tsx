@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Unlock, Trash2, RotateCcw, Save } from 'lucide-react';
+import { Lock, Unlock, Trash2, RotateCcw, Save, AlertTriangle } from 'lucide-react';
 
 interface ControlPanelProps {
   roomName: string;
@@ -47,8 +47,8 @@ export const ControlPanel = React.memo(({
             教室のID: <strong style={{ color: 'var(--text-primary)', userSelect: 'all' }}>{roomId}</strong>
           </p>
         ) : (
-          <p style={{ fontSize: '0.8rem', color: 'rgba(245, 158, 11, 0.85)', marginTop: '0.25rem' }}>
-            ⚠️ <strong>未登録の新規教室です。</strong> 「<strong>教室を保存</strong>」ボタンから登録してください。
+          <p style={{ fontSize: '0.8rem', color: 'rgba(245, 158, 11, 0.85)', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <AlertTriangle size={14} /> <span><strong>未登録の新規教室です。</strong> 「<strong>教室を保存</strong>」ボタンから登録してください。</span>
           </p>
         )}
       </div>

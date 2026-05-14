@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sliders, MonitorPlay, Users, LogOut, Search, Shield, ShieldAlert, CheckCircle, RefreshCw, Plus, Trash2, X, Loader2, Key, LayoutGrid } from 'lucide-react';
+import { Sliders, MonitorPlay, Users, User, LogOut, Search, Shield, ShieldAlert, CheckCircle, RefreshCw, Plus, Trash2, X, Loader2, Key, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 
 interface UserTeacherPageProps {
@@ -207,7 +207,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
           <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>ログイン中</span>
             <span style={{ fontSize: '1rem', fontWeight: 600, color: '#8b5cf6', marginTop: '0.75rem', background: 'rgba(139, 92, 246, 0.1)', padding: '0.5rem 1rem', borderRadius: '6px', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
-              👤 {currentTeacher?.username || '不明なユーザー'}
+              <User size={16} /> {currentTeacher?.username || '不明なユーザー'}
             </span>
           </div>
         </div>

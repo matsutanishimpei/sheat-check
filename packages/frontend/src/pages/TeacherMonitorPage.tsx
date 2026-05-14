@@ -6,7 +6,7 @@ import { useSeatManager } from '../hooks/useSeatManager';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { TeacherView } from '../containers/TeacherView';
 import { LiveSeatStatus, GridItem } from '@my-app/shared';
-import { LogOut, Sliders, MonitorPlay, FolderOpen, Lock, Unlock, RotateCcw, Database, ChevronUp, ChevronDown, QrCode, Users, ShieldAlert, Download, Trash2, Activity, LayoutGrid } from 'lucide-react';
+import { LogOut, Sliders, MonitorPlay, FolderOpen, Lock, Unlock, RotateCcw, Database, ChevronUp, ChevronDown, QrCode, Users, ShieldAlert, Download, Trash2, Activity, LayoutGrid, Radio, AlertTriangle } from 'lucide-react';
 import { SeatMap } from '../components/SeatMap';
 import client from '../lib/hc';
 import { generateCSVContent } from '../lib/csvHelper';
@@ -489,7 +489,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                   const commentLogs = [...realtimeLogs.filter(log => log.comment && log.comment.trim() !== '')].reverse();
                   return commentLogs.length === 0 ? (
                     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '260px', flexDirection: 'column', gap: '0.75rem', color: 'var(--text-muted)' }}>
-                      <span style={{ fontSize: '2rem' }}>📡</span>
+                      <Radio size={32} />
                       <p style={{ fontSize: '0.85rem', textAlign: 'center', margin: 0, lineHeight: 1.4 }}>
                         学生からのコメントや質問を<br />リアルタイムに待機しています...
                       </p>
@@ -601,7 +601,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                 </div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', justifyContent: 'center', alignItems: 'center', flex: 1, padding: '1rem', border: '2px dashed rgba(245, 158, 11, 0.3)', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.05)', textAlign: 'center' }}>
-                  <span style={{ fontSize: '2rem' }}>⚠️</span>
+                  <AlertTriangle size={32} style={{ color: '#f59e0b' }} />
                   <span style={{ fontSize: '0.95rem', fontWeight: 600, color: '#f59e0b' }}>Supabase 接続未設定</span>
                   <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, maxWidth: '320px', lineHeight: 1.4 }}>
                     左側のフォームに有効な Supabase 設定を入力し「設定を保存して接続」ボタンをクリックすると、ここに学生用のチェックインQRコードが自動生成されます。
