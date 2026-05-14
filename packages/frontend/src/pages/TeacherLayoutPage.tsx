@@ -155,7 +155,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
@@ -163,16 +163,16 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
         </div>
 
         <div className="header-controls">
-          <Link to="/room_layout" className="mode-toggle-btn active">
+          <Link to="/room_layout" className="mode-toggle-btn layout-btn active">
             <Sliders size={16} /> 教室設定
           </Link>
-           <Link to="/seats/monitoring" className="mode-toggle-btn">
+           <Link to="/seats/monitoring" className="mode-toggle-btn monitor-btn">
             <MonitorPlay size={16} /> みんなの様子
           </Link>
-          <Link to="/student/monitoring" className="mode-toggle-btn">
+          <Link to="/student/monitoring" className="mode-toggle-btn students-btn">
             <Users size={16} /> 学生名簿
           </Link>
-          <Link to="/user/teacher" className="mode-toggle-btn">
+          <Link to="/user/teacher" className="mode-toggle-btn teachers-btn">
             <ShieldAlert size={16} /> 教員一覧
           </Link>
           <button onClick={handleLogout} className="mode-toggle-btn" style={{ marginLeft: '1rem', color: 'var(--color-obstacle)' }}>

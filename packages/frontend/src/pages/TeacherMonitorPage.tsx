@@ -346,7 +346,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
@@ -354,16 +354,16 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
         </div>
 
         <div className="header-controls">
-          <Link to="/room_layout" className="mode-toggle-btn">
+          <Link to="/room_layout" className="mode-toggle-btn layout-btn">
             <Sliders size={16} /> 教室設定
           </Link>
-          <Link to="/seats/monitoring" className="mode-toggle-btn active">
+          <Link to="/seats/monitoring" className="mode-toggle-btn monitor-btn active">
             <MonitorPlay size={16} /> みんなの様子
           </Link>
-          <Link to="/student/monitoring" className="mode-toggle-btn">
+          <Link to="/student/monitoring" className="mode-toggle-btn students-btn">
             <Users size={16} /> 学生名簿
           </Link>
-          <Link to="/user/teacher" className="mode-toggle-btn">
+          <Link to="/user/teacher" className="mode-toggle-btn teachers-btn">
             <ShieldAlert size={16} /> 教員一覧
           </Link>
           <button onClick={handleLogout} className="mode-toggle-btn" style={{ marginLeft: '1rem', color: 'var(--color-obstacle)' }}>
@@ -409,7 +409,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                  <button className="btn btn-secondary" style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={onHandleBulkReset} title="現在の学生の回答状態を履歴に保存し、全員의回答状況をクリアして新しい質問を開始します。">
                     <RotateCcw size={16}/> みんなの回答をクリア
                  </button>
-                 <button className="btn btn-success" style={{ padding: '0.5rem 1rem', backgroundColor: '#10b981', borderColor: '#10b981', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={handleExportCSV}>
+                 <button className="btn btn-primary" style={{ padding: '0.5rem 1rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.25rem' }} onClick={handleExportCSV}>
                     <Download size={16}/> 回答ログ (CSV)
                  </button>
                  <button 
@@ -496,16 +496,17 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
                     <div className="activity-feed-container" style={{ flex: 1, overflowY: 'scroll', maxHeight: '380px', paddingRight: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       {commentLogs.map((log) => (
                         <div key={log.id} className={`feed-item ${log.status}`} style={{ margin: 0 }}>
-                          <div className="feed-item-header">
-                            <span style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)' }}>{log.studentName} ({log.seatId})</span>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontFamily: 'monospace' }}>{log.studentId || '-'}</span>
+                              <span style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{log.studentName}</span>
+                              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', background: 'var(--bg-deep)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>席 {log.seatId}</span>
+                            </div>
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{log.timestamp}</span>
                           </div>
-                          <span className="feed-item-comment" style={{ fontSize: '0.85rem', marginTop: '0.4rem', color: 'var(--text-primary)', display: 'block', padding: '0.35rem 0.5rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '4px', borderLeft: '2.5px solid var(--color-student)', fontStyle: 'normal', lineHeight: '1.4' }}>
+                          <p style={{ fontSize: '0.9rem', color: 'var(--text-primary)', margin: 0, lineHeight: 1.5, paddingLeft: '0.1rem' }}>
                             {log.comment}
-                          </span>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.4rem', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                            <span>学籍: {log.studentId || '-'}</span>
-                            <span>{log.timestamp}</span>
-                          </div>
+                          </p>
                         </div>
                       ))}
                     </div>

@@ -287,7 +287,7 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       {/* App Header */}
       <header className="app-header">
         <div className="header-brand">
@@ -296,16 +296,16 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
         </div>
 
         <div className="header-controls">
-          <Link to="/room_layout" className="mode-toggle-btn">
+          <Link to="/room_layout" className="mode-toggle-btn layout-btn">
             <Sliders size={16} /> 教室設定
           </Link>
-          <Link to="/seats/monitoring" className="mode-toggle-btn">
+          <Link to="/seats/monitoring" className="mode-toggle-btn monitor-btn">
             <MonitorPlay size={16} /> みんなの様子
           </Link>
-          <Link to="/student/monitoring" className="mode-toggle-btn active">
+          <Link to="/student/monitoring" className="mode-toggle-btn students-btn active">
             <Users size={16} /> 学生名簿
           </Link>
-          <Link to="/user/teacher" className="mode-toggle-btn">
+          <Link to="/user/teacher" className="mode-toggle-btn teachers-btn">
             <ShieldAlert size={16} /> 教員一覧
           </Link>
           <button onClick={handleLogout} className="mode-toggle-btn" style={{ marginLeft: '1rem', color: 'var(--color-obstacle)' }}>
@@ -383,7 +383,7 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
               <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
             </button>
             {/* CSV Export */}
-            <button className="btn btn-primary" onClick={handleExportCSV} style={{ backgroundColor: '#10b981', borderColor: '#10b981', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
+            <button className="btn btn-primary" onClick={handleExportCSV} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}>
               <Download size={16} /> 名簿 CSV 出力
             </button>
           </div>

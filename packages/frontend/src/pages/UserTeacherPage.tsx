@@ -162,7 +162,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
   }, [teachersList, searchQuery]);
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       {/* App Header */}
       <header className="app-header">
         <div className="header-brand">
@@ -171,16 +171,16 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
         </div>
 
         <div className="header-controls">
-          <Link to="/room_layout" className="mode-toggle-btn">
+          <Link to="/room_layout" className="mode-toggle-btn layout-btn">
             <Sliders size={16} /> 教室設定
           </Link>
-          <Link to="/seats/monitoring" className="mode-toggle-btn">
+          <Link to="/seats/monitoring" className="mode-toggle-btn monitor-btn">
             <MonitorPlay size={16} /> みんなの様子
           </Link>
-          <Link to="/student/monitoring" className="mode-toggle-btn">
+          <Link to="/student/monitoring" className="mode-toggle-btn students-btn">
             <Users size={16} /> 学生名簿
           </Link>
-          <Link to="/user/teacher" className="mode-toggle-btn active">
+          <Link to="/user/teacher" className="mode-toggle-btn teachers-btn active">
             <ShieldAlert size={16} /> 教員一覧
           </Link>
           <button onClick={handleLogout} className="mode-toggle-btn" style={{ marginLeft: '1rem', color: 'var(--color-obstacle)' }}>
@@ -204,7 +204,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
           </div>
           <div className="card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 600 }}>ログイン中</span>
-            <span style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--color-teacher)', marginTop: '0.75rem', background: 'rgba(16, 185, 129, 0.1)', padding: '0.5rem 1rem', borderRadius: 'var(--border-radius)', alignSelf: 'flex-start' }}>
+            <span style={{ fontSize: '1rem', fontWeight: 600, color: '#8b5cf6', marginTop: '0.75rem', background: 'rgba(139, 92, 246, 0.1)', padding: '0.5rem 1rem', borderRadius: '6px', alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
               👤 {currentTeacher?.username || '不明なユーザー'}
             </span>
           </div>
@@ -237,7 +237,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
             <button 
               className="btn btn-primary" 
               onClick={() => setIsAddModalOpen(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem', backgroundColor: 'var(--color-teacher)', borderColor: 'var(--color-teacher)' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 1rem' }}
             >
               <Plus size={16} /> 新規教員追加
             </button>
@@ -439,8 +439,6 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
                   disabled={isSubmitting}
                   style={{ 
                     flex: 1, 
-                    backgroundColor: 'var(--color-teacher)', 
-                    borderColor: 'var(--color-teacher)',
                     padding: '0.75rem',
                     display: 'flex',
                     alignItems: 'center',

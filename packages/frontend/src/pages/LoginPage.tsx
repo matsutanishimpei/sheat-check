@@ -63,7 +63,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
@@ -73,7 +73,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
       
       <main style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div className="card" style={{ maxWidth: '420px', width: '100%', padding: '2.5rem 2rem', textAlign: 'center' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(16, 185, 129, 0.1)', color: 'var(--color-teacher)', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '50%', backgroundColor: 'rgba(234, 88, 12, 0.1)', color: 'var(--color-teacher)', marginBottom: '1.5rem' }}>
             <Lock size={32} />
           </div>
           <h2 className="card-title" style={{ fontSize: '1.5rem', marginBottom: '0.5rem', justifyContent: 'center' }}>教員ログイン</h2>
@@ -117,7 +117,6 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
               disabled={loading}
               style={{ 
                 width: '100%', 
-                backgroundColor: 'var(--color-teacher)', 
                 padding: '0.85rem', 
                 marginTop: '0.5rem',
                 display: 'flex',
