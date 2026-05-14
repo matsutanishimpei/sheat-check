@@ -111,18 +111,18 @@ export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
       <div style={{ display: 'flex', gap: '0.75rem' }}>
         <button 
           className="btn btn-secondary" 
-          style={{ flex: 1 }}
+          style={{ flex: 1, justifyContent: 'center', whiteSpace: 'nowrap', fontSize: '0.95rem' }}
           onClick={() => setStudentStage('config')}
         >
           戻る
         </button>
         <button 
           className="btn btn-primary" 
-          style={{ flex: 2, justifyContent: 'center' }}
+          style={{ flex: 2, justifyContent: 'center', whiteSpace: 'nowrap', fontSize: '0.95rem', gap: '0.5rem' }}
           onClick={onLockSeat}
           disabled={!studentSeatId}
         >
-          <Lock size={16} /> この席で確定・ロック
+          <Lock size={16} /> この席で確定
         </button>
       </div>
     </div>

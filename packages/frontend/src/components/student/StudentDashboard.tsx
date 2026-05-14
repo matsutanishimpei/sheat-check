@@ -7,7 +7,7 @@ interface StudentDashboardProps {
   studentComment: string;
   setStudentComment: (val: string) => void;
   studentLiveSeatLocked: boolean;
-  onSendBroadcast: (status: 'ok' | 'ng', responseTime: number) => void;
+  onSendBroadcast: (status: 'ok' | 'ng', responseTime: number, overrideComment?: string) => void;
   onChangeSeat: () => void;
   currentStatus: 'ok' | 'ng' | null;
 }
@@ -31,69 +31,45 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
     }
   }, [currentStatus]);
 
-  const handleSend = (status: 'ok' | 'ng') => {
+  const handleSend = (status: 'ok' | 'ng', overrideComment?: string) => {
     const now = Date.now();
     const duration = now - startTimeRef.current;
-    onSendBroadcast(status, duration);
+    onSendBroadcast(status, duration, overrideComment);
     // Reset start time to measure subsequent status adjustments
     startTimeRef.current = now;
   };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-      <div className="student-title-group">
+      <div className="student-title-group" style={{ marginBottom: 0 }}>
         <h2 className="student-title">
-          <Heart size={24} style={{ color: 'var(--color-obstacle)' }} /> 固定席理解度ポータル
+          <Heart size={24} style={{ color: '#0891b2' }} /> 講義フィードバック
         </h2>
-        <p className="student-subtitle">あなたの状態を教員にリアルタイム送信します</p>
       </div>
 
-      {/* Fixed seat details summary */}
-      <div style={{ background: 'var(--bg-deep)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <User size={18} style={{ color: 'var(--color-student)' }} />
-          <span style={{ fontWeight: 600 }}>{studentName} さん</span>
+      {/* Fixed seat details & subtle status summary */}
+      <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid rgba(0, 0, 0, 0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(8, 145, 178, 0.1)', color: '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <User size={16} />
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{studentName} さん</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>登録席: <strong style={{ color: '#0891b2' }}>{studentSeatId}</strong></div>
+          </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>登録席:</span>
-          <strong style={{ color: 'var(--color-student)', fontSize: '1rem' }}>({studentSeatId})</strong>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', fontWeight: 700 }}>
+          {currentStatus === null ? (
+            <span style={{ color: '#ef4444', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+              <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: '#ef4444', animation: 'bannerPulse 1.5s infinite alternate' }} />
+              回答待ち
+            </span>
+          ) : (
+            <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+              ✓ 送信済み
+            </span>
+          )}
         </div>
-      </div>
-
-      {/* Dynamic Status Banner */}
-      <div 
-        style={{ 
-          padding: '1.25rem', 
-          borderRadius: 'var(--radius-md)', 
-          textAlign: 'center',
-          fontWeight: 800,
-          fontSize: '1.2rem',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          gap: '0.75rem',
-          transition: 'all var(--transition-normal)',
-          border: '2px solid transparent',
-          marginTop: '0.25rem',
-          background: currentStatus === null 
-            ? 'linear-gradient(135deg, rgba(249, 115, 22, 0.15), rgba(239, 68, 68, 0.15))'
-            : 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.1))',
-          borderColor: currentStatus === null ? '#f97316' : '#10b981',
-          color: currentStatus === null ? '#f97316' : '#10b981',
-          animation: currentStatus === null ? 'bannerPulse 1.5s infinite alternate' : 'none'
-        }}
-      >
-        {currentStatus === null ? (
-          <>
-            <span style={{ fontSize: '1.5rem' }}>⚡</span>
-            <span>現在、回答待ち（理解度を選択してください）</span>
-          </>
-        ) : (
-          <>
-            <span style={{ fontSize: '1.5rem' }}>✓</span>
-            <span>回答送信完了（次の質問を待機中）</span>
-          </>
-        )}
       </div>
 
       {studentLiveSeatLocked && (
@@ -103,43 +79,192 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
         </div>
       )}
 
-      <div className="input-group">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
-          <label className="input-label" style={{ margin: 0 }}>コメント (任意)</label>
-          {currentStatus && (
-            <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-              ✓ 回答送信完了
-            </span>
-          )}
-        </div>
-        <input
-          type="text"
-          className="text-input"
-          placeholder="例: ここがわかりません、等"
-          value={studentComment}
-          onChange={(e) => setStudentComment(e.target.value)}
-        />
-      </div>
-
-      {/* Main giant OK / NG buttons */}
-      <div className="action-buttons-grid">
+      {/* Mood Selector Buttons (Zero Typing / Absolute Single Line 2x3 Grid) */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginTop: '0.5rem' }}>
+        {/* 1. 順調 */}
         <button
-          onClick={() => handleSend('ok')}
-          className={`btn-huge btn-ok ${
-            currentStatus === 'ok' ? 'active' : currentStatus === 'ng' ? 'inactive' : ''
-          }`}
+          onClick={() => {
+            const msg = '[順調] ペースも理解もバッチリです！';
+            setStudentComment(msg);
+            handleSend('ok', msg);
+          }}
+          style={{
+            padding: '1.5rem 0.5rem',
+            borderRadius: '18px',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05))',
+            color: '#059669',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            boxShadow: '0 8px 16px rgba(16, 185, 129, 0.08)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <Heart size={36} />
-          <span>了解 (OK)</span>
+          <span style={{ fontSize: '1.75rem' }}>✨</span>
+          <span>バッチリ！</span>
         </button>
+
+        {/* 2. なるほど */}
         <button
-          onClick={() => handleSend('ng')}
-          className={`btn-huge btn-ng ${
-            currentStatus === 'ng' ? 'active' : currentStatus === 'ok' ? 'inactive' : ''
-          }`}
+          onClick={() => {
+            const msg = '[なるほど] 今の説明とても分かりやすくて腑に落ちました！';
+            setStudentComment(msg);
+            handleSend('ok', msg);
+          }}
+          style={{
+            padding: '1.5rem 0.5rem',
+            borderRadius: '18px',
+            border: '1px solid rgba(8, 145, 178, 0.3)',
+            background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.15), rgba(14, 116, 144, 0.05))',
+            color: '#0891b2',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            boxShadow: '0 8px 16px rgba(8, 145, 178, 0.08)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
         >
-          <AlertTriangle size={36} />
-          <span>不調 (NG)</span>
+          <span style={{ fontSize: '1.75rem' }}>💡</span>
+          <span>なるほど！</span>
+        </button>
+
+        {/* 3. メモ待って */}
+        <button
+          onClick={() => {
+            const msg = '[待って] メモを取っているので少し待ってください';
+            setStudentComment(msg);
+            handleSend('ng', msg);
+          }}
+          style={{
+            padding: '1.5rem 0.5rem',
+            borderRadius: '18px',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.05))',
+            color: '#d97706',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            boxShadow: '0 8px 16px rgba(245, 158, 11, 0.08)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+        >
+          <span style={{ fontSize: '1.75rem' }}>✍️</span>
+          <span>メモ待って</span>
+        </button>
+
+        {/* 4. わからない */}
+        <button
+          onClick={() => {
+            const msg = '[SOS] 説明が難しくて理解が追いついていません';
+            setStudentComment(msg);
+            handleSend('ng', msg);
+          }}
+          style={{
+            padding: '1.5rem 0.5rem',
+            borderRadius: '18px',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.05))',
+            color: '#dc2626',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            boxShadow: '0 8px 16px rgba(239, 68, 68, 0.08)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+        >
+          <span style={{ fontSize: '1.75rem' }}>❓</span>
+          <span>むずかしい</span>
+        </button>
+
+        {/* 5. 声が遠い */}
+        <button
+          onClick={() => {
+            const msg = '[音響SOS] マイクの音声が遠い・聞き取りにくいです';
+            setStudentComment(msg);
+            handleSend('ng', msg);
+          }}
+          style={{
+            padding: '1.5rem 0.5rem',
+            borderRadius: '18px',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
+            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(109, 40, 217, 0.05))',
+            color: '#7c3aed',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            boxShadow: '0 8px 16px rgba(139, 92, 246, 0.08)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+        >
+          <span style={{ fontSize: '1.75rem' }}>📢</span>
+          <span>声が遠い</span>
+        </button>
+
+        {/* 6. 空調 */}
+        <button
+          onClick={() => {
+            const msg = '[環境SOS] 教室の空調（暑い/寒い）の調整をお願いしたいです';
+            setStudentComment(msg);
+            handleSend('ng', msg);
+          }}
+          style={{
+            padding: '1.5rem 0.5rem',
+            borderRadius: '18px',
+            border: '1px solid rgba(100, 116, 139, 0.3)',
+            background: 'linear-gradient(135deg, rgba(100, 116, 139, 0.15), rgba(71, 85, 105, 0.05))',
+            color: '#475569',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '0.5rem',
+            fontWeight: 800,
+            fontSize: '0.95rem',
+            whiteSpace: 'nowrap',
+            cursor: 'pointer',
+            boxShadow: '0 8px 16px rgba(100, 116, 139, 0.08)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+        >
+          <span style={{ fontSize: '1.75rem' }}>❄️</span>
+          <span>暑い・寒い</span>
         </button>
       </div>
 
