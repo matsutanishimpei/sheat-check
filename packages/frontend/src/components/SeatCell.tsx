@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { Users, GraduationCap, XCircle, DoorOpen } from 'lucide-react';
+import { User, GraduationCap, XCircle, DoorOpen } from 'lucide-react';
 import { GridItem, LiveSeatStatus } from '@my-app/shared';
 
 interface SeatCellProps {
@@ -25,7 +25,7 @@ export const SeatCell = React.memo(({
 
   const getIcon = () => {
     switch (cellType) {
-      case 'student': return <Users size={20} />;
+      case 'student': return <User size={20} />;
       case 'teacher': return <GraduationCap size={20} />;
       case 'obstacle': return <XCircle size={18} />;
       case 'door': return <DoorOpen size={20} />;

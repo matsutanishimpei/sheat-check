@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sliders, MonitorPlay, Users, User, LogOut, Search, Shield, ShieldAlert, CheckCircle, RefreshCw, Plus, Trash2, X, Loader2, Key, LayoutGrid } from 'lucide-react';
+import { Sliders, MonitorPlay, UserCheck, User, LogOut, Search, Shield, ShieldAlert, CheckCircle, RefreshCw, Plus, Trash2, X, Loader2, Key, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 
 interface UserTeacherPageProps {
@@ -180,7 +180,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
             <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn students-btn">
-            <Users size={16} /> 学生名簿
+            <UserCheck size={16} /> 学生名簿
           </Link>
           <Link to="/user/teacher" className="mode-toggle-btn teachers-btn active">
             <ShieldAlert size={16} /> 教員一覧
@@ -394,7 +394,7 @@ export const UserTeacherPage: React.FC<UserTeacherPageProps> = ({ addToast }) =>
             <form onSubmit={handleAddTeacher} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               <div className="input-group" style={{ textAlign: 'left' }}>
                 <label className="input-label" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Users size={14} /> ユーザー名
+                  <User size={14} /> ユーザー名
                 </label>
                 <input
                   type="text"

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Sliders, MonitorPlay, Users, LogOut, Search, Filter, Download, Trash2, CheckCircle, AlertCircle, RefreshCw, ShieldAlert, LayoutGrid } from 'lucide-react';
+import { Sliders, MonitorPlay, UserCheck, LogOut, Search, Filter, Download, Trash2, CheckCircle, AlertCircle, RefreshCw, ShieldAlert, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 import { LiveSeatStatus } from '@my-app/shared';
 import { createClient } from '@supabase/supabase-js';
@@ -305,7 +305,7 @@ export const UserStudentPage: React.FC<UserStudentPageProps> = ({ addToast }) =>
             <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn students-btn active">
-            <Users size={16} /> 学生名簿
+            <UserCheck size={16} /> 学生名簿
           </Link>
           <Link to="/user/teacher" className="mode-toggle-btn teachers-btn">
             <ShieldAlert size={16} /> 教員一覧

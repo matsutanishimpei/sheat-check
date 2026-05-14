@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid3X3, Lock, Users, GraduationCap } from 'lucide-react';
+import { Grid3X3, Lock, User, GraduationCap } from 'lucide-react';
 import { GridItem } from '@my-app/shared';
 
 interface StudentSelectProps {
@@ -90,7 +90,7 @@ export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
                             className="cell-item student" 
                             style={isSelected ? { backgroundColor: 'transparent', borderColor: 'transparent', boxShadow: 'none' } : undefined}
                           >
-                            <Users size={14} style={isSelected ? { color: '#0b132b', filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.25))' } : undefined} />
+                            <User size={14} style={isSelected ? { color: '#0b132b', filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.25))' } : undefined} />
                           </div>
                         )}
                         {cellType === 'teacher' && (

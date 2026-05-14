@@ -6,7 +6,7 @@ import { useSeatManager } from '../hooks/useSeatManager';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { TeacherView } from '../containers/TeacherView';
 import { LiveSeatStatus, GridItem } from '@my-app/shared';
-import { LogOut, Sliders, MonitorPlay, Users, ShieldAlert, LayoutGrid } from 'lucide-react';
+import { LogOut, Sliders, MonitorPlay, UserCheck, ShieldAlert, LayoutGrid } from 'lucide-react';
 
 interface TeacherLayoutPageProps {
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
@@ -172,7 +172,7 @@ export const TeacherLayoutPage: React.FC<TeacherLayoutPageProps> = ({ addToast }
             <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn students-btn">
-            <Users size={16} /> 学生名簿
+            <UserCheck size={16} /> 学生名簿
           </Link>
           <Link to="/user/teacher" className="mode-toggle-btn teachers-btn">
             <ShieldAlert size={16} /> 教員一覧

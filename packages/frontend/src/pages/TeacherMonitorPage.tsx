@@ -6,7 +6,7 @@ import { useSeatManager } from '../hooks/useSeatManager';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { TeacherView } from '../containers/TeacherView';
 import { LiveSeatStatus, GridItem } from '@my-app/shared';
-import { LogOut, Sliders, MonitorPlay, FolderOpen, Lock, Unlock, RotateCcw, Database, ChevronUp, ChevronDown, QrCode, Users, ShieldAlert, Download, Trash2, Activity, LayoutGrid, Radio, AlertTriangle } from 'lucide-react';
+import { LogOut, Sliders, MonitorPlay, FolderOpen, Lock, Unlock, RotateCcw, Database, ChevronUp, ChevronDown, QrCode, UserCheck, ShieldAlert, Download, Trash2, Activity, LayoutGrid, Radio, AlertTriangle } from 'lucide-react';
 import { SeatMap } from '../components/SeatMap';
 import client from '../lib/hc';
 import { generateCSVContent } from '../lib/csvHelper';
@@ -363,7 +363,7 @@ export const TeacherMonitorPage: React.FC<TeacherMonitorPageProps> = ({ addToast
             <MonitorPlay size={16} /> みんなの様子
           </Link>
           <Link to="/student/monitoring" className="mode-toggle-btn students-btn">
-            <Users size={16} /> 学生名簿
+            <UserCheck size={16} /> 学生名簿
           </Link>
           <Link to="/user/teacher" className="mode-toggle-btn teachers-btn">
             <ShieldAlert size={16} /> 教員一覧

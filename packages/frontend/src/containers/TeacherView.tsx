@@ -5,7 +5,7 @@ import {
   DragEndEvent 
 } from '@dnd-kit/core';
 import { 
-  Users, 
+  User, 
   GraduationCap, 
   XCircle, 
   DoorOpen, 
@@ -73,7 +73,7 @@ interface TeacherViewProps {
 }
 
 const PALETTE_ITEMS = [
-  { type: 'student' as const, name: 'みんなの席', icon: Users, colorClass: 'student' },
+  { type: 'student' as const, name: 'みんなの席', icon: User, colorClass: 'student' },
   { type: 'teacher' as const, name: '教卓', icon: GraduationCap, colorClass: 'teacher' },
   { type: 'obstacle' as const, name: '空き', icon: XCircle, colorClass: 'obstacle' },
   { type: 'door' as const, name: '出入り口', icon: DoorOpen, colorClass: 'door' },
