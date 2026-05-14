@@ -230,7 +230,19 @@
 
 ### Phase 19: Remove Responsive Design from Teacher Pages & Table-structured SeatMap (Completed)
 - [x] Identify elements causing responsive layout in `/seats/monitoring` (`TeacherMonitorPage.tsx` and `index.css`)
-- [x] Refactor SeatMap layout to a robust HTML `<table>` structure, locking cell sizes to 86px x 40px (massive mode) to completely eliminate CSS grid collapse
-- [x] Move the Realtime comment feed container directly underneath the SeatMap as a full-width bottom panel to prevent horizontal collisions
+- [x] Refactor SeatMap layout to a robust HTML `<table>` structure using `table-layout: fixed` and `width: 100%` to completely eliminate CSS grid collapse
+- [x] Implement dynamic viewport-based auto-fit resizing to stretch each seat to its maximum available width within the screen
+- [x] Compact the navigation `app-header` into a single inline row layout to reclaim valuable vertical display height
+- [x] Reposition the Realtime comment feed beneath the SeatMap as a 100% full-width scrolling timeline, automatically sorted to show the latest messages at the top
+- [x] Integrate an automatic backoff reconnection loop in Supabase Realtime subscriptions to seamlessly recover from connection limits or timeouts
+- [x] Refactor student seat selection (`StudentSelect.tsx`) to a clean, isolated table structure without sharing teacher massive styles
 - [x] Lock page width and prevent wrapping on all other teacher dashboards (`TeacherLayoutPage`, `UserStudentPage`, `UserTeacherPage`) to enforce desktop-first visualization
 - [x] Verify that building and typechecking pass 100% successfully and without issues
+
+### Phase 20: Premium UI Harmonization, Synchronous Realtime, & Zero-Noise Grid (Completed)
+- [x] Harmonize application primary buttons to Night Steel Blue (`#334155`) to prevent clashing with page aura background gradients.
+- [x] Polish mobile student dashboard (`StudentDashboard.tsx`) with Glassmorphism cards and a zero-typing 6-button Mood Selector grid (✨ バッチリ！, 💡 なるほど！, ✍️ メモ待って, ❓ むずかしい, 📢 声が遠い, ❄️ 暑い・寒い).
+- [x] Prevent mobile line wrapping on student mood buttons and confirmation buttons by applying `whiteSpace: 'nowrap'` and responsive font sizing.
+- [x] Fix Realtime broadcast stale state synchronization trap by allowing immediate override message parameters across `StudentPage`, `StudentView`, and `StudentDashboard`.
+- [x] Simplify and eliminate visual noise from the classroom grid: empty student seats render as border-only (no fill), and unassigned floor cells render completely transparent (no border or fill).
+- [x] Verify flawless compilation and zero errors across all monorepo packages.
