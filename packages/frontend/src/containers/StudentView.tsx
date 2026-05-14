@@ -27,7 +27,7 @@ interface StudentViewProps {
   onStudentLogin: () => void;
   onLockSeat: () => void;
   onChangeSeat: () => void;
-  onSendBroadcast: (status: 'ok' | 'ng', responseTime: number) => void;
+  onSendBroadcast: (status: 'ok' | 'ng', responseTime: number, overrideComment?: string) => void;
   addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
 }
 

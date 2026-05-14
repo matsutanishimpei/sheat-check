@@ -290,7 +290,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">🪑</div>
@@ -368,9 +368,13 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
           onStudentLogin={handleStudentLogin}
           onLockSeat={handleLockSeat}
           onChangeSeat={handleChangeSeat}
-          onSendBroadcast={(status, responseTime) => {
+          onSendBroadcast={(status, responseTime, overrideComment) => {
+            const commentToSend = overrideComment !== undefined ? overrideComment : studentComment;
             setStudentCurrentStatus(status);
-            sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentId, studentComment, responseTime);
+            if (overrideComment !== undefined) {
+              setStudentComment(overrideComment);
+            }
+            sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentId, commentToSend, responseTime);
           }}
           addToast={addToast}
         />
