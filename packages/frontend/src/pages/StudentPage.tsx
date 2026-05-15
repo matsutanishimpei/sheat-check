@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { LayoutGrid, Lock } from 'lucide-react';
 import { GridItem, LiveSeatStatus } from '@my-app/shared';
-import { useRealtimeSession } from '../hooks/useRealtimeSession';
+import { useSupabaseClient } from '../hooks/useSupabaseClient';
+import { useStudentRealtime } from '../hooks/useStudentRealtime';
 import { StudentView } from '../containers/StudentView';
 import client from '../lib/hc';
 import { useToast } from '../contexts/ToastContext';
@@ -108,15 +109,14 @@ export const StudentPage: React.FC = () => {
     }
   }, [addToast]);
 
+  const { supabase } = useSupabaseClient(supabaseUrl, supabaseAnonKey);
+
   const {
-    supabase,
     isFallbackActive,
     sendStudentToTeacherBroadcast,
-  } = useRealtimeSession({
-    roomId: '', // Student doesn't need to subscribe to the teacher's management channel the same way
+  } = useStudentRealtime({
+    supabase,
     studentClassroomId,
-    isSeatLocked: false, // Teacher's lock state is handled by receiving broadcast
-    setLiveStatuses,
     addToast,
     onTeacherReset: () => {
       setStudentComment('');
@@ -142,11 +142,6 @@ export const StudentPage: React.FC = () => {
         addToast('info', '教員が教室の座席レイアウトを更新しました。配置が自動同期されました！');
       }
     },
-    supabaseUrl,
-    setSupabaseUrl,
-    supabaseAnonKey,
-    setSupabaseAnonKey,
-    authToken: studentToken,
   });
 
   // Handle URL parameter login flow on mount

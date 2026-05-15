@@ -2,7 +2,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { DragEndEvent } from '@dnd-kit/core';
 import { useRoomLayout } from './useRoomLayout';
 import { useSeatManager } from './useSeatManager';
-import { useRealtimeSession } from './useRealtimeSession';
+import { useSupabaseClient } from './useSupabaseClient';
+import { useTeacherRealtime } from './useTeacherRealtime';
 import { GridItem, LiveSeatStatus } from '@my-app/shared';
 import { useToast } from '../contexts/ToastContext';
 import { supabaseConfig, teacherAuth, activeRoom } from '../lib/storage';
@@ -17,9 +18,15 @@ import { supabaseConfig, teacherAuth, activeRoom } from '../lib/storage';
 export function useTeacherSession() {
   const { addToast } = useToast();
 
+  const [teacherToken] = useState(() => teacherAuth.getSupabaseToken());
+
   // ── Supabase credentials (lifted to this level as single source of truth) ──
-  const [supabaseUrl, setSupabaseUrl] = useState(() => supabaseConfig.getUrl());
-  const [supabaseAnonKey, setSupabaseAnonKey] = useState(() => supabaseConfig.getKey());
+  const supabaseClient = useSupabaseClient(
+    supabaseConfig.getUrl() || '',
+    supabaseConfig.getKey() || ''
+  );
+  
+  const { supabaseUrl, setSupabaseUrl, supabaseAnonKey, setSupabaseAnonKey, supabase, saveSupabaseConfig } = supabaseClient;
 
   // ── Room layout management ──
   const roomLayout = useRoomLayout({
@@ -38,21 +45,12 @@ export function useTeacherSession() {
   });
 
   // ── Realtime session (Supabase channels) ──
-  const [teacherToken] = useState(() => teacherAuth.getSupabaseToken());
-
-  const realtimeSession = useRealtimeSession({
+  const realtimeSession = useTeacherRealtime({
+    supabase,
     roomId: roomLayout.roomId,
-    studentClassroomId: '',
     isSeatLocked: seatManager.isSeatLocked,
     setLiveStatuses: seatManager.setLiveStatuses,
     addToast,
-    onTeacherReset: () => seatManager.bulkResetLiveStatuses(),
-    onTeacherLockState: () => seatManager.toggleSeatLock(),
-    supabaseUrl,
-    setSupabaseUrl,
-    supabaseAnonKey,
-    setSupabaseAnonKey,
-    authToken: teacherToken,
   });
 
   // ── Auto-restore active room ID across navigation ──
@@ -121,11 +119,19 @@ export function useTeacherSession() {
   }, [roomLayout.saveClassroom, realtimeSession.sendRoomLayoutUpdatedBroadcast]);
 
   const handleSaveSupabaseConfig = useCallback(async () => {
-    realtimeSession.saveSupabaseConfig();
+    saveSupabaseConfig(
+      (msg) => {
+        addToast('success', msg);
+        if (!roomLayout.roomId) {
+          addToast('success', '右上の「D1 に保存」で教室を新規登録してください。');
+        }
+      },
+      (msg) => addToast('error', msg)
+    );
     if (roomLayout.roomId) {
       await handleSaveClassroom();
     }
-  }, [realtimeSession.saveSupabaseConfig, roomLayout.roomId, handleSaveClassroom]);
+  }, [saveSupabaseConfig, roomLayout.roomId, handleSaveClassroom, addToast]);
 
   return {
     // Supabase config
@@ -133,7 +139,7 @@ export function useTeacherSession() {
     setSupabaseUrl,
     supabaseAnonKey,
     setSupabaseAnonKey,
-    supabase: realtimeSession.supabase,
+    supabase,
     saveSupabaseConfig: handleSaveSupabaseConfig,
 
     // Room layout
