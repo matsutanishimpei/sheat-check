@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, User, Loader2, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
+import { useToast } from '../contexts/ToastContext';
+import { teacherAuth } from '../lib/storage';
 
-interface LoginPageProps {
-  addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
-}
-
-export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
+export const LoginPage: React.FC = () => {
+  const { addToast } = useToast();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,10 +46,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ addToast }) => {
       const data = await res.json();
 
       // Store authentication tokens & teacher profile details securely in browser storage
-      localStorage.setItem('teacher_jwt', data.token);
-      localStorage.setItem('supabase_teacher_token', data.supabaseToken);
-      localStorage.setItem('logged_in_teacher', JSON.stringify(data.teacher));
-      localStorage.setItem('teacher_auth', 'true'); // For legacy guard compatibility
+      teacherAuth.save(data);
 
       addToast('success', 'ログインしました。教員用管理画面へ移動します。');
       navigate('/room_layout');
