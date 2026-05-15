@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { LiveSeatStatus } from '@my-app/shared';
+import { seatStatuses as seatStorage } from '../lib/storage';
 
 interface UseSeatManagerProps {
   roomId: string | null;
@@ -13,13 +14,9 @@ export function useSeatManager({ roomId, addToast }: UseSeatManagerProps) {
   // Load live statuses from Local Storage on roomId changes
   useEffect(() => {
     if (roomId) {
-      const stored = localStorage.getItem(`seat_statuses_room_${roomId}`);
+      const stored = seatStorage.get<Record<string, LiveSeatStatus>>(roomId);
       if (stored) {
-        try {
-          setLiveStatuses(JSON.parse(stored));
-        } catch (err) {
-          console.error('Failed to parse saved seat statuses from Local Storage:', err);
-        }
+        setLiveStatuses(stored);
       } else {
         setLiveStatuses({});
       }
@@ -31,7 +28,7 @@ export function useSeatManager({ roomId, addToast }: UseSeatManagerProps) {
   // Persist live statuses to Local Storage when updated
   useEffect(() => {
     if (roomId) {
-      localStorage.setItem(`seat_statuses_room_${roomId}`, JSON.stringify(liveStatuses));
+      seatStorage.save(roomId, liveStatuses);
     }
   }, [liveStatuses, roomId]);
 

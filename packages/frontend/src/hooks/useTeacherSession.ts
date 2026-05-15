@@ -1,0 +1,177 @@
+import { useState, useCallback, useEffect } from 'react';
+import { DragEndEvent } from '@dnd-kit/core';
+import { useRoomLayout } from './useRoomLayout';
+import { useSeatManager } from './useSeatManager';
+import { useRealtimeSession } from './useRealtimeSession';
+import { GridItem, LiveSeatStatus } from '@my-app/shared';
+import { useToast } from '../contexts/ToastContext';
+import { supabaseConfig, teacherAuth, activeRoom } from '../lib/storage';
+
+/**
+ * Facade hook that combines useRoomLayout + useSeatManager + useRealtimeSession
+ * into a single interface for Teacher pages.
+ *
+ * This eliminates the ~60 lines of duplicated wiring code that was
+ * previously copy-pasted between TeacherLayoutPage and TeacherMonitorPage.
+ */
+export function useTeacherSession() {
+  const { addToast } = useToast();
+
+  // ── Supabase credentials (lifted to this level as single source of truth) ──
+  const [supabaseUrl, setSupabaseUrl] = useState(() => supabaseConfig.getUrl());
+  const [supabaseAnonKey, setSupabaseAnonKey] = useState(() => supabaseConfig.getKey());
+
+  // ── Room layout management ──
+  const roomLayout = useRoomLayout({
+    addToast,
+    onClearLiveStatuses: () => seatManager.setLiveStatuses({} as Record<string, LiveSeatStatus>),
+    supabaseUrl,
+    supabaseAnonKey,
+    setSupabaseUrl,
+    setSupabaseAnonKey,
+  });
+
+  // ── Seat status management ──
+  const seatManager = useSeatManager({
+    roomId: roomLayout.roomId,
+    addToast,
+  });
+
+  // ── Realtime session (Supabase channels) ──
+  const [teacherToken] = useState(() => teacherAuth.getSupabaseToken());
+
+  const realtimeSession = useRealtimeSession({
+    roomId: roomLayout.roomId,
+    studentClassroomId: '',
+    isSeatLocked: seatManager.isSeatLocked,
+    setLiveStatuses: seatManager.setLiveStatuses,
+    addToast,
+    onTeacherReset: () => seatManager.bulkResetLiveStatuses(),
+    onTeacherLockState: () => seatManager.toggleSeatLock(),
+    supabaseUrl,
+    setSupabaseUrl,
+    supabaseAnonKey,
+    setSupabaseAnonKey,
+    authToken: teacherToken,
+  });
+
+  // ── Auto-restore active room ID across navigation ──
+  useEffect(() => {
+    if (!roomLayout.roomId && roomLayout.savedRooms.length > 0) {
+      const savedActiveRoomId = activeRoom.getId();
+      if (savedActiveRoomId && roomLayout.savedRooms.some(r => r.id === savedActiveRoomId)) {
+        roomLayout.loadClassroom(savedActiveRoomId);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomLayout.roomId, roomLayout.savedRooms]);
+
+  // ── Composed action handlers ──
+  const handleRemoveLiveStatus = useCallback((key: string) => {
+    seatManager.removeLiveStatus(key);
+    realtimeSession.sendStudentEvictedBroadcast(key);
+  }, [seatManager.removeLiveStatus, realtimeSession.sendStudentEvictedBroadcast]);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || !active) return;
+
+    const dragType = active.data.current?.type as GridItem['type'];
+    const { x, y } = over.data.current as { x: number; y: number };
+
+    if (dragType && typeof x === 'number' && typeof y === 'number') {
+      roomLayout.updateGridCell(x, y, dragType, handleRemoveLiveStatus);
+    }
+  }, [roomLayout.updateGridCell, handleRemoveLiveStatus]);
+
+  const handleCellCycle = useCallback((x: number, y: number) => {
+    const currentGrid = roomLayout.cases[roomLayout.activeCaseIdx]?.grid || {};
+    const key = `${x},${y}`;
+    const current = currentGrid[key];
+
+    let next: GridItem['type'] | undefined;
+    if (!current) next = 'student';
+    else if (current === 'student') next = 'teacher';
+    else if (current === 'teacher') next = 'obstacle';
+    else if (current === 'obstacle') next = 'door';
+    else next = undefined;
+
+    roomLayout.updateGridCell(x, y, next, handleRemoveLiveStatus);
+  }, [roomLayout.cases, roomLayout.activeCaseIdx, roomLayout.updateGridCell, handleRemoveLiveStatus]);
+
+  const handleBulkReset = useCallback(() => {
+    const ok = seatManager.bulkResetLiveStatuses();
+    if (ok) {
+      realtimeSession.sendTeacherResetBroadcast();
+    }
+    return ok;
+  }, [seatManager.bulkResetLiveStatuses, realtimeSession.sendTeacherResetBroadcast]);
+
+  const handleToggleSeatLock = useCallback(() => {
+    const nextLocked = seatManager.toggleSeatLock();
+    realtimeSession.sendTeacherLockStateBroadcast(nextLocked);
+    return nextLocked;
+  }, [seatManager.toggleSeatLock, realtimeSession.sendTeacherLockStateBroadcast]);
+
+  const handleSaveClassroom = useCallback(async () => {
+    await roomLayout.saveClassroom();
+    setTimeout(() => {
+      realtimeSession.sendRoomLayoutUpdatedBroadcast();
+    }, 800);
+  }, [roomLayout.saveClassroom, realtimeSession.sendRoomLayoutUpdatedBroadcast]);
+
+  const handleSaveSupabaseConfig = useCallback(async () => {
+    realtimeSession.saveSupabaseConfig();
+    if (roomLayout.roomId) {
+      await handleSaveClassroom();
+    }
+  }, [realtimeSession.saveSupabaseConfig, roomLayout.roomId, handleSaveClassroom]);
+
+  return {
+    // Supabase config
+    supabaseUrl,
+    setSupabaseUrl,
+    supabaseAnonKey,
+    setSupabaseAnonKey,
+    supabase: realtimeSession.supabase,
+    saveSupabaseConfig: handleSaveSupabaseConfig,
+
+    // Room layout
+    roomName: roomLayout.roomName,
+    setRoomName: roomLayout.setRoomName,
+    roomId: roomLayout.roomId,
+    cases: roomLayout.cases,
+    activeCaseIdx: roomLayout.activeCaseIdx,
+    setActiveCaseIdx: roomLayout.setActiveCaseIdx,
+    updateActiveCaseName: roomLayout.updateActiveCaseName,
+    addNewCase: roomLayout.addNewCase,
+    deleteCurrentCase: roomLayout.deleteCurrentCase,
+    isLoadingRooms: roomLayout.isLoadingRooms,
+    savedRooms: roomLayout.savedRooms,
+    isSaving: roomLayout.isSaving,
+    isActive: roomLayout.isActive,
+    setIsActive: roomLayout.setIsActive,
+    loadClassroom: roomLayout.loadClassroom,
+    saveClassroom: handleSaveClassroom,
+    createNewClassroomSession: roomLayout.createNewClassroomSession,
+    fetchRooms: roomLayout.fetchRooms,
+    clearCurrentGrid: roomLayout.clearCurrentGrid,
+    deleteClassroom: roomLayout.deleteClassroom,
+
+    // Seat manager
+    liveStatuses: seatManager.liveStatuses,
+    setLiveStatuses: seatManager.setLiveStatuses,
+    isSeatLocked: seatManager.isSeatLocked,
+    removeLiveStatus: handleRemoveLiveStatus,
+
+    // Realtime
+    realtimeLogs: realtimeSession.realtimeLogs,
+    isOnline: realtimeSession.isOnline,
+
+    // Composed actions
+    handleDragEnd,
+    handleCellCycle,
+    handleBulkReset,
+    handleToggleSeatLock,
+  };
+}

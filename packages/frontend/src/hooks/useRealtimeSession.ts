@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createClient, SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
 import { RealtimeLog, LiveSeatStatus } from '@my-app/shared';
+import { supabaseConfig, seatStatuses as seatStorage, realtimeLogs as logsStorage } from '../lib/storage';
 
 interface UseRealtimeSessionProps {
   roomId: string | null;
@@ -36,8 +37,8 @@ export function useRealtimeSession({
   authToken,
 }: UseRealtimeSessionProps) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(() => {
-    const url = localStorage.getItem('sb_url');
-    const key = localStorage.getItem('sb_key');
+    const url = supabaseConfig.getUrl();
+    const key = supabaseConfig.getKey();
     if (url && key) {
       try {
         return createClient(url.trim(), key.trim());
@@ -53,14 +54,9 @@ export function useRealtimeSession({
   // Restore room-specific logs from LocalStorage on mount or when roomId changes
   useEffect(() => {
     if (roomId) {
-      const saved = localStorage.getItem(`realtime_logs_room_${roomId}`);
+      const saved = logsStorage.get<RealtimeLog[]>(roomId);
       if (saved) {
-        try {
-          setRealtimeLogs(JSON.parse(saved));
-        } catch (e) {
-          console.error('Failed to parse saved realtime logs:', e);
-          setRealtimeLogs([]);
-        }
+        setRealtimeLogs(saved);
       } else {
         setRealtimeLogs([]);
       }
@@ -112,8 +108,7 @@ export function useRealtimeSession({
         setSupabase(client);
         
         try {
-          localStorage.setItem('sb_url', trimmedUrl);
-          localStorage.setItem('sb_key', trimmedKey);
+          supabaseConfig.save(trimmedUrl, trimmedKey);
         } catch (storageErr) {
           console.warn('Failed to save Supabase config to localStorage (Private Window?):', storageErr);
         }
@@ -163,8 +158,7 @@ export function useRealtimeSession({
       setSupabase(client);
       
       try {
-        localStorage.setItem('sb_url', trimmedUrl);
-        localStorage.setItem('sb_key', trimmedKey);
+        supabaseConfig.save(trimmedUrl, trimmedKey);
       } catch (storageErr) {
         console.warn('Failed to save to localStorage:', storageErr);
       }
@@ -238,7 +232,7 @@ export function useRealtimeSession({
               };
             }
             if (currentRoomId) {
-              localStorage.setItem(`seat_statuses_room_${currentRoomId}`, JSON.stringify(nextStatuses));
+              seatStorage.save(currentRoomId, nextStatuses);
             }
             return nextStatuses;
           });
@@ -256,7 +250,7 @@ export function useRealtimeSession({
           setRealtimeLogs((prev) => {
             const nextLogs = [logItem, ...prev].slice(0, 50);
             if (currentRoomId) {
-              localStorage.setItem(`realtime_logs_room_${currentRoomId}`, JSON.stringify(nextLogs));
+              logsStorage.save(currentRoomId, nextLogs);
             }
             return nextLogs;
           });
@@ -419,7 +413,7 @@ export function useRealtimeSession({
       if (res === 'ok') {
         setRealtimeLogs([]);
         if (roomIdRef.current) {
-          localStorage.removeItem(`realtime_logs_room_${roomIdRef.current}`);
+          logsStorage.remove(roomIdRef.current);
         }
       }
       return res === 'ok' ? 'ok' : 'error';

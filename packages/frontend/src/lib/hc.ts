@@ -1,5 +1,6 @@
 import { hc } from 'hono/client';
 import type { AppType } from '@my-app/backend';
+import { teacherAuth } from './storage';
 
 // Use a custom fetch to act as a global response interceptor for 401 Unauthorized
 const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -15,21 +16,14 @@ const customFetch = async (input: RequestInfo | URL, init?: RequestInit) => {
 
     // Do not redirect on login attempts themselves
     if (!urlString.includes('/api/auth/teacher/login')) {
-      try {
-        localStorage.removeItem('teacher_jwt');
-        localStorage.removeItem('supabase_teacher_token');
-        localStorage.removeItem('logged_in_teacher');
-        localStorage.removeItem('teacher_auth');
+      teacherAuth.clear();
 
-        // Redirect to login page with an expiry signal query param
-        if (
-          window.location.pathname !== '/' &&
-          !window.location.search.includes('expired=true')
-        ) {
-          window.location.href = '/?expired=true';
-        }
-      } catch (e) {
-        // ignore
+      // Redirect to login page with an expiry signal query param
+      if (
+        window.location.pathname !== '/' &&
+        !window.location.search.includes('expired=true')
+      ) {
+        window.location.href = '/?expired=true';
       }
     }
   }
@@ -43,13 +37,9 @@ const client = hc<AppType>(apiUrl, {
   fetch: customFetch,
   headers: () => {
     const headers: Record<string, string> = {};
-    try {
-      const token = localStorage.getItem('teacher_jwt');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-    } catch (e) {
-      // ignore
+    const token = teacherAuth.getJwt();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
     return headers;
   },

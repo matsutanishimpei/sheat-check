@@ -1,6 +1,7 @@
 import React from 'react';
 import { Grid3X3, Lock, User, GraduationCap } from 'lucide-react';
 import { GridItem } from '@my-app/shared';
+import { useToast } from '../../contexts/ToastContext';
 
 interface StudentSelectProps {
   studentRoomTitle: string;
@@ -10,7 +11,6 @@ interface StudentSelectProps {
   setStudentSeatId: (val: string) => void;
   setStudentStage: (stage: 'config' | 'select' | 'dashboard') => void;
   onLockSeat: () => void;
-  addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
 }
 
 export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
@@ -21,8 +21,8 @@ export const StudentSelect: React.FC<StudentSelectProps> = React.memo(({
   setStudentSeatId,
   setStudentStage,
   onLockSeat,
-  addToast,
 }) => {
+  const { addToast } = useToast();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div className="student-title-group">

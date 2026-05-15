@@ -5,12 +5,11 @@ import { GridItem, LiveSeatStatus } from '@my-app/shared';
 import { useRealtimeSession } from '../hooks/useRealtimeSession';
 import { StudentView } from '../containers/StudentView';
 import client from '../lib/hc';
+import { useToast } from '../contexts/ToastContext';
+import { studentSession } from '../lib/storage';
 
-interface StudentPageProps {
-  addToast: (type: 'success' | 'error' | 'info' | 'warning', message: string) => void;
-}
-
-export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
+export const StudentPage: React.FC = () => {
+  const { addToast } = useToast();
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
 
@@ -18,7 +17,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
   const [supabaseUrl, setSupabaseUrl] = useState('');
   const [supabaseAnonKey, setSupabaseAnonKey] = useState('');
   const [isRoomActive, setIsRoomActive] = useState(true);
-  const [studentToken, setStudentToken] = useState(() => localStorage.getItem('supabase_student_token') || '');
+  const [studentToken, setStudentToken] = useState(() => studentSession.getToken());
 
   // Student specific states
   const [studentStage, setStudentStage] = useState<'config' | 'select' | 'dashboard'>('config');
@@ -67,7 +66,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
               });
               if (tokenRes.ok) {
                 const tokenData = await tokenRes.json();
-                localStorage.setItem('supabase_student_token', tokenData.supabaseToken);
+                studentSession.saveToken(tokenData.supabaseToken);
                 setStudentToken(tokenData.supabaseToken);
               }
             } catch (jwtErr) {
@@ -127,7 +126,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
     },
     onTeacherEvict: (evictedSeatId) => {
       if (studentSeatId === evictedSeatId) {
-        localStorage.removeItem(`student_seat_id_${studentClassroomId}`);
+        studentSession.removeSeatId(studentClassroomId);
         setStudentSeatId('');
         setStudentCurrentStatus(null);
         setStudentComment('');
@@ -156,9 +155,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       const cleanUuid = roomId.trim();
       setStudentClassroomId(cleanUuid);
 
-      const storedId = localStorage.getItem(`student_id_${cleanUuid}`);
-      const storedName = localStorage.getItem(`student_name_${cleanUuid}`);
-      const storedSeatId = localStorage.getItem(`student_seat_id_${cleanUuid}`);
+      const storedId = studentSession.getId(cleanUuid);
+      const storedName = studentSession.getName(cleanUuid);
+      const storedSeatId = studentSession.getSeatId(cleanUuid);
 
       if (storedId) {
         setStudentId(storedId);
@@ -224,7 +223,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
 
             if (tokenRes.ok) {
               const tokenData = await tokenRes.json();
-              localStorage.setItem('supabase_student_token', tokenData.supabaseToken);
+              studentSession.saveToken(tokenData.supabaseToken);
               setStudentToken(tokenData.supabaseToken);
             } else {
               throw new Error('Supabase 認証トークンの取得に失敗しました');
@@ -245,9 +244,9 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
         }
         setStudentGridLayout(gridObj);
 
-        localStorage.setItem(`student_id_${studentClassroomId}`, studentId.trim());
-        localStorage.setItem(`student_name_${studentClassroomId}`, studentName.trim());
-        localStorage.setItem('last_room_id', studentClassroomId);
+        studentSession.saveId(studentClassroomId, studentId.trim());
+        studentSession.saveName(studentClassroomId, studentName.trim());
+        studentSession.saveLastRoomId(studentClassroomId);
 
         // If not using a URL parameter, explicitly navigate to the clean URL so they can bookmark it
         if (!roomId) {
@@ -275,7 +274,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       addToast('warning', '現在、座席変更は教員によってロックされています。');
       return;
     }
-    localStorage.setItem(`student_seat_id_${studentClassroomId}`, studentSeatId);
+    studentSession.saveSeatId(studentClassroomId, studentSeatId);
     setStudentStage('dashboard');
     addToast('success', `座席を [ ${studentSeatId} ] に固定しました！`);
   };
@@ -286,7 +285,7 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
       return;
     }
     setStudentStage('select');
-    localStorage.removeItem(`student_seat_id_${studentClassroomId}`);
+    studentSession.removeSeatId(studentClassroomId);
     setStudentSeatId('');
   };
 
@@ -379,7 +378,6 @@ export const StudentPage: React.FC<StudentPageProps> = ({ addToast }) => {
             }
             sendStudentToTeacherBroadcast(studentSeatId, status, studentName, studentId, commentToSend, responseTime);
           }}
-          addToast={addToast}
         />
       )}
     </div>

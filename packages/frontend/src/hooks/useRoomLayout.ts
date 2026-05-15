@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import client from '../lib/hc';
 import { GridItem } from '@my-app/shared';
 import { createClient } from '@supabase/supabase-js';
+import { activeRoom, supabaseConfig } from '../lib/storage';
 
 export interface EditorCase {
   caseName: string;
@@ -68,7 +69,7 @@ export function useRoomLayout({
         setIsActive(data.isActive !== false);
         
         try {
-          localStorage.setItem('active_teacher_room_id', data.id);
+          activeRoom.save(data.id);
         } catch (e) {
           console.warn('Failed to save room ID to localStorage:', e);
         }
@@ -106,8 +107,8 @@ export function useRoomLayout({
       return;
     }
 
-    const finalSupabaseUrl = supabaseUrl.trim() || localStorage.getItem('sb_url') || 'https://temp-placeholder.supabase.co';
-    const finalSupabaseAnonKey = supabaseAnonKey.trim() || localStorage.getItem('sb_key') || 'temp-placeholder-key';
+    const finalSupabaseUrl = supabaseUrl.trim() || supabaseConfig.getUrl() || 'https://temp-placeholder.supabase.co';
+    const finalSupabaseAnonKey = supabaseAnonKey.trim() || supabaseConfig.getKey() || 'temp-placeholder-key';
 
     setIsSaving(true);
     
@@ -136,7 +137,7 @@ export function useRoomLayout({
         if (res.ok) {
           addToast('success', `教室「${roomName}」のレイアウトを更新しました！`);
           try {
-            localStorage.setItem('active_teacher_room_id', roomId);
+            activeRoom.save(roomId);
           } catch (e) {}
           fetchRooms();
         } else {
@@ -158,7 +159,7 @@ export function useRoomLayout({
           const data = await res.json() as any;
           setRoomId(data.id);
           try {
-            localStorage.setItem('active_teacher_room_id', data.id);
+            activeRoom.save(data.id);
           } catch (e) {}
           addToast('success', `新規教室「${roomName}」を作成・保存しました！`);
           fetchRooms();
@@ -182,7 +183,7 @@ export function useRoomLayout({
     setIsActive(true);
     onClearLiveStatuses();
     try {
-      localStorage.removeItem('active_teacher_room_id');
+      activeRoom.clear();
     } catch (e) {}
     addToast('info', '新しい教室の編集スタジオを開始しました');
   };
