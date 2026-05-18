@@ -6,6 +6,7 @@ import { useResponseArchive } from '../hooks/useResponseArchive';
 import { SeatMap } from '../components/SeatMap';
 import client from '../lib/hc';
 import { responseArchive } from '../lib/storage';
+import { initAudioOnInteraction } from '../lib/audio';
 import { useRequireAuth, useLogout } from '../hooks/useRequireAuth';
 import { TeacherHeader } from '../components/layout/TeacherHeader';
 import { MonitorControlBar } from '../components/monitor/MonitorControlBar';
@@ -21,6 +22,11 @@ export const TeacherMonitorPage: React.FC = () => {
   const minHeight = import.meta.env.VITE_MONITOR_CELL_MIN_HEIGHT || '40';
 
   const session = useTeacherSession();
+
+  // ページマウント時にユーザー操作で AudioContext を有効化（ブラウザ自動再生ポリシー対策）
+  useEffect(() => {
+    return initAudioOnInteraction();
+  }, []);
 
   const {
     archiveCurrentStatuses,
