@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
 import { RealtimeLog, LiveSeatStatus } from '@my-app/shared';
 import { seatStatuses as seatStorage, realtimeLogs as logsStorage } from '../lib/storage';
+import { playAlertSound } from '../lib/audio';
 
 interface UseTeacherRealtimeProps {
   supabase: SupabaseClient | null;
@@ -124,6 +125,9 @@ export function useTeacherRealtime({
             addToastRef.current('info', `座席解除: ${logItem.studentName} さんが座席 ${logItem.seatId} を解放しました`);
           } else {
             addToastRef.current('success', `リアルタイム受信: ${logItem.studentName} さん (座席: ${logItem.seatId}) ➔ ${payload.status.toUpperCase()}`);
+            if (payload.status === 'ng') {
+              playAlertSound();
+            }
           }
         }
       })
