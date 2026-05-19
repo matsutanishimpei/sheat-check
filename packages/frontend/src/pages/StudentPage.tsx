@@ -168,6 +168,22 @@ export const StudentPage: React.FC = () => {
     }
   }, [roomId, fetchRoomAndSetup]);
 
+  // ページを閉じる・リロード・モバイルでのバックグラウンド移行時の自動離籍処理
+  useEffect(() => {
+    const handleUnload = () => {
+      if (studentSeatId && studentClassroomId && studentName && studentId) {
+        sendStudentToTeacherBroadcast(studentSeatId, 'none', studentName, studentId);
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
+    window.addEventListener('pagehide', handleUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleUnload);
+      window.removeEventListener('pagehide', handleUnload);
+    };
+  }, [studentSeatId, studentClassroomId, studentName, studentId, sendStudentToTeacherBroadcast]);
+
   const handleStudentLogin = async () => {
     if (!studentClassroomId.trim()) {
       addToast('error', '教室の UUID を入力してください');
@@ -279,9 +295,14 @@ export const StudentPage: React.FC = () => {
       addToast('warning', '現在、座席変更は教員によってロックされています。');
       return;
     }
+    if (studentSeatId) {
+      sendStudentToTeacherBroadcast(studentSeatId, 'none', studentName, studentId);
+    }
     setStudentStage('select');
     studentSession.removeSeatId(studentClassroomId);
     setStudentSeatId('');
+    setStudentCurrentStatus(null);
+    setStudentComment('');
   };
 
   return (
