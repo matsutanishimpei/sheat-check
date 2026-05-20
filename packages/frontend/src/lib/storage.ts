@@ -160,12 +160,14 @@ export const studentSession = {
   getId: (roomId: string) => safeGetItem(`student_id_${roomId}`),
   getName: (roomId: string) => safeGetItem(`student_name_${roomId}`),
   getSeatId: (roomId: string) => safeGetItem(`student_seat_id_${roomId}`),
+  getPrevSeatId: (roomId: string) => safeGetItem(`student_prev_seat_id_${roomId}`),
   getToken: () => safeGetItem('supabase_student_token') || '',
   getLastRoomId: () => safeGetItem('last_room_id'),
 
   saveId: (roomId: string, studentId: string) => safeSetItem(`student_id_${roomId}`, studentId),
   saveName: (roomId: string, name: string) => safeSetItem(`student_name_${roomId}`, name),
   saveSeatId: (roomId: string, seatId: string) => safeSetItem(`student_seat_id_${roomId}`, seatId),
+  savePrevSeatId: (roomId: string, seatId: string) => safeSetItem(`student_prev_seat_id_${roomId}`, seatId),
   saveToken: (token: string) => safeSetItem('supabase_student_token', token),
   saveLastRoomId: (roomId: string) => safeSetItem('last_room_id', roomId),
 
