@@ -153,6 +153,7 @@ export const StudentPage: React.FC = () => {
       const storedId = studentSession.getId(cleanUuid);
       const storedName = studentSession.getName(cleanUuid);
       const storedSeatId = studentSession.getSeatId(cleanUuid);
+      const prevSeatId = studentSession.getPrevSeatId(cleanUuid);
 
       if (storedId) {
         setStudentId(storedId);
@@ -161,6 +162,8 @@ export const StudentPage: React.FC = () => {
         setStudentName(storedName);
         if (storedSeatId) {
           setStudentSeatId(storedSeatId);
+        } else if (prevSeatId) {
+          setStudentSeatId(prevSeatId);
         }
       }
 
@@ -259,6 +262,11 @@ export const StudentPage: React.FC = () => {
         studentSession.saveName(studentClassroomId, studentName.trim());
         studentSession.saveLastRoomId(studentClassroomId);
 
+        const prevSeatId = studentSession.getPrevSeatId(studentClassroomId.trim());
+        if (prevSeatId) {
+          setStudentSeatId(prevSeatId);
+        }
+
         // If not using a URL parameter, explicitly navigate to the clean URL so they can bookmark it
         if (!roomId) {
           navigate(`/student/${studentClassroomId}`);
@@ -286,6 +294,7 @@ export const StudentPage: React.FC = () => {
       return;
     }
     studentSession.saveSeatId(studentClassroomId, studentSeatId);
+    studentSession.savePrevSeatId(studentClassroomId, studentSeatId);
     setStudentStage('dashboard');
     addToast('success', `座席を [ ${studentSeatId} ] に固定しました！`);
   };
@@ -300,7 +309,7 @@ export const StudentPage: React.FC = () => {
     }
     setStudentStage('select');
     studentSession.removeSeatId(studentClassroomId);
-    setStudentSeatId('');
+    // Keep studentSeatId in state as pre-selected highlight
     setStudentCurrentStatus(null);
     setStudentComment('');
   };
