@@ -72,8 +72,6 @@ export function useTeacherRealtime({
 
     if (!supabase || !roomId) return;
 
-    addToastRef.current('info', `Supabase チャンネル「${roomId}」を購読中...`);
-
     const channel = supabase.channel(`room:${roomId}`, {
       config: { broadcast: { self: true } },
     });
@@ -121,13 +119,8 @@ export function useTeacherRealtime({
             return nextLogs;
           });
 
-          if (payload.status === 'none') {
-            addToastRef.current('info', `座席解除: ${logItem.studentName} さんが座席 ${logItem.seatId} を解放しました`);
-          } else {
-            addToastRef.current('success', `リアルタイム受信: ${logItem.studentName} さん (座席: ${logItem.seatId}) ➔ ${payload.status.toUpperCase()}`);
-            if (payload.status === 'ng') {
-              playAlertSound();
-            }
+          if (payload.status === 'ng') {
+            playAlertSound();
           }
         }
       })
