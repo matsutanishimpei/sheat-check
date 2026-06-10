@@ -35,17 +35,17 @@
   --color-obstacle-hover: #9e4e57;
   --color-obstacle-glow: rgba(181, 96, 106, 0.08);
 
-  --color-door: #6A9478;
-  --color-door-hover: #567d62;
-  --color-door-glow: rgba(106, 148, 120, 0.08);
+  --color-door: #64748b;
+  --color-door-hover: #475569;
+  --color-door-glow: rgba(100, 116, 139, 0.08);
 
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 18px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-lg: none;
 
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -847,25 +847,27 @@ body {
 }
 
 .btn-huge.btn-ok {
-  background: linear-gradient(135deg, #87b296 0%, #6A9478 100%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 24px rgba(106, 148, 120, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  background-color: #6A9478; /* 青磁色 */
+  border: none;
+  box-shadow: none;
 }
 
 .btn-huge.btn-ok:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 32px rgba(106, 148, 120, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  background-color: #567d62;
+  box-shadow: none;
 }
 
 .btn-huge.btn-ng {
-  background: linear-gradient(135deg, #cf828c 0%, #B5606A 100%);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 24px rgba(181, 96, 106, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  background-color: #B5606A; /* 紅樺色 */
+  border: none;
+  box-shadow: none;
 }
 
 .btn-huge.btn-ng:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 32px rgba(181, 96, 106, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+  background-color: #9e4e57;
+  box-shadow: none;
 }
 
 .btn-huge:active {

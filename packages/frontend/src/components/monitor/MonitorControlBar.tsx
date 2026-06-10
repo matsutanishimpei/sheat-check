@@ -80,9 +80,9 @@ export const MonitorControlBar: React.FC<MonitorControlBarProps> = ({
               className="btn" 
               style={{ 
                 padding: '0.5rem 1rem', 
-                backgroundColor: isActive ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)', 
-                border: isActive ? '1px solid #10b981' : '1px solid #ef4444',
-                color: isActive ? '#10b981' : '#ef4444',
+                backgroundColor: isActive ? 'rgba(106, 148, 120, 0.12)' : 'rgba(181, 96, 106, 0.12)', 
+                border: 'none',
+                color: isActive ? '#6A9478' : '#B5606A',
                 fontWeight: 'bold',
                 display: 'flex',
                 alignItems: 'center',
