@@ -10,6 +10,9 @@ interface SeatCellProps {
   liveStatus?: LiveSeatStatus;
   onCycle: (x: number, y: number) => void;
   onRemoveLiveStatus?: (key: string) => void;
+  massive?: boolean;
+  isEmptyRow?: boolean;
+  isShrinkCol?: boolean;
 }
 
 export const SeatCell = React.memo(({ 
@@ -18,7 +21,10 @@ export const SeatCell = React.memo(({
   cellType, 
   liveStatus,
   onCycle,
-  onRemoveLiveStatus
+  onRemoveLiveStatus,
+  massive = false,
+  isEmptyRow = false,
+  isShrinkCol = false
 }: SeatCellProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
@@ -39,6 +45,10 @@ export const SeatCell = React.memo(({
   const getCellClassName = () => {
     let classes = `grid-cell`;
     if (isOver) classes += ' cell-over';
+    if (massive) classes += ' cell-massive';
+    if (isEmptyRow) classes += ' cell-empty-row';
+    if (isShrinkCol) classes += ' cell-shrink-col';
+    if (!cellType) classes += ' cell-empty-space';
     return classes;
   };
 
@@ -47,16 +57,27 @@ export const SeatCell = React.memo(({
   return (
     <div
       ref={setNodeRef}
-      onClick={() => onCycle(x, y)}
+      onClick={massive ? undefined : () => onCycle(x, y)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className={getCellClassName()}
-      title={cellType ? undefined : `座標: (${x}, ${y})`}
-      style={{ position: 'relative' }}
+      title={cellType || massive ? undefined : `座標: (${x}, ${y})`}
+      style={{ 
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        display: isEmptyRow ? 'none' : 'flex',
+        border: isEmptyRow || !cellType ? 'none' : undefined,
+      }}
     >
       {cellType && (
         <div 
           className={`cell-item ${cellType} ${cellType === 'student' && liveStatus ? `student-live-${liveStatus.status}` : ''}`}
+          style={
+            massive && cellType === 'student' && !liveStatus
+              ? { maxWidth: '44px', margin: '0 auto' }
+              : undefined
+          }
         >
           {cellType === 'student' && liveStatus ? (
             <>
