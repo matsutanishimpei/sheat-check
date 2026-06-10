@@ -23,21 +23,21 @@
   --color-primary: #334155;
   --color-primary-hover: #1e293b;
 
-  --color-student: #0891b2;
-  --color-student-hover: #0e7490;
-  --color-student-glow: rgba(8, 145, 178, 0.08);
+  --color-student: #6B8CAE;
+  --color-student-hover: #547496;
+  --color-student-glow: rgba(107, 140, 174, 0.08);
 
-  --color-teacher: #ea580c;
-  --color-teacher-hover: #c2410c;
-  --color-teacher-glow: rgba(234, 88, 12, 0.08);
+  --color-teacher: #C4714F;
+  --color-teacher-hover: #ab5c3c;
+  --color-teacher-glow: rgba(196, 113, 79, 0.08);
 
-  --color-obstacle: #e11d48;
-  --color-obstacle-hover: #be123c;
-  --color-obstacle-glow: rgba(225, 29, 72, 0.08);
+  --color-obstacle: #B5606A;
+  --color-obstacle-hover: #9e4e57;
+  --color-obstacle-glow: rgba(181, 96, 106, 0.08);
 
-  --color-door: #059669;
-  --color-door-hover: #047857;
-  --color-door-glow: rgba(5, 150, 105, 0.08);
+  --color-door: #6A9478;
+  --color-door-hover: #567d62;
+  --color-door-glow: rgba(106, 148, 120, 0.08);
 
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -697,32 +697,32 @@ body {
 /* Page Specific Navigation Colors */
 /* 教室設定 (Amber) */
 .mode-toggle-btn.layout-btn:hover {
-  color: #ea580c;
-  background: rgba(234, 88, 12, 0.1);
+  color: #D25F37;
+  background: rgba(210, 95, 55, 0.1);
 }
 .mode-toggle-btn.layout-btn.active {
-  color: #ea580c;
-  background: rgba(234, 88, 12, 0.15);
+  color: #D25F37;
+  background: rgba(210, 95, 55, 0.15);
 }
 
 /* みんなの様子 (Indigo) */
 .mode-toggle-btn.monitor-btn:hover {
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.1);
+  color: #6B8CAE;
+  background: rgba(107, 140, 174, 0.1);
 }
 .mode-toggle-btn.monitor-btn.active {
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.15);
+  color: #6B8CAE;
+  background: rgba(107, 140, 174, 0.15);
 }
 
 /* 教員一覧 (Violet) */
 .mode-toggle-btn.teachers-btn:hover {
-  color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.1);
+  color: #B5606A;
+  background: rgba(181, 96, 106, 0.1);
 }
 .mode-toggle-btn.teachers-btn.active {
-  color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.15);
+  color: #B5606A;
+  background: rgba(181, 96, 106, 0.15);
 }
 
 /* Supabase configuration panel */
@@ -847,25 +847,25 @@ body {
 }
 
 .btn-huge.btn-ok {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #87b296 0%, #6A9478 100%);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 24px rgba(106, 148, 120, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
 }
 
 .btn-huge.btn-ok:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 32px rgba(16, 185, 129, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 32px rgba(106, 148, 120, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-huge.btn-ng {
-  background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+  background: linear-gradient(135deg, #cf828c 0%, #B5606A 100%);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 24px rgba(244, 63, 94, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: 0 12px 24px rgba(181, 96, 106, 0.35), inset 0 2px 0 rgba(255, 255, 255, 0.3);
 }
 
 .btn-huge.btn-ng:hover {
   transform: translateY(-3px);
-  box-shadow: 0 16px 32px rgba(244, 63, 94, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 32px rgba(181, 96, 106, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.4);
 }
 
 .btn-huge:active {

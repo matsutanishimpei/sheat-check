@@ -97,7 +97,7 @@ export const TeacherMonitorPage: React.FC = () => {
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(107, 140, 174, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <TeacherHeader activePage="monitor" subtitle="みんなの様子" onLogout={handleLogout} />
 
       <main 

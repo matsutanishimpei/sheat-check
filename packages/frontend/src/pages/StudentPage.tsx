@@ -315,7 +315,7 @@ export const StudentPage: React.FC = () => {
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', background: 'linear-gradient(135deg, rgba(107, 140, 174, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">

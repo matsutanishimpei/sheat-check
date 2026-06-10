@@ -59,7 +59,7 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', background: 'linear-gradient(135deg, rgba(234, 88, 12, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', background: 'linear-gradient(135deg, rgba(210, 95, 55, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <header className="app-header">
         <div className="header-brand">
           <div className="logo-icon">

@@ -11,7 +11,7 @@ export const TeacherLayoutPage: React.FC = () => {
   const session = useTeacherSession();
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(210, 95, 55, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       <TeacherHeader activePage="layout" subtitle="教室設定" onLogout={handleLogout} />
 
       <TeacherView

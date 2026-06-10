@@ -147,7 +147,7 @@ export const UserTeacherPage: React.FC = () => {
   }, [teachersList, searchQuery]);
 
   return (
-    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
+    <div style={{ height: '100%', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)', minWidth: '1280px', background: 'linear-gradient(135deg, rgba(114, 98, 122, 0.08) 0%, rgba(248, 250, 252, 0) 50%)' }}>
       {/* App Header */}
       <TeacherHeader activePage="teachers" subtitle="教員一覧" onLogout={handleLogout} />
 

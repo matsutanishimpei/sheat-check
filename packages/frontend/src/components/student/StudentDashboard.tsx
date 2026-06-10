@@ -43,19 +43,19 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
       <div className="student-title-group" style={{ marginBottom: 0 }}>
         <h2 className="student-title">
-          <Heart size={24} style={{ color: '#0891b2' }} /> 講義フィードバック
+          <Heart size={24} style={{ color: '#6B8CAE' }} /> 講義フィードバック
         </h2>
       </div>
 
       {/* Fixed seat details & subtle status summary */}
       <div style={{ background: 'rgba(255, 255, 255, 0.5)', padding: '1rem 1.25rem', borderRadius: '16px', border: '1px solid rgba(0, 0, 0, 0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(8, 145, 178, 0.1)', color: '#0891b2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(107, 140, 174, 0.1)', color: '#6B8CAE', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <User size={16} />
           </div>
           <div>
             <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{studentName} さん</div>
-            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>登録席: <strong style={{ color: '#0891b2' }}>{studentSeatId}</strong></div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.1rem' }}>登録席: <strong style={{ color: '#6B8CAE' }}>{studentSeatId}</strong></div>
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontSize: '0.85rem', fontWeight: 700 }}>
@@ -65,7 +65,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
               回答待ち
             </span>
           ) : (
-            <span style={{ color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <span style={{ color: '#6A9478', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
               ✓ 送信済み
             </span>
           )}
@@ -91,9 +91,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           style={{
             padding: '1.5rem 0.5rem',
             borderRadius: '18px',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.05))',
-            color: '#059669',
+            border: '1px solid rgba(106, 148, 120, 0.3)',
+            background: 'linear-gradient(135deg, rgba(106, 148, 120, 0.15), rgba(106, 148, 120, 0.05))',
+            color: '#6A9478',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -102,7 +102,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            boxShadow: '0 8px 16px rgba(16, 185, 129, 0.08)',
+            boxShadow: '0 8px 16px rgba(106, 148, 120, 0.08)',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -122,9 +122,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           style={{
             padding: '1.5rem 0.5rem',
             borderRadius: '18px',
-            border: '1px solid rgba(8, 145, 178, 0.3)',
-            background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.15), rgba(14, 116, 144, 0.05))',
-            color: '#0891b2',
+            border: '1px solid rgba(107, 140, 174, 0.3)',
+            background: 'linear-gradient(135deg, rgba(107, 140, 174, 0.15), rgba(107, 140, 174, 0.05))',
+            color: '#6B8CAE',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -133,7 +133,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            boxShadow: '0 8px 16px rgba(8, 145, 178, 0.08)',
+            boxShadow: '0 8px 16px rgba(107, 140, 174, 0.08)',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -153,9 +153,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           style={{
             padding: '1.5rem 0.5rem',
             borderRadius: '18px',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(217, 119, 6, 0.05))',
-            color: '#d97706',
+            border: '1px solid rgba(210, 95, 55, 0.3)',
+            background: 'linear-gradient(135deg, rgba(210, 95, 55, 0.15), rgba(210, 95, 55, 0.05))',
+            color: '#D25F37',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -164,7 +164,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            boxShadow: '0 8px 16px rgba(245, 158, 11, 0.08)',
+            boxShadow: '0 8px 16px rgba(210, 95, 55, 0.08)',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -184,9 +184,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           style={{
             padding: '1.5rem 0.5rem',
             borderRadius: '18px',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(220, 38, 38, 0.05))',
-            color: '#dc2626',
+            border: '1px solid rgba(181, 96, 106, 0.3)',
+            background: 'linear-gradient(135deg, rgba(181, 96, 106, 0.15), rgba(181, 96, 106, 0.05))',
+            color: '#B5606A',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -195,7 +195,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            boxShadow: '0 8px 16px rgba(239, 68, 68, 0.08)',
+            boxShadow: '0 8px 16px rgba(181, 96, 106, 0.08)',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
@@ -215,9 +215,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
           style={{
             padding: '1.5rem 0.5rem',
             borderRadius: '18px',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(109, 40, 217, 0.05))',
-            color: '#7c3aed',
+            border: '1px solid rgba(114, 98, 122, 0.3)',
+            background: 'linear-gradient(135deg, rgba(114, 98, 122, 0.15), rgba(114, 98, 122, 0.05))',
+            color: '#72627A',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
@@ -226,7 +226,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
             fontSize: '0.95rem',
             whiteSpace: 'nowrap',
             cursor: 'pointer',
-            boxShadow: '0 8px 16px rgba(139, 92, 246, 0.08)',
+            boxShadow: '0 8px 16px rgba(114, 98, 122, 0.08)',
             transition: 'all 0.2s ease'
           }}
           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
