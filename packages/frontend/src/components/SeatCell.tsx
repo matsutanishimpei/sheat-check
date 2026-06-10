@@ -32,6 +32,8 @@ export const SeatCell = React.memo(({
     data: { x, y },
   });
 
+  const coordKey = `${x},${y}`;
+
   const getIcon = () => {
     switch (cellType) {
       case 'student': return <User size={20} />;
@@ -42,26 +44,48 @@ export const SeatCell = React.memo(({
     }
   };
 
-  const getCellClassName = () => {
-    let classes = `grid-cell`;
-    if (isOver) classes += ' cell-over';
-    if (massive) classes += ' cell-massive';
+  // 1. 教室設定画面（通常モード / massive=false）のレンダリング
+  if (!massive) {
+    const getCellClassName = () => {
+      let classes = `grid-cell`;
+      if (isOver) classes += ' cell-over';
+      return classes;
+    };
+
+    return (
+      <div
+        ref={setNodeRef}
+        onClick={() => onCycle(x, y)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={getCellClassName()}
+        title={cellType ? undefined : `座標: (${x}, ${y})`}
+        style={{ position: 'relative' }}
+      >
+        {cellType && (
+          <div className={`cell-item ${cellType}`}>
+            {getIcon()}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // 2. みんなの様子画面（モニターモード / massive=true）のレンダリング
+  const getCellClassNameMassive = () => {
+    let classes = `grid-cell cell-massive`;
     if (isEmptyRow) classes += ' cell-empty-row';
     if (isShrinkCol) classes += ' cell-shrink-col';
     if (!cellType) classes += ' cell-empty-space';
     return classes;
   };
 
-  const coordKey = `${x},${y}`;
-
   return (
     <div
       ref={setNodeRef}
-      onClick={massive ? undefined : () => onCycle(x, y)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className={getCellClassName()}
-      title={cellType || massive ? undefined : `座標: (${x}, ${y})`}
+      className={getCellClassNameMassive()}
       style={{ 
         position: 'relative',
         width: '100%',
@@ -71,9 +95,7 @@ export const SeatCell = React.memo(({
       }}
     >
       {cellType && (
-        <div 
-          className={`cell-item ${cellType} ${cellType === 'student' && liveStatus ? `student-live-${liveStatus.status}` : ''}`}
-        >
+        <div className={`cell-item ${cellType} ${cellType === 'student' && liveStatus ? `student-live-${liveStatus.status}` : ''}`}>
           {cellType === 'student' && liveStatus ? (
             <>
               {/* Default Name Display */}
@@ -102,7 +124,7 @@ export const SeatCell = React.memo(({
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                display: 'none', /* Toggled via CSS on hover */
+                display: 'none',
                 width: '100%',
                 padding: '0 4px',
                 boxSizing: 'border-box',
