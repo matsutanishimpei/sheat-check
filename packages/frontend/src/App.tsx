@@ -6,7 +6,6 @@ import { LoginPage } from './pages/LoginPage';
 import { TeacherLayoutPage } from './pages/TeacherLayoutPage';
 import { TeacherMonitorPage } from './pages/TeacherMonitorPage';
 import { StudentPage } from './pages/StudentPage';
-import { UserStudentPage } from './pages/UserStudentPage';
 import { UserTeacherPage } from './pages/UserTeacherPage';
 import './index.css';
 
@@ -23,8 +22,7 @@ const AppRoutes = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/room_layout" element={<TeacherLayoutPage />} />
         <Route path="/seats/monitoring" element={<TeacherMonitorPage />} />
-        <Route path="/user" element={<Navigate to="/student/monitoring" replace />} />
-        <Route path="/student/monitoring" element={<UserStudentPage />} />
+        <Route path="/user" element={<Navigate to="/seats/monitoring" replace />} />
         <Route path="/user/teacher" element={<UserTeacherPage />} />
         <Route path="/teacher" element={<Navigate to="/" replace />} />
         <Route path="/student/:roomId" element={<StudentPage />} />

@@ -715,16 +715,6 @@ body {
   background: rgba(99, 102, 241, 0.15);
 }
 
-/* 学生名簿 (Emerald) */
-.mode-toggle-btn.students-btn:hover {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-}
-.mode-toggle-btn.students-btn.active {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.15);
-}
-
 /* 教員一覧 (Violet) */
 .mode-toggle-btn.teachers-btn:hover {
   color: #8b5cf6;

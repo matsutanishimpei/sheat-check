@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, Sliders, MonitorPlay, UserCheck, ShieldAlert, LayoutGrid } from 'lucide-react';
+import { LogOut, Sliders, MonitorPlay, ShieldAlert, LayoutGrid } from 'lucide-react';
 
-type ActivePage = 'layout' | 'monitor' | 'students' | 'teachers';
+type ActivePage = 'layout' | 'monitor' | 'teachers';
 
 interface TeacherHeaderProps {
   activePage: ActivePage;
@@ -40,9 +40,6 @@ export const TeacherHeader: React.FC<TeacherHeaderProps> = ({ activePage, subtit
         </Link>
         <Link to="/seats/monitoring" className={`mode-toggle-btn monitor-btn${activePage === 'monitor' ? ' active' : ''}`}>
           <MonitorPlay size={16} /> みんなの様子
-        </Link>
-        <Link to="/student/monitoring" className={`mode-toggle-btn students-btn${activePage === 'students' ? ' active' : ''}`}>
-          <UserCheck size={16} /> 学生名簿
         </Link>
         <Link to="/user/teacher" className={`mode-toggle-btn teachers-btn${activePage === 'teachers' ? ' active' : ''}`}>
           <ShieldAlert size={16} /> 教員一覧
