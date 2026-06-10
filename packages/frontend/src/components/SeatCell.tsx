@@ -73,11 +73,6 @@ export const SeatCell = React.memo(({
       {cellType && (
         <div 
           className={`cell-item ${cellType} ${cellType === 'student' && liveStatus ? `student-live-${liveStatus.status}` : ''}`}
-          style={
-            massive && cellType === 'student' && !liveStatus
-              ? { maxWidth: '44px', margin: '0 auto' }
-              : undefined
-          }
         >
           {cellType === 'student' && liveStatus ? (
             <>
