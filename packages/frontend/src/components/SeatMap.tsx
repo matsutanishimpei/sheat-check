@@ -6,10 +6,11 @@ interface SeatMapProps {
   grid: Record<string, GridItem['type']>;
   liveStatuses: Record<string, LiveSeatStatus>;
   onCycle: (x: number, y: number) => void;
+  onRemoveLiveStatus?: (key: string) => void;
   massive?: boolean;
 }
 
-export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, massive = false }: SeatMapProps) => {
+export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, onRemoveLiveStatus, massive = false }: SeatMapProps) => {
   return (
     <div className={`grid-container-card ${massive ? 'grid-massive-container' : ''}`} style={{ overflowX: 'auto', width: '100%' }}>
       <table 
@@ -36,6 +37,7 @@ export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, massive = fals
                       cellType={cellType}
                       liveStatus={liveStatus}
                       onCycle={onCycle}
+                      onRemoveLiveStatus={onRemoveLiveStatus}
                     />
                   </td>
                 );

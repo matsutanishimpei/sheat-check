@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
-import { User, GraduationCap, XCircle, DoorOpen } from 'lucide-react';
+import { User, GraduationCap, XCircle, DoorOpen, X } from 'lucide-react';
 import { GridItem, LiveSeatStatus } from '@my-app/shared';
 
 interface SeatCellProps {
@@ -9,6 +9,7 @@ interface SeatCellProps {
   cellType?: GridItem['type'];
   liveStatus?: LiveSeatStatus;
   onCycle: (x: number, y: number) => void;
+  onRemoveLiveStatus?: (key: string) => void;
 }
 
 export const SeatCell = React.memo(({ 
@@ -16,8 +17,10 @@ export const SeatCell = React.memo(({
   y, 
   cellType, 
   liveStatus,
-  onCycle 
+  onCycle,
+  onRemoveLiveStatus
 }: SeatCellProps) => {
+  const [isHovered, setIsHovered] = useState(false);
   const { isOver, setNodeRef } = useDroppable({
     id: `cell-${x}-${y}`,
     data: { x, y },
@@ -39,12 +42,17 @@ export const SeatCell = React.memo(({
     return classes;
   };
 
+  const coordKey = `${x},${y}`;
+
   return (
     <div
       ref={setNodeRef}
       onClick={() => onCycle(x, y)}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       className={getCellClassName()}
       title={cellType ? undefined : `座標: (${x}, ${y})`}
+      style={{ position: 'relative' }}
     >
       {cellType && (
         <div 
@@ -86,6 +94,47 @@ export const SeatCell = React.memo(({
               }}>
                 {liveStatus.studentId}
               </span>
+
+              {/* Individual Student Eviction (Kick) Button */}
+              {onRemoveLiveStatus && isHovered && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (window.confirm(`${liveStatus.name} さんをこの席から退室させますか？`)) {
+                      onRemoveLiveStatus(coordKey);
+                    }
+                  }}
+                  style={{
+                    position: 'absolute',
+                    top: '-6px',
+                    right: '-6px',
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    backgroundColor: '#ef4444',
+                    color: '#ffffff',
+                    border: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                    padding: 0,
+                    zIndex: 10,
+                    transition: 'background-color 0.2s',
+                  }}
+                  title="この席を空席にする"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#dc2626';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ef4444';
+                  }}
+                >
+                  <X size={12} strokeWidth={2.5} />
+                </button>
+              )}
             </>
           ) : (
             getIcon()

@@ -138,6 +138,7 @@ export const TeacherMonitorPage: React.FC = () => {
                   grid={session.cases[session.activeCaseIdx]?.grid}
                   liveStatuses={session.liveStatuses}
                   onCycle={() => {}}
+                  onRemoveLiveStatus={session.removeLiveStatus}
                   massive={true}
                 />
               </div>
