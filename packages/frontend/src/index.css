@@ -938,10 +938,10 @@ body {
 }
 
 .cell-item.student-live-ng {
-  background-color: var(--color-obstacle) !important;
+  background-color: #fee2e2 !important; /* Premium soft light red */
   animation: pulseRedBorder 2s infinite ease-in-out;
-  border-color: var(--color-obstacle-hover) !important;
-  color: white !important;
+  border-color: #fca5a5 !important;
+  color: #991b1b !important; /* Deep readable red text */
 }
 
 .cell-item.student-live-ok {
@@ -1031,8 +1031,8 @@ body {
 }
 
 .tooltip-status.ng {
-  background-color: rgba(239, 68, 68, 0.15);
-  color: var(--color-obstacle);
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .tooltip-comment {
