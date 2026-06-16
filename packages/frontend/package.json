@@ -2,6 +2,15 @@
   "name": "@my-app/frontend",
   "version": "1.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/matsutanishimpei/sheets-and-check.git",
+    "directory": "packages/frontend"
+  },
+  "bugs": {
+    "url": "https://github.com/matsutanishimpei/sheets-and-check/issues"
+  },
+  "homepage": "https://github.com/matsutanishimpei/sheets-and-check/tree/main/packages/frontend#readme",
   "type": "module",
   "scripts": {
     "dev": "vite",
