@@ -7,6 +7,7 @@ import { TeacherLayoutPage } from './pages/TeacherLayoutPage';
 import { TeacherMonitorPage } from './pages/TeacherMonitorPage';
 import { StudentPage } from './pages/StudentPage';
 import { UserTeacherPage } from './pages/UserTeacherPage';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import './index.css';
 
 // Re-export Toast type for any external consumers that might need it
@@ -18,17 +19,19 @@ const AppRoutes = () => {
 
   return (
     <>
-      <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/room_layout" element={<TeacherLayoutPage />} />
-        <Route path="/seats/monitoring" element={<TeacherMonitorPage />} />
-        <Route path="/user" element={<Navigate to="/seats/monitoring" replace />} />
-        <Route path="/user/teacher" element={<UserTeacherPage />} />
-        <Route path="/teacher" element={<Navigate to="/" replace />} />
-        <Route path="/student/:roomId" element={<StudentPage />} />
-        <Route path="/student" element={<StudentPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/room_layout" element={<TeacherLayoutPage />} />
+          <Route path="/seats/monitoring" element={<TeacherMonitorPage />} />
+          <Route path="/user" element={<Navigate to="/seats/monitoring" replace />} />
+          <Route path="/user/teacher" element={<UserTeacherPage />} />
+          <Route path="/teacher" element={<Navigate to="/" replace />} />
+          <Route path="/student/:roomId" element={<StudentPage />} />
+          <Route path="/student" element={<StudentPage />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </ErrorBoundary>
       <ToastList toasts={toasts} />
     </>
   );
@@ -45,3 +48,4 @@ const App = () => {
 };
 
 export default App;
+

@@ -42,13 +42,17 @@ const shouldShrinkColumn = (
 
 export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, onRemoveLiveStatus, massive = false }: SeatMapProps) => {
   if (massive) {
-    const gridTemplateColumns = Array.from({ length: 12 })
-      .map((_, x) => shouldShrinkColumn(x, grid, liveStatuses) ? '44px' : 'minmax(120px, 1fr)')
-      .join(' ');
+    const gridTemplateColumns = React.useMemo(() => {
+      return Array.from({ length: 12 })
+        .map((_, x) => shouldShrinkColumn(x, grid, liveStatuses) ? '44px' : 'minmax(120px, 1fr)')
+        .join(' ');
+    }, [grid, liveStatuses]);
 
-    const gridTemplateRows = Array.from({ length: 12 })
-      .map((_, y) => isRowEmpty(y, grid) ? '8px' : '44px')
-      .join(' ');
+    const gridTemplateRows = React.useMemo(() => {
+      return Array.from({ length: 12 })
+        .map((_, y) => isRowEmpty(y, grid) ? '8px' : '44px')
+        .join(' ');
+    }, [grid]);
 
     return (
       <div className="grid-container-card grid-massive-container" style={{ overflowX: 'auto', width: '100%' }}>
