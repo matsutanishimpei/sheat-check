@@ -34,7 +34,12 @@ const limiter = rateLimiter({
   standardHeaders: 'draft-6', // Return standard rate limit info in headers
   keyGenerator: (c) => {
     // Bypass rate limiting entirely during unit/integration tests to prevent test pollution
-    if (c.env?.JWT_SECRET === 'dev-app-jwt-secret-key-123' || process.env.NODE_ENV === 'test' || typeof globalThis.describe === 'function') {
+    const isTestEnv = 
+      (c.env && 'JWT_SECRET' in c.env && c.env.JWT_SECRET === 'dev-app-jwt-secret-key-123') ||
+      (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process.env?.NODE_ENV === 'test') ||
+      (typeof (globalThis as any).describe === 'function');
+
+    if (isTestEnv) {
       return `bypass-${Math.random()}`; // Give each request a unique key to bypass limits in test runs
     }
 

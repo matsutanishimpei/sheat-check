@@ -52,15 +52,37 @@ export const SeatCell = React.memo(({
       return classes;
     };
 
+    const getAriaLabel = () => {
+      const typeLabels: Record<string, string> = {
+        student: '学生席',
+        teacher: '先生席',
+        obstacle: '障害物',
+        door: '出入り口'
+      };
+      const current = cellType ? typeLabels[cellType] || cellType : '空きスペース';
+      return `席種切り替え: 座標 (${x}, ${y})、現在: ${current}`;
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onCycle(x, y);
+      }
+    };
+
     return (
       <div
         ref={setNodeRef}
         onClick={() => onCycle(x, y)}
+        onKeyDown={handleKeyDown}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={getCellClassName()}
         title={cellType ? undefined : `座標: (${x}, ${y})`}
         style={{ position: 'relative' }}
+        role="button"
+        tabIndex={0}
+        aria-label={getAriaLabel()}
       >
         {cellType && (
           <div className={`cell-item ${cellType}`}>
@@ -163,6 +185,7 @@ export const SeatCell = React.memo(({
                     transition: 'background-color 0.2s',
                   }}
                   title="この席を空席にする"
+                  aria-label={`${liveStatus.name} さんをこの席から退室させる`}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.backgroundColor = '#dc2626';
                   }}

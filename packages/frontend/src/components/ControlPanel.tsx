@@ -55,7 +55,11 @@ export const ControlPanel = React.memo(({
       <div className="btn-group">
         {mode === 'monitor' && (
           <>
-            <button className="btn btn-danger" onClick={onBulkReset}>
+            <button 
+              className="btn btn-danger" 
+              onClick={onBulkReset}
+              aria-label="すべての学生の回答と座席状況をクリアする"
+            >
               <RotateCcw size={16} /> みんなの回答をクリア
             </button>
           </>
@@ -63,13 +67,18 @@ export const ControlPanel = React.memo(({
 
         {mode === 'layout' && (
           <>
-            <button className="btn btn-secondary" onClick={onClearGrid}>
+            <button 
+              className="btn btn-secondary" 
+              onClick={onClearGrid}
+              aria-label="教室内のすべての配置オブジェクトをクリアする"
+            >
               <Trash2 size={16} /> クリア
             </button>
             <button 
               className="btn btn-primary" 
               disabled={isSaving} 
               onClick={onSaveClassroom}
+              aria-label="現在の教室のレイアウト設定を保存する"
             >
               <Save size={16} /> {isSaving ? '保存中...' : '教室を保存'}
             </button>
