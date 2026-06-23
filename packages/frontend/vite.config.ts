@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import webfontDl from 'vite-plugin-webfont-dl';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -7,7 +8,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    webfontDl(),
+  ],
   resolve: {
     alias: {
       '@my-app/shared': path.resolve(__dirname, '../shared/src/index.ts'),
