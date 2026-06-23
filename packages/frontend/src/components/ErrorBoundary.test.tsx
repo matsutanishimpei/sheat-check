@@ -41,13 +41,13 @@ describe('ErrorBoundary Component', () => {
   });
 
   it('should render custom fallback UI when provided', () => {
-    render(
+    const { queryByText, getByText } = render(
       <ErrorBoundary fallback={<div>カスタムエラーUI</div>}>
         <ProblematicComponent />
       </ErrorBoundary>
     );
 
-    expect(screen.getByText('カスタムエラーUI')).toBeDefined();
-    expect(screen.queryByText('想定外のエラーが発生しました')).toBeNull();
+    expect(getByText('カスタムエラーUI')).toBeDefined();
+    expect(queryByText('想定外のエラーが発生しました')).toBeNull();
   });
 });
