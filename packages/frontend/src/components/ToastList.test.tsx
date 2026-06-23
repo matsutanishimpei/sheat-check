@@ -1,10 +1,14 @@
 // @vitest-environment jsdom
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { render, screen, cleanup } from '@testing-library/react';
 import React from 'react';
 import { ToastList, ToastMessage } from './ToastList';
 
 describe('ToastList Component', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it('should render multiple toast messages with correct text and style classes', () => {
     const mockToasts: ToastMessage[] = [
       { id: '1', type: 'success', message: '操作が完了しました' },
