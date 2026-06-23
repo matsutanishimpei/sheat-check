@@ -3,8 +3,8 @@ import path from 'node:path';
 
 export default defineConfig({
   test: {
-    environment: 'jsdom',
     globals: true,
+    environment: 'node',
   },
   resolve: {
     alias: {
