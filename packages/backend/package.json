@@ -23,7 +23,8 @@
     "@hono/zod-validator": "^0.7.6",
     "@my-app/shared": "*",
     "bcryptjs": "^3.0.3",
-    "hono": "^4.4.7"
+    "hono": "^4.4.7",
+    "hono-rate-limiter": "^0.5.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240529.0",

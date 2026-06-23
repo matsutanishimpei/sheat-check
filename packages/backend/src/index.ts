@@ -5,6 +5,7 @@ import { SaveRoomLayoutInputSchema, TeacherLoginInputSchema } from '@my-app/shar
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
 import { sign, verify } from 'hono/jwt';
+import { rateLimiter } from 'hono-rate-limiter';
 import { IRoomRepository } from './repositories/RoomRepository';
 import { D1RoomRepository } from './repositories/D1RoomRepository';
 import { TeacherRepository } from './repositories/TeacherRepository';
@@ -25,6 +26,31 @@ type Variables = {
 };
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+
+// Rate Limiter configuration for all /api endpoints to protect DB against brute-forcing/spamming
+const limiter = rateLimiter({
+  windowMs: 60 * 1000, // 1 minute window
+  limit: 100, // Limit each IP to 100 requests per windowMs
+  standardHeaders: 'draft-6', // Return standard rate limit info in headers
+  keyGenerator: (c) => {
+    // Dynamic IP extraction compatible with Cloudflare Workers context
+    const cfConnectingIp = c.req.header('cf-connecting-ip');
+    if (cfConnectingIp) return cfConnectingIp;
+    
+    // Fallback context details
+    return c.req.header('x-real-ip') || c.req.header('x-forwarded-for') || 'anonymous-ip';
+  },
+  handler: (c, next) => {
+    c.status(429);
+    return c.json({
+      error: 'リクエストが多すぎます。しばらく時間をおいてから再度お試しください。',
+      retryAfter: 60,
+    });
+  },
+});
+
+// Apply rate limiter middleware to all API routes
+app.use('/api/*', limiter);
 
 // Enable secure dynamic CORS for local dev and Cloudflare Pages deployments
 app.use(
