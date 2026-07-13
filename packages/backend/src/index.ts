@@ -27,40 +27,42 @@ type Variables = {
 
 const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
 
-// Rate Limiter configuration for all /api endpoints to protect DB against brute-forcing/spamming
-const limiter = rateLimiter({
-  windowMs: 10 * 1000, // 10 seconds window
-  limit: 1, // Limit each IP to 1 request per 10 seconds
-  standardHeaders: 'draft-6', // Return standard rate limit info in headers
-  keyGenerator: (c) => {
-    // Bypass rate limiting entirely during unit/integration tests to prevent test pollution
-    const isTestEnv = 
-      (c.env && 'JWT_SECRET' in c.env && c.env.JWT_SECRET === 'dev-app-jwt-secret-key-123') ||
-      (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process.env?.NODE_ENV === 'test') ||
-      (typeof (globalThis as any).describe === 'function');
+// Rate limiter configuration for all /api endpoints to protect DB against brute-forcing/spamming.
+// Construct it lazily so Cloudflare doesn't evaluate the middleware's internal setup in global scope.
+const createApiRateLimiter = () =>
+  rateLimiter({
+    windowMs: 10 * 1000, // 10 seconds window
+    limit: 1, // Limit each IP to 1 request per 10 seconds
+    standardHeaders: 'draft-6', // Return standard rate limit info in headers
+    keyGenerator: (c) => {
+      // Bypass rate limiting entirely during unit/integration tests to prevent test pollution
+      const isTestEnv =
+        (c.env && 'JWT_SECRET' in c.env && c.env.JWT_SECRET === 'dev-app-jwt-secret-key-123') ||
+        (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process.env?.NODE_ENV === 'test') ||
+        (typeof (globalThis as any).describe === 'function');
 
-    if (isTestEnv) {
-      return `bypass-${Math.random()}`; // Give each request a unique key to bypass limits in test runs
-    }
+      if (isTestEnv) {
+        return `bypass-${Math.random()}`; // Give each request a unique key to bypass limits in test runs
+      }
 
-    // Dynamic IP extraction compatible with Cloudflare Workers context
-    const cfConnectingIp = c.req.header('cf-connecting-ip');
-    if (cfConnectingIp) return cfConnectingIp;
-    
-    // Fallback context details
-    return c.req.header('x-real-ip') || c.req.header('x-forwarded-for') || 'anonymous-ip';
-  },
-  handler: (c, next) => {
-    c.status(429);
-    return c.json({
-      error: 'リクエスト頻度が高すぎます。10秒以上間隔を空けて再試行してください。',
-      retryAfter: 10,
-    });
-  },
-});
+      // Dynamic IP extraction compatible with Cloudflare Workers context
+      const cfConnectingIp = c.req.header('cf-connecting-ip');
+      if (cfConnectingIp) return cfConnectingIp;
+
+      // Fallback context details
+      return c.req.header('x-real-ip') || c.req.header('x-forwarded-for') || 'anonymous-ip';
+    },
+    handler: (c, next) => {
+      c.status(429);
+      return c.json({
+        error: 'リクエスト頻度が高すぎます。10秒以上間隔を空けて再試行してください。',
+        retryAfter: 10,
+      });
+    },
+  });
 
 // Apply rate limiter middleware to all API routes
-app.use('/api/*', limiter);
+app.use('/api/*', async (c, next) => createApiRateLimiter()(c, next));
 
 // Enable secure dynamic CORS for local dev and Cloudflare Pages deployments
 app.use(
