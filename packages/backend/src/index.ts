@@ -25,12 +25,14 @@ type Variables = {
   teacherAuthUser?: any;
 };
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>();
+type AppEnv = { Bindings: Bindings; Variables: Variables };
+
+const app = new Hono<AppEnv>();
 
 // Rate limiter configuration for all /api endpoints to protect DB against brute-forcing/spamming.
 // Construct it lazily so Cloudflare doesn't evaluate the middleware's internal setup in global scope.
 const createApiRateLimiter = () =>
-  rateLimiter({
+  rateLimiter<AppEnv>({
     windowMs: 10 * 1000, // 10 seconds window
     limit: 1, // Limit each IP to 1 request per 10 seconds
     standardHeaders: 'draft-6', // Return standard rate limit info in headers
@@ -62,7 +64,11 @@ const createApiRateLimiter = () =>
   });
 
 // Apply rate limiter middleware to all API routes
-app.use('/api/*', async (c, next) => createApiRateLimiter()(c, next));
+let apiRateLimiter: ReturnType<typeof createApiRateLimiter> | undefined;
+app.use('/api/*', async (c, next) => {
+  apiRateLimiter ??= createApiRateLimiter();
+  return apiRateLimiter(c, next);
+});
 
 // Enable secure dynamic CORS for local dev and Cloudflare Pages deployments
 app.use(
