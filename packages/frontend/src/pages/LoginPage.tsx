@@ -4,6 +4,7 @@ import { Lock, User, Loader2, LayoutGrid } from 'lucide-react';
 import client from '../lib/hc';
 import { useToast } from '../contexts/ToastContext';
 import { teacherAuth } from '../lib/storage';
+import { extractErrorMessage, isTeacherLoginResponse, readResponseBody } from '../lib/apiResponse';
 
 export const LoginPage: React.FC = () => {
   const { addToast } = useToast();
@@ -38,15 +39,18 @@ export const LoginPage: React.FC = () => {
         },
       });
 
+      const body = await readResponseBody(res);
+
       if (!res.ok) {
-        const errData = await res.json() as { error?: string };
-        throw new Error(errData.error || 'ユーザー名またはパスワードが正しくありません');
+        throw new Error(extractErrorMessage(body, 'ユーザー名またはパスワードが正しくありません'));
       }
 
-      const data = await res.json();
+      if (!isTeacherLoginResponse(body)) {
+        throw new Error('ログイン応答の形式が正しくありません。');
+      }
 
       // Store authentication tokens & teacher profile details securely in browser storage
-      teacherAuth.save(data);
+      teacherAuth.save(body);
 
       addToast('success', 'ログインしました。教員用管理画面へ移動します。');
       navigate('/room_layout');
