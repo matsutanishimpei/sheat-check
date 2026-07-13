@@ -7,11 +7,20 @@ export type TeacherLoginResponse = {
   };
 };
 
+type ResponseLike = {
+  clone(): {
+    text(): Promise<string>;
+  };
+  headers: {
+    get(name: string): string | null;
+  };
+};
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
-export async function readResponseBody(response: Response): Promise<unknown> {
+export async function readResponseBody(response: ResponseLike): Promise<unknown> {
   const rawBody = await response.clone().text();
   const contentType = response.headers.get('content-type')?.toLowerCase() ?? '';
 
