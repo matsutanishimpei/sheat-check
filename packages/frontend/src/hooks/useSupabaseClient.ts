@@ -2,16 +2,24 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { supabaseConfig } from '../lib/storage';
 
+const cleanSupabaseUrl = (url: string): string => {
+  return url
+    .trim()
+    .replace(/\/realtime\/v1\/?$/, '')
+    .replace(/\/rest\/v1\/?$/, '')
+    .trim();
+};
+
 export function useSupabaseClient(initialUrl: string, initialKey: string) {
   const [supabaseUrl, setSupabaseUrl] = useState(initialUrl);
   const [supabaseAnonKey, setSupabaseAnonKey] = useState(initialKey);
   
   const [supabase, setSupabase] = useState<SupabaseClient | null>(() => {
-    const url = supabaseConfig.getUrl() || initialUrl;
+    const url = cleanSupabaseUrl(supabaseConfig.getUrl() || initialUrl);
     const key = supabaseConfig.getKey() || initialKey;
     if (url && key) {
       try {
-        return createClient(url.trim(), key.trim());
+        return createClient(url, key.trim());
       } catch (err) {
         console.error('Supabase initialization failed:', err);
       }
@@ -31,16 +39,16 @@ export function useSupabaseClient(initialUrl: string, initialKey: string) {
 
   // Dynamically re-initialize Supabase client when credentials update
   useEffect(() => {
-    const trimmedUrl = supabaseUrl.trim();
+    const cleanedUrl = cleanSupabaseUrl(supabaseUrl);
     const trimmedKey = supabaseAnonKey.trim();
 
-    if (trimmedUrl && trimmedKey) {
+    if (cleanedUrl && trimmedKey) {
       try {
-        const client = createClient(trimmedUrl, trimmedKey);
+        const client = createClient(cleanedUrl, trimmedKey);
         setSupabase(client);
         
         try {
-          supabaseConfig.save(trimmedUrl, trimmedKey);
+          supabaseConfig.save(cleanedUrl, trimmedKey);
         } catch (storageErr) {
           console.warn('Failed to save Supabase config to localStorage (Private Window?):', storageErr);
         }
@@ -54,19 +62,19 @@ export function useSupabaseClient(initialUrl: string, initialKey: string) {
   }, [supabaseUrl, supabaseAnonKey]);
 
   const saveSupabaseConfig = useCallback((onSuccess: (msg: string) => void, onError: (msg: string) => void) => {
-    const trimmedUrl = supabaseUrl.trim();
+    const cleanedUrl = cleanSupabaseUrl(supabaseUrl);
     const trimmedKey = supabaseAnonKey.trim();
     
-    if (!trimmedUrl || !trimmedKey) {
+    if (!cleanedUrl || !trimmedKey) {
       onError('Supabase URL と Anon Key を両方とも入力してください');
       return;
     }
     try {
-      const client = createClient(trimmedUrl, trimmedKey);
+      const client = createClient(cleanedUrl, trimmedKey);
       setSupabase(client);
       
       try {
-        supabaseConfig.save(trimmedUrl, trimmedKey);
+        supabaseConfig.save(cleanedUrl, trimmedKey);
       } catch (storageErr) {
         console.warn('Failed to save to localStorage:', storageErr);
       }

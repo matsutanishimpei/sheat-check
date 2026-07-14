@@ -4,6 +4,14 @@ import { GridItem } from '@my-app/shared';
 import { createClient } from '@supabase/supabase-js';
 import { activeRoom, supabaseConfig } from '../lib/storage';
 
+const cleanSupabaseUrl = (url: string): string => {
+  return url
+    .trim()
+    .replace(/\/realtime\/v1\/?$/, '')
+    .replace(/\/rest\/v1\/?$/, '')
+    .trim();
+};
+
 export interface EditorCase {
   caseName: string;
   grid: Record<string, GridItem['type']>;
@@ -107,7 +115,8 @@ export function useRoomLayout({
       return;
     }
 
-    const finalSupabaseUrl = supabaseUrl.trim() || supabaseConfig.getUrl() || 'https://temp-placeholder.supabase.co';
+    const rawUrl = supabaseUrl.trim() || supabaseConfig.getUrl() || 'https://temp-placeholder.supabase.co';
+    const finalSupabaseUrl = cleanSupabaseUrl(rawUrl);
     const finalSupabaseAnonKey = supabaseAnonKey.trim() || supabaseConfig.getKey() || 'temp-placeholder-key';
 
     setIsSaving(true);
