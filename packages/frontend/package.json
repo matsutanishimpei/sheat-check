@@ -4,13 +4,13 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matsutanishimpei/sheets-and-check.git",
+    "url": "git+https://github.com/matsutanishimpei/sheat-check.git",
     "directory": "packages/frontend"
   },
   "bugs": {
-    "url": "https://github.com/matsutanishimpei/sheets-and-check/issues"
+    "url": "https://github.com/matsutanishimpei/sheat-check/issues"
   },
-  "homepage": "https://github.com/matsutanishimpei/sheets-and-check/tree/main/packages/frontend#readme",
+  "homepage": "https://github.com/matsutanishimpei/sheat-check/tree/main/packages/frontend#readme",
   "type": "module",
   "scripts": {
     "dev": "vite",

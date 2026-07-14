@@ -4,12 +4,12 @@
   "description": "Seats & Check Studio - リアルタイム座席配置・理解度監視システム",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/matsutanishimpei/sheets-and-check.git"
+    "url": "git+https://github.com/matsutanishimpei/sheat-check.git"
   },
   "bugs": {
-    "url": "https://github.com/matsutanishimpei/sheets-and-check/issues"
+    "url": "https://github.com/matsutanishimpei/sheat-check/issues"
   },
-  "homepage": "https://github.com/matsutanishimpei/sheets-and-check#readme",
+  "homepage": "https://github.com/matsutanishimpei/sheat-check#readme",
   "workspaces": [
     "packages/*"
   ],

@@ -31,7 +31,7 @@
 * **実装されたアプローチ**:
   - `useRealtimeSession.ts` にて、学生側リアルタイム購読（Supabase Subscription）の接続状況を自律的に監視。定員制限や通信エラーによる `CHANNEL_ERROR` や `TIMED_OUT` を完璧にフック。
   - 接続制限を検知した瞬間に、学生へ注意を促すトースト警告をポップアップさせると同時に、自動的に **「7秒間隔の HTTP D1 データベース・自動ポーリング（HTTP Fallback）」** を作動させ、バックアップ同期へシームレスに移行。
-  - **[StudentView.tsx](file:///d:/dev/seets-and-check/packages/frontend/src/containers/StudentView.tsx)** の最上部には、優しく回転するギアアイコン付きの **「大教室制限により、HTTPバックアップ同期モードが稼働中」** のステータスバナーが自動的に脈動表示され、通信不通の不安を 100% 根絶しています。
+  - **[StudentView.tsx](file:///d:/dev/sheets-and-check/packages/frontend/src/containers/StudentView.tsx)** の最上部には、優しく回転するギアアイコン付きの **「大教室制限により、HTTPバックアップ同期モードが稼働中」** のステータスバナーが自動的に脈動表示され、通信不通の不安を 100% 根絶しています。
 
 ---
 
