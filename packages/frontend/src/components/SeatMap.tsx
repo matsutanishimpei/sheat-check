@@ -27,14 +27,8 @@ const shouldShrinkColumn = (
   for (let y = 0; y < 12; y++) {
     const cellType = grid[`${x},${y}`];
     if (!cellType) continue;
-    if (cellType === 'teacher' || cellType === 'door') {
+    if (cellType === 'teacher' || cellType === 'door' || cellType === 'student') {
       return false;
-    }
-    if (cellType === 'student') {
-      const liveStatus = liveStatuses?.[`${x},${y}`];
-      if (liveStatus) {
-        return false;
-      }
     }
   }
   return true;
