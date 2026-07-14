@@ -48,6 +48,7 @@ export const SeatCell = React.memo(({
   if (!massive) {
     const getCellClassName = () => {
       let classes = `grid-cell`;
+      if (!cellType) classes += ' cell-empty';
       if (isOver) classes += ' cell-over';
       return classes;
     };

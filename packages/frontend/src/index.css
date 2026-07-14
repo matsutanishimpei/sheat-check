@@ -544,6 +544,11 @@ body {
   font-size: 1.5rem;
 }
 
+.grid-cell.cell-empty {
+  border: 1px dashed var(--border-color);
+  background: rgba(0, 0, 0, 0.01);
+}
+
 .grid-cell:hover {
   border-color: rgba(0, 0, 0, 0.15);
   background: rgba(0, 0, 0, 0.02);
