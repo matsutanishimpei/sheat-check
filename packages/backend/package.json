@@ -20,15 +20,15 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.7.6",
+    "@hono/zod-validator": "0.7.6",
     "@my-app/shared": "*",
-    "bcryptjs": "^3.0.3",
-    "hono": "^4.4.7",
-    "hono-rate-limiter": "^0.5.3"
+    "bcryptjs": "3.0.3",
+    "hono": "4.12.18",
+    "hono-rate-limiter": "0.5.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240529.0",
-    "@types/bcryptjs": "^2.4.6",
-    "wrangler": "^3.57.2"
+    "@cloudflare/workers-types": "4.20240529.0",
+    "@types/bcryptjs": "2.4.6",
+    "wrangler": "3.57.2"
   }
 }
