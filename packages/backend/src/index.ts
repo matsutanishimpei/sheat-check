@@ -86,9 +86,9 @@ const createApiRateLimiter = () =>
     },
   });
 
-// Apply rate limiter middleware to all API routes
+// Apply rate limiter middleware only to the student check-in endpoint to protect against spamming
 let apiRateLimiter: ReturnType<typeof createApiRateLimiter> | undefined;
-app.use('/api/*', async (c, next) => {
+app.use('/api/rooms/:id/student-token', async (c, next) => {
   apiRateLimiter ??= createApiRateLimiter();
   return apiRateLimiter(c, next);
 });
