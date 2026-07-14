@@ -74,7 +74,7 @@ export const StudentView: React.FC<StudentViewProps> = React.memo(({
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
         }}>
           <Settings size={16} style={{ animation: 'spin 4s infinite linear' }} />
-          <span>大教室制限により、HTTPバックアップ同期モードが稼働中（リアルタイム自動復旧中）</span>
+          <span>リアルタイム接続に失敗しました。教室の接続設定（Supabase）に問題がある可能性があります。教員に確認してください。</span>
         </div>
       )}
       

@@ -94,7 +94,7 @@ export function useStudentRealtime({
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn(`[Student] Realtime subscription status failed: ${status}. Fallback activated.`);
           setIsFallbackActive(true);
-          addToastRef.current('warning', '大教室での接続上限、または通信不通により、リアルタイム同期が制限されています。バックアップのHTTP自動同期（自動ポーリング）に自動切り替えしました。');
+          addToastRef.current('warning', 'リアルタイム接続に失敗しました。教室の接続設定に問題がある可能性があります。教員に確認してください。バックアップの自動同期へ移行しました。');
           setTimeout(() => {
             if (studentChannelRef.current) {
               studentChannelRef.current.subscribe();
