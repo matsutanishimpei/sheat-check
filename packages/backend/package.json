@@ -12,6 +12,8 @@
   },
   "homepage": "https://github.com/matsutanishimpei/sheets-and-check/tree/main/packages/backend#readme",
   "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
     "build": "tsc --noEmit",
