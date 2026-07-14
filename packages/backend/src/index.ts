@@ -34,7 +34,7 @@ app.use(
   '*',
   cors({
     origin: (origin) => {
-      if (!origin) return 'https://seets-check.pages.dev';
+      if (!origin) return 'https://seat-check.pages.dev';
       // Dynamically allow local development and any Cloudflare Pages deployments (including preview URLs)
       if (
         origin.endsWith('.pages.dev') ||
@@ -43,7 +43,7 @@ app.use(
       ) {
         return origin;
       }
-      return 'https://seets-check.pages.dev';
+      return 'https://seat-check.pages.dev';
     },
     allowHeaders: ['Content-Type', 'Authorization'],
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
