@@ -476,5 +476,13 @@ const routes = app
     }
   });
 
-export type AppType = typeof routes;
+type DecoupledEnv = {
+  Bindings: Omit<Bindings, 'DB'> & { DB: any };
+  Variables: Variables;
+};
+
+export type AppType = typeof routes extends Hono<any, infer S, infer O>
+  ? Hono<DecoupledEnv, S, O>
+  : never;
+
 export default app;

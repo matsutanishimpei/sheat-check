@@ -13,10 +13,10 @@
   "homepage": "https://github.com/matsutanishimpei/sheat-check/tree/main/packages/backend#readme",
   "type": "module",
   "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "wrangler dev src/index.ts",
-    "build": "tsc --noEmit",
+    "build": "tsc",
     "typecheck": "tsc --noEmit",
     "deploy": "wrangler deploy --minify src/index.ts",
     "test": "vitest run",
