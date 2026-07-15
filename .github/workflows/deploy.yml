@@ -14,6 +14,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
+      - name: Build Production Bundles
+        run: npm run build
       - name: Check Types
         run: npm run typecheck
       - name: Run Tests

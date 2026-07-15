@@ -23,11 +23,11 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+      - name: Build Production Bundles
+        run: npm run build
+
       - name: Check Types (TypeScript Compiler)
         run: npm run typecheck
 
       - name: Run All Tests (Vitest)
         run: npm run test
-
-      - name: Build Production Bundles
-        run: npm run build
