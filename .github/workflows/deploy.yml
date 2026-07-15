@@ -56,7 +56,7 @@ jobs:
         with: { node-version: '20' }
       - run: npm ci
       # フロントエンドのビルドとデプロイ
-      - run: npm run build -w packages/frontend
+      - run: npm run build
         env:
           VITE_API_URL: ${{ secrets.VITE_API_URL }}
       - name: Deploy Pages
