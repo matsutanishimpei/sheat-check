@@ -36,17 +36,25 @@ const shouldShrinkColumn = (
 
 export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, onRemoveLiveStatus, massive = false }: SeatMapProps) => {
   if (massive) {
-    const gridTemplateColumns = React.useMemo(() => {
-      return Array.from({ length: 12 })
-        .map((_, x) => shouldShrinkColumn(x, grid, liveStatuses) ? '44px' : 'minmax(120px, 1fr)')
-        .join(' ');
+    const shrinkCols = React.useMemo(() => {
+      return Array.from({ length: 12 }).map((_, x) => shouldShrinkColumn(x, grid, liveStatuses));
     }, [grid, liveStatuses]);
 
-    const gridTemplateRows = React.useMemo(() => {
-      return Array.from({ length: 12 })
-        .map((_, y) => isRowEmpty(y, grid) ? '8px' : '44px')
-        .join(' ');
+    const emptyRows = React.useMemo(() => {
+      return Array.from({ length: 12 }).map((_, y) => isRowEmpty(y, grid));
     }, [grid]);
+
+    const gridTemplateColumns = React.useMemo(() => {
+      return shrinkCols
+        .map((isShrink) => isShrink ? '44px' : 'minmax(120px, 1fr)')
+        .join(' ');
+    }, [shrinkCols]);
+
+    const gridTemplateRows = React.useMemo(() => {
+      return emptyRows
+        .map((isEmpty) => isEmpty ? '8px' : '44px')
+        .join(' ');
+    }, [emptyRows]);
 
     return (
       <div className="grid-container-card grid-massive-container" style={{ overflowX: 'auto', width: '100%' }}>
@@ -63,12 +71,12 @@ export const SeatMap = React.memo(({ grid, liveStatuses, onCycle, onRemoveLiveSt
           }}
         >
           {Array.from({ length: 12 }).map((_, y) => {
-            const isEmptyR = isRowEmpty(y, grid);
+            const isEmptyR = emptyRows[y];
             return Array.from({ length: 12 }).map((_, x) => {
               const coordKey = `${x},${y}`;
               const cellType = grid ? grid[coordKey] : undefined;
               const liveStatus = liveStatuses ? liveStatuses[coordKey] : undefined;
-              const isShrinkC = shouldShrinkColumn(x, grid, liveStatuses);
+              const isShrinkC = shrinkCols[x];
 
               return (
                 <div
