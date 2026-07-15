@@ -3,6 +3,7 @@ import client from '../lib/hc';
 import { GridItem } from '@my-app/shared';
 import { createClient } from '@supabase/supabase-js';
 import { activeRoom, supabaseConfig } from '../lib/storage';
+import { readResponseBody, extractErrorMessage } from '../lib/apiResponse';
 
 const cleanSupabaseUrl = (url: string): string => {
   return url
@@ -150,8 +151,9 @@ export function useRoomLayout({
           } catch (e) {}
           fetchRooms();
         } else {
-          const errData = await res.json() as any;
-          addToast('error', `保存に失敗しました: ${errData.error || '不明なエラー'}`);
+          const body = await readResponseBody(res);
+          const errorMsg = extractErrorMessage(body, '不明なエラー');
+          addToast('error', `保存に失敗しました: ${errorMsg}`);
         }
       } else {
         const res = await client.api.rooms.$post({
@@ -165,16 +167,20 @@ export function useRoomLayout({
         });
 
         if (res.ok) {
-          const data = await res.json() as any;
-          setRoomId(data.id);
-          try {
-            activeRoom.save(data.id);
-          } catch (e) {}
+          const body = await readResponseBody(res);
+          if (body && typeof body === 'object' && 'id' in body) {
+            const id = (body as any).id;
+            setRoomId(id);
+            try {
+              activeRoom.save(id);
+            } catch (e) {}
+          }
           addToast('success', `新規教室「${roomName}」を作成・保存しました！`);
           fetchRooms();
         } else {
-          const errData = await res.json() as any;
-          addToast('error', `作成に失敗しました: ${errData.error || '不明なエラー'}`);
+          const body = await readResponseBody(res);
+          const errorMsg = extractErrorMessage(body, '不明なエラー');
+          addToast('error', `作成に失敗しました: ${errorMsg}`);
         }
       }
     } catch (err: any) {
@@ -296,8 +302,9 @@ export function useRoomLayout({
         }
         fetchRooms();
       } else {
-        const errData = await res.json() as any;
-        addToast('error', `講義室の削除に失敗しました: ${errData.error || '不明なエラー'}`);
+        const body = await readResponseBody(res);
+        const errorMsg = extractErrorMessage(body, '不明なエラー');
+        addToast('error', `講義室の削除に失敗しました: ${errorMsg}`);
       }
     } catch (err: any) {
       addToast('error', `削除中に通信エラーが発生しました: ${err.message}`);

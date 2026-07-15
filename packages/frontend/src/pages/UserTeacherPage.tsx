@@ -9,6 +9,7 @@ import { TeacherHeader } from '../components/layout/TeacherHeader';
 import { TeacherStatsWidgets } from '../components/teacher/TeacherStatsWidgets';
 import { TeacherListTable } from '../components/teacher/TeacherListTable';
 import { AddTeacherModal } from '../components/teacher/AddTeacherModal';
+import { readResponseBody, extractErrorMessage } from '../lib/apiResponse';
 
 export interface TeacherRecord {
   id: string;
@@ -98,8 +99,9 @@ export const UserTeacherPage: React.FC = () => {
         setIsAddModalOpen(false);
         fetchTeachers();
       } else {
-        const errData = await res.json() as { error?: string };
-        addToast('error', errData.error || '教員の登録に失敗しました。');
+        const body = await readResponseBody(res);
+        const errorMsg = extractErrorMessage(body, '教員の登録に失敗しました。');
+        addToast('error', errorMsg);
       }
     } catch (err) {
       console.error('教員登録中にエラーが発生しました。', err);
@@ -127,8 +129,9 @@ export const UserTeacherPage: React.FC = () => {
         addToast('success', `教員「${name}」を削除しました。`);
         fetchTeachers();
       } else {
-        const errData = await res.json() as { error?: string };
-        addToast('error', errData.error || '教員の削除に失敗しました。');
+        const body = await readResponseBody(res);
+        const errorMsg = extractErrorMessage(body, '教員の削除に失敗しました。');
+        addToast('error', errorMsg);
       }
     } catch (err) {
       console.error('削除中にエラーが発生しました。', err);
