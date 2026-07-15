@@ -7,9 +7,10 @@ import bcrypt from 'bcryptjs';
 import { sign, verify } from 'hono/jwt';
 import { rateLimiter } from 'hono-rate-limiter';
 import { IRoomRepository } from './repositories/RoomRepository';
-import { D1RoomRepository } from './repositories/D1RoomRepository';
+import { DrizzleRoomRepository } from './repositories/DrizzleRoomRepository';
 import { TeacherRepository } from './repositories/TeacherRepository';
-import { D1TeacherRepository } from './repositories/D1TeacherRepository';
+import { DrizzleTeacherRepository } from './repositories/DrizzleTeacherRepository';
+import { drizzle } from 'drizzle-orm/d1';
 
 type Bindings = {
   DB: D1Database;
@@ -117,11 +118,14 @@ const verifyTeacher = async (c: any) => {
 // Inject repositories dependency via middleware
 app.use('*', async (c, next) => {
   // Live environment injection (if not already injected by test setups)
-  if (!c.get('roomRepo')) {
-    c.set('roomRepo', new D1RoomRepository(c.env.DB));
-  }
-  if (!c.get('teacherRepo')) {
-    c.set('teacherRepo', new D1TeacherRepository(c.env.DB));
+  if (!c.get('roomRepo') || !c.get('teacherRepo')) {
+    const db = drizzle(c.env.DB);
+    if (!c.get('roomRepo')) {
+      c.set('roomRepo', new DrizzleRoomRepository(db));
+    }
+    if (!c.get('teacherRepo')) {
+      c.set('teacherRepo', new DrizzleTeacherRepository(db));
+    }
   }
 
   // Self-healing / Dynamic Seeding: Ensure at least one teacher exists dynamically at boot time
