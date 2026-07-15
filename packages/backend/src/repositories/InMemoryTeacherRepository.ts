@@ -37,8 +37,19 @@ export class InMemoryTeacherRepository implements TeacherRepository {
     return Array.from(this.teachers.values()).map((t) => ({
       id: t.id,
       username: t.username,
-      createdAt: t.createdAt
+      createdAt: t.createdAt,
+      lastLoginAt: t.lastLoginAt
     })).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  async updateLastLogin(id: string, lastLoginAt: string): Promise<void> {
+    const teacher = this.teachers.get(id);
+    if (teacher) {
+      this.teachers.set(id, {
+        ...teacher,
+        lastLoginAt
+      });
+    }
   }
 
   // Helper method for testing

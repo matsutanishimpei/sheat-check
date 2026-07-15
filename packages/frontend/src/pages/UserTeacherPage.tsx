@@ -15,6 +15,7 @@ export interface TeacherRecord {
   id: string;
   username: string;
   createdAt: string;
+  lastLoginAt?: string | null;
 }
 
 export const UserTeacherPage: React.FC = () => {

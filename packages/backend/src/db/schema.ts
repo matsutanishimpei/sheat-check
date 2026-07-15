@@ -15,4 +15,5 @@ export const teachers = sqliteTable('teachers', {
   username: text('username').unique().notNull(),
   passwordHash: text('password_hash').notNull(),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`).notNull(),
+  lastLoginAt: text('last_login_at'),
 });

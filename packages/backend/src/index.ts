@@ -324,6 +324,9 @@ const routes = app
         return c.json({ error: 'ユーザー名またはパスワードが正しくありません' }, 401);
       }
 
+      // 最終ログイン日時を更新
+      await repo.updateLastLogin(teacher.id, new Date().toISOString());
+
       // Generate standard Teacher Auth JWT
       const jwtSecret = c.env?.JWT_SECRET || 'dev-app-jwt-secret-key-123';
       const expiresAt = Math.floor(Date.now() / 1000) + 60 * 60 * 24; // 24 hours

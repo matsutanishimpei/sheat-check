@@ -5,6 +5,7 @@ interface TeacherRecord {
   id: string;
   username: string;
   createdAt: string;
+  lastLoginAt?: string | null;
 }
 
 interface TeacherListTableProps {
@@ -43,6 +44,7 @@ export const TeacherListTable: React.FC<TeacherListTableProps> = ({
                 <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontWeight: 600 }}>ユーザー名</th>
                 <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontWeight: 600 }}>システム権限</th>
                 <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontWeight: 600, width: '180px' }}>登録日</th>
+                <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontWeight: 600, width: '180px' }}>最終ログイン</th>
                 <th style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)', fontWeight: 600, width: '100px', textAlign: 'center' }}>操作</th>
               </tr>
             </thead>
@@ -54,6 +56,14 @@ export const TeacherListTable: React.FC<TeacherListTableProps> = ({
                   month: '2-digit',
                   day: '2-digit',
                 }) : '-';
+
+                const lastLoginStr = teacher.lastLoginAt ? new Date(teacher.lastLoginAt).toLocaleString('ja-JP', {
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }) : '未ログイン';
 
                 return (
                   <tr 
@@ -80,6 +90,7 @@ export const TeacherListTable: React.FC<TeacherListTableProps> = ({
                       </span>
                     </td>
                     <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{dateStr}</td>
+                    <td style={{ padding: '1rem 1.5rem', color: 'var(--text-muted)' }}>{lastLoginStr}</td>
                     <td style={{ padding: '1rem 1.5rem', textAlign: 'center' }}>
                       <button
                         className="btn btn-secondary"

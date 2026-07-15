@@ -24,6 +24,7 @@ export class DrizzleTeacherRepository implements TeacherRepository {
       username: result.username,
       passwordHash: result.passwordHash,
       createdAt: result.createdAt,
+      lastLoginAt: result.lastLoginAt,
     };
   }
 
@@ -51,11 +52,20 @@ export class DrizzleTeacherRepository implements TeacherRepository {
         id: schema.teachers.id,
         username: schema.teachers.username,
         createdAt: schema.teachers.createdAt,
+        lastLoginAt: schema.teachers.lastLoginAt,
       })
       .from(schema.teachers)
       .orderBy(desc(schema.teachers.createdAt))
       .all();
 
     return results;
+  }
+
+  async updateLastLogin(id: string, lastLoginAt: string): Promise<void> {
+    await this.db
+      .update(schema.teachers)
+      .set({ lastLoginAt })
+      .where(eq(schema.teachers.id, id))
+      .run();
   }
 }
