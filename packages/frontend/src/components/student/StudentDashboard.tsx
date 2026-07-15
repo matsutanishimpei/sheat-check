@@ -32,6 +32,12 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
   }, [currentStatus]);
 
   const handleSend = (status: 'ok' | 'ng', overrideComment?: string) => {
+    if ('vibrate' in navigator) {
+      try {
+        navigator.vibrate(40);
+      } catch (e) {}
+    }
+
     const now = Date.now();
     const duration = now - startTimeRef.current;
     onSendBroadcast(status, duration, overrideComment);
@@ -83,6 +89,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.85rem', marginTop: '0.5rem' }}>
         {/* 1. 順調 */}
         <button
+          className="quick-feedback-btn"
           onClick={() => {
             const msg = '[順調] ペースも理解もバッチリです！';
             setStudentComment(msg);
@@ -114,6 +121,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
 
         {/* 2. なるほど */}
         <button
+          className="quick-feedback-btn"
           onClick={() => {
             const msg = '[なるほど] 今の説明とても分かりやすくて腑に落ちました！';
             setStudentComment(msg);
@@ -145,6 +153,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
 
         {/* 3. メモ待って */}
         <button
+          className="quick-feedback-btn"
           onClick={() => {
             const msg = '[待って] メモを取っているので少し待ってください';
             setStudentComment(msg);
@@ -176,6 +185,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
 
         {/* 4. わからない */}
         <button
+          className="quick-feedback-btn"
           onClick={() => {
             const msg = '[SOS] 説明が難しくて理解が追いついていません';
             setStudentComment(msg);
@@ -207,6 +217,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
 
         {/* 5. 声が遠い */}
         <button
+          className="quick-feedback-btn"
           onClick={() => {
             const msg = '[音響SOS] マイクの音声が遠い・聞き取りにくいです';
             setStudentComment(msg);
@@ -238,6 +249,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = React.memo(({
 
         {/* 6. 空調 */}
         <button
+          className="quick-feedback-btn"
           onClick={() => {
             const msg = '[環境SOS] 教室の空調（暑い/寒い）の調整をお願いしたいです';
             setStudentComment(msg);

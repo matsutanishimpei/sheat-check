@@ -1258,3 +1258,11 @@ body {
   aspect-ratio: 1;
   font-size: 1rem;
 }
+
+/* Quick feedback buttons: elastic bounce micro-interactions for PC/Mobile */
+.quick-feedback-btn {
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s, border-color 0.2s, color 0.2s !important;
+}
+.quick-feedback-btn:active {
+  transform: scale(0.92) translateY(1px) !important;
+}
