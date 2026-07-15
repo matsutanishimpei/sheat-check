@@ -22,6 +22,7 @@ export function useTeacherRealtime({
   const [realtimeLogs, setRealtimeLogs] = useState<RealtimeLog[]>([]);
   const [isOnline, setIsOnline] = useState(true);
   const teacherChannelRef = useRef<RealtimeChannel | null>(null);
+  const reconnectTimeoutRef = useRef<any>(null);
 
   const isSeatLockedRef = useRef(isSeatLocked);
   const roomIdRef = useRef(roomId);
@@ -45,8 +46,8 @@ export function useTeacherRealtime({
     window.addEventListener('offline', handleOffline);
 
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
     };
   }, []);
 
@@ -64,10 +65,25 @@ export function useTeacherRealtime({
     }
   }, [roomId]);
 
+  // Persist realtime logs to Local Storage when updated (Debounced to avoid disk I/O bottlenecks)
+  useEffect(() => {
+    if (!roomId) return;
+    const timer = setTimeout(() => {
+      if (realtimeLogs.length > 0) {
+        logsStorage.save(roomId, realtimeLogs);
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [realtimeLogs, roomId]);
+
   useEffect(() => {
     if (teacherChannelRef.current) {
       teacherChannelRef.current.unsubscribe();
       teacherChannelRef.current = null;
+    }
+    if (reconnectTimeoutRef.current) {
+      clearTimeout(reconnectTimeoutRef.current);
+      reconnectTimeoutRef.current = null;
     }
 
     if (!supabase || !roomId) return;
@@ -80,8 +96,6 @@ export function useTeacherRealtime({
       .on('broadcast', { event: 'student_to_teacher' }, (response) => {
         const payload = response.payload;
         if (payload && payload.seatId && payload.status) {
-          const currentRoomId = roomIdRef.current;
-
           setLiveStatuses((prev) => {
             const nextStatuses = { ...prev };
             if (payload.status === 'none') {
@@ -94,9 +108,6 @@ export function useTeacherRealtime({
                 responseTime: typeof payload.responseTime === 'number' ? payload.responseTime : undefined,
                 comment: payload.comment || undefined,
               };
-            }
-            if (currentRoomId) {
-              seatStorage.save(currentRoomId, nextStatuses);
             }
             return nextStatuses;
           });
@@ -113,9 +124,6 @@ export function useTeacherRealtime({
           };
           setRealtimeLogs((prev) => {
             const nextLogs = [logItem, ...prev].slice(0, 50);
-            if (currentRoomId) {
-              logsStorage.save(currentRoomId, nextLogs);
-            }
             return nextLogs;
           });
 
@@ -134,7 +142,10 @@ export function useTeacherRealtime({
           });
         } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
           console.warn(`[Teacher] Realtime subscription failed: ${status}. Scheduling auto-reconnect in 10s...`);
-          setTimeout(() => {
+          if (reconnectTimeoutRef.current) {
+            clearTimeout(reconnectTimeoutRef.current);
+          }
+          reconnectTimeoutRef.current = setTimeout(() => {
             if (teacherChannelRef.current) {
               teacherChannelRef.current.subscribe();
             }
@@ -148,6 +159,10 @@ export function useTeacherRealtime({
       if (teacherChannelRef.current) {
         teacherChannelRef.current.unsubscribe();
         teacherChannelRef.current = null;
+      }
+      if (reconnectTimeoutRef.current) {
+        clearTimeout(reconnectTimeoutRef.current);
+        reconnectTimeoutRef.current = null;
       }
     };
   }, [supabase, roomId, setLiveStatuses]);

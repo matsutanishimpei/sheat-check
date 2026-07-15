@@ -25,11 +25,13 @@ export function useSeatManager({ roomId, addToast }: UseSeatManagerProps) {
     }
   }, [roomId]);
 
-  // Persist live statuses to Local Storage when updated
+  // Persist live statuses to Local Storage when updated (Debounced to prevent performance drops under high traffic)
   useEffect(() => {
-    if (roomId) {
+    if (!roomId) return;
+    const timer = setTimeout(() => {
       seatStorage.save(roomId, liveStatuses);
-    }
+    }, 1000);
+    return () => clearTimeout(timer);
   }, [liveStatuses, roomId]);
 
   const removeLiveStatus = useCallback((key: string) => {
