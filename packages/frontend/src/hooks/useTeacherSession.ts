@@ -21,9 +21,12 @@ export function useTeacherSession() {
   const [teacherToken] = useState(() => teacherAuth.getSupabaseToken());
 
   // ── Supabase credentials (lifted to this level as single source of truth) ──
+  const [initialUrl] = useState(() => supabaseConfig.getUrl() || '');
+  const [initialKey] = useState(() => supabaseConfig.getKey() || '');
+
   const supabaseClient = useSupabaseClient(
-    supabaseConfig.getUrl() || '',
-    supabaseConfig.getKey() || ''
+    initialUrl,
+    initialKey
   );
   
   const { supabaseUrl, setSupabaseUrl, supabaseAnonKey, setSupabaseAnonKey, supabase, saveSupabaseConfig } = supabaseClient;
