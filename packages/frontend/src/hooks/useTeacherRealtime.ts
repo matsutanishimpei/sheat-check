@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { SupabaseClient, RealtimeChannel } from '@supabase/supabase-js';
 import { RealtimeLog, LiveSeatStatus } from '@my-app/shared';
-import { seatStatuses as seatStorage, realtimeLogs as logsStorage } from '../lib/storage';
+import { realtimeLogs as logsStorage } from '../lib/storage';
 import { playAlertSound } from '../lib/audio';
 
 interface UseTeacherRealtimeProps {
